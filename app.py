@@ -54,3 +54,13 @@ def counter():
 @app.route("/info")
 def info():
     return redirect("/author")
+
+@app.route ('/lab1/created') #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
+def created():
+    return """<!doctype html>
+        <html>
+           <body>
+               <h1>Создано успешно</h1>
+               <div><i> что-то создано... </i></div>
+           </body>
+        </html>"""
