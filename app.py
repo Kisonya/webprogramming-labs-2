@@ -36,6 +36,5 @@ def oak():
            <body>
                <h1>Дуб</h1>
                <img src="''' + path + '''">
-               <img src="static/oak.jpg">
            </body>
         </html>"""
