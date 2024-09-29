@@ -28,9 +28,9 @@ def author():
             </body>
         </html>"""
 
-@app.route ("/lab1/oak") #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
+@app.route ('/lab1/oak') #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
 def oak():
-    path = url_for("static", filename="static/oak.jpg")
+    path = url_for("static", filename="oak.jpg")
     return """<!doctype html>
         <html>
            <body>
