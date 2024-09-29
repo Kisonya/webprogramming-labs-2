@@ -38,3 +38,15 @@ def oak():
                <img src="''' + path + '''">
            </body>
         </html>"""
+
+count = 0
+@app.route ('/lab1/counter') #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
+def counter():
+    global count
+    count += 1
+    return """<!doctype html>
+        <html>
+           <body>
+               Сколько раз вы сюда заходили: ''' + str(count) + '''
+           </body>
+        </html>"""
