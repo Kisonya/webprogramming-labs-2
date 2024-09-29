@@ -1,4 +1,4 @@
-from flask import Flask, url_for
+from flask import Flask, url_for, redirect
 app = Flask (__name__) #создаем объект
 
 @app.route ("/") #указываем путь
@@ -35,7 +35,7 @@ def oak():
         <html>
            <body>
                <h1>Дуб</h1>
-               <img src="""" + path + """">
+               <img src=" """ + path + """ ">
            </body>
         </html>"""
 
@@ -50,3 +50,7 @@ def counter():
                Сколько раз вы сюда заходили: """ + str(count) + """
            </body>
         </html>"""
+
+@app.route("/info")
+def info():
+    return redirect("/author")
