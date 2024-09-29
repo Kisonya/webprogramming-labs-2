@@ -30,12 +30,12 @@ def author():
 
 @app.route ('/lab1/oak') #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
 def oak():
-    path = url_for("static", filename="static/oak.jpg")
+    path = url_for("static", filename="oak.jpg")
     return """<!doctype html>
         <html>
            <body>
                <h1>Дуб</h1>
-               <img src="''' + path + '''">
+               <img src="""" + path + """">
            </body>
         </html>"""
 
@@ -47,6 +47,6 @@ def counter():
     return """<!doctype html>
         <html>
            <body>
-               Сколько раз вы сюда заходили: ''' + str(count) + '''
+               Сколько раз вы сюда заходили: """ + str(count) + """
            </body>
         </html>"""
