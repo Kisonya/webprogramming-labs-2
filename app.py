@@ -9,7 +9,7 @@ def web():
            <body>
                <h1>web-сервер на flask</h1>
                <a href="/author">author</a>
-           </body>
+           </body> 
         </html>""", 200, {
             "X-Server": "sample",
             "Content-Type": "text/plain; charset=utf-8"
