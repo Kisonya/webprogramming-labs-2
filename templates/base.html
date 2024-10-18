@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block lab_title %}Лабораторная работа{% endblock %}
+    </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <header>
+        WEB-программирование, часть 2. Лабораторная работа {{ self.lab() }}
+    </header>
+    
+    <main>
+        {% block main %}{% endblock %}
+    </main>
+
+    <footer>
+        &copy; Софья Скобель, ФБИ-21, 3 курс, 2024
+    </footer>
+</body>
+</html>
