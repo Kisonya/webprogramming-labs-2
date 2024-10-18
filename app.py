@@ -1,4 +1,4 @@
-from flask import Flask, url_for, redirect
+from flask import Flask, url_for, redirect, url_for, render_template
 app = Flask(__name__)  # создаем объект
 
 @app.route("/")  # добавляем маршрут для "/"
@@ -273,3 +273,10 @@ def flowers(flower_id):
         return "Такого цветка нет", 404  # Возвращаем сообщение об ошибке и код 404
     else:
         return "Цветок: " + flower_list[flower_id]  # Возвращаем название цветка из списка по его идентификатору
+
+@app.route('/lab2/example')  # Маршрут для страницы с примером
+def example():
+    name = 'Софья Скобель'  # Имя студента
+    group = 'ФБИ-21'  # Группа
+    course = '3'  # Номер курса
+    return render_template('example.html', name=name, group=group, course=course)  # Рендерим шаблон и передаем переменную name
