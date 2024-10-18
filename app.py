@@ -276,7 +276,19 @@ def flowers(flower_id):
 
 @app.route('/lab2/example')  # Маршрут для страницы с примером
 def example():
-    name = 'Софья Скобель'  # Имя студента
-    group = 'ФБИ-21'  # Группа
-    course = '3'  # Номер курса
-    return render_template('example.html', name=name, group=group, course=course)  # Рендерим шаблон и передаем переменную name
+    name, lab_num, group, course = 'Иван Иванов', 2, 'ФБИ-00', 3
+    fruits = [
+        {'name': 'яблоки', 'price': 100},
+        {'name': 'груши', 'price': 120},
+        {'name': 'апельсины', 'price': 80},
+        {'name': 'мандарины', 'price': 95},
+        {'name': 'манго', 'price': 321}
+    ]
+    return render_template(
+        'example.html', 
+        name=name, 
+        lab_num=lab_num, 
+        group=group, 
+        course=course, 
+        fruits=fruits
+    )
