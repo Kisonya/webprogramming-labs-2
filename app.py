@@ -125,3 +125,33 @@ def created():
 @app.errorhandler(404)
 def not_found(err):
     return "нет такой страницы", 404
+
+# Страница с кодом 400
+@app.route("/error400")
+def error400():
+    return "400: Bad Request — сервер не может обработать запрос из-за синтаксической ошибки.", 400
+
+# Страница с кодом 401
+@app.route("/error401")
+def error401():
+    return "401: Unauthorized — для доступа к ресурсу требуется аутентификация.", 401
+
+# Страница с кодом 402
+@app.route("/error402")
+def error402():
+    return "402: Payment Required — требуется оплата для доступа к ресурсу (зарезервирован для будущего использования).", 402
+
+# Страница с кодом 403
+@app.route("/error403")
+def error403():
+    return "403: Forbidden — доступ к ресурсу запрещён.", 403
+
+# Страница с кодом 405
+@app.route("/error405")
+def error405():
+    return "405: Method Not Allowed — метод запроса не поддерживается для данного ресурса.", 405
+
+# Страница с кодом 418
+@app.route("/error418")
+def error418():
+    return "418: I'm a teapot — я чайник. Шутливый код, указанный в RFC 2324.", 418
