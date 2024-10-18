@@ -47,14 +47,27 @@ def oak():
         </html>"""
 
 count = 0
-@app.route ('/lab1/counter') #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
+@app.route('/lab1/counter') # добавляем еще 1 декоратор-роут, чтобы ф-я срабатывала на разные адреса
 def counter():
     global count
     count += 1
     return """<!doctype html>
         <html>
            <body>
-               Сколько раз вы сюда заходили: """ + str(count) + """
+               <p>Сколько раз вы сюда заходили: """ + str(count) + """</p>
+               <a href="/lab1/reset_counter">Сбросить счетчик</a> <!-- Ссылка на сброс счетчика -->
+           </body>
+        </html>"""
+
+@app.route('/lab1/reset_counter') # новый роут для сброса счетчика
+def reset_counter():
+    global count
+    count = 0
+    return """<!doctype html>
+        <html>
+           <body>
+               <p>Счетчик сброшен!</p>
+               <a href="/lab1/counter">Назад к счетчику</a> <!-- Ссылка для возврата на страницу счетчика -->
            </body>
         </html>"""
 
