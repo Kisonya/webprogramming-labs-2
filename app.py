@@ -252,6 +252,21 @@ def a2():
 
 flower_list = ['роза', 'тюльпан', 'незабудка', 'ромашка']  # Список доступных цветов
 
+@app.route('/lab2/add_flower/<name>')  # Маршрут для добавления нового цветка
+def add_flower(name):
+    flower_list.append(name)  # Добавляем новый цветок в список
+    return f'''
+    <!doctype html>
+    <html>
+        <body>
+            <h1>Добавлен новый цветок</h1>
+            <p>Название нового цветка: {name}</p>
+            <p>Всего цветов: {len(flower_list)}</p>
+            <p>Полный список: {flower_list}</p>
+        </body>
+    </html>
+    '''
+
 @app.route('/lab2/flowers/<int:flower_id>')  # Маршрут, принимающий числовой идентификатор цветка
 def flowers(flower_id):
     if flower_id >= len(flower_list):  # Проверяем, если идентификатор превышает длину списка
