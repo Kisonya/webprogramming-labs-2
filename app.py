@@ -175,3 +175,23 @@ def error405():
 @app.route("/error418")
 def error418():
     return "418: I'm a teapot — я чайник. Шутливый код, указанный в RFC 2324.", 418
+
+@app.route("/error500")  # Маршрут для теста ошибки 500
+def error500():
+    # Создаем ошибку делением на ноль
+    return 1 / 0
+
+@app.errorhandler(500)
+def internal_error(err):
+    return """<!doctype html>
+        <html>
+           <head>
+               <title>Ошибка сервера</title>
+           </head>
+           <body>
+               <h1>500: Внутренняя ошибка сервера</h1>
+               <p>Произошла непредвиденная ошибка. Мы уже работаем над её исправлением.</p>
+               <p><a href="/">Вернуться на главную страницу</a></p>
+           </body>
+        </html>""", 500
+
