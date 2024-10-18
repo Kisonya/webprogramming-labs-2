@@ -124,7 +124,27 @@ def created():
 
 @app.errorhandler(404)
 def not_found(err):
-    return "нет такой страницы", 404
+    return redirect(url_for('error404'))
+
+@app.route("/error404")
+def error404(err=None):
+    css_path = url_for("static", filename="error.css")
+    img_path = url_for("static", filename="404_image.jpg")
+    return """<!doctype html>
+        <html>
+           <head>
+               <title>Страница не найдена</title>
+               <link rel="stylesheet" type="text/css" href=" """ + css_path + """ ">
+           </head>
+           <body>
+               <div class="error-container">
+                   <h1>Ой! Что-то пошло не так...</h1>
+                   <p>Похоже, вы заблудились. Но не волнуйтесь, мы вас вернем на правильный путь.</p>
+                   <img src=" """ + img_path + """ " alt="404 image" class="error-img">
+                   <p><a href="/">Вернуться на главную страницу</a></p>
+               </div>
+           </body>
+        </html>""", 404
 
 # Страница с кодом 400
 @app.route("/error400")
