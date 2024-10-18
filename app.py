@@ -37,7 +37,6 @@ def lab1():
                <h2>Список роутов</h2> <!-- Заголовок h2 -->
                <ul>
                    <li><a href="/">Главная</a></li>
-                   <li><a href="/lab1">Лабораторная 1</a></li>
                    <li><a href="/lab1/oak">Страница с дубом</a></li>
                    <li><a href="/lab1/counter">Счетчик посещений</a></li>
                    <li><a href="/lab1/reset_counter">Сбросить счетчик</a></li>
