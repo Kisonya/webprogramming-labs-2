@@ -1,21 +1,21 @@
 from flask import Flask, url_for, redirect
-app = Flask (__name__) #создаем объект
+app = Flask(__name__)  # создаем объект
 
-@app.route ("/") #указываем путь
-@app.route ("/web") #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
+@app.route("/")  # указываем путь
+@app.route("/lab1/web")  # изменяем роут с /web на /lab1/web
 def web():
     return """<!doctype html>
         <html>
            <body>
                <h1>web-сервер на flask</h1>
-               <a href="/author">author</a>
-           </body> 
+               <a href="/lab1/author">author</a> <!-- Изменили ссылку -->
+           </body>
         </html>""", 200, {
             "X-Server": "sample",
             "Content-Type": "text/plain; charset=utf-8"
         }
 
-@app.route ("/author")
+@app.route("/lab1/author")  # изменяем роут с /author на /lab1/author
 def author():
     name = "Скобель Софья Валентиновна"
     group = "ФБИ-21"
@@ -27,14 +27,19 @@ def author():
                 <p> Студент: """ + name + """</p>
                 <p> Группа: """ + group + """</p>
                 <p> Факультет: """ + faculty + """</p>
-                <a href="/web">web</a>
+                <a href="/lab1/web">web</a> <!-- Изменили ссылку -->
             </body>
         </html>"""
 
-@app.route ('/lab1/oak') #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
+@app.route("/lab1/info")  # изменяем роут с /info на /lab1/info
+def info():
+    return redirect("/lab1/author")  # изменили адрес перенаправления
+
+# Оставшиеся маршруты
+@app.route('/lab1/oak')
 def oak():
     path = url_for("static", filename="oak.jpg")
-    css_path = url_for("static", filename="lab1.css")  # подключаем CSS
+    css_path = url_for("static", filename="lab1.css")
     return """<!doctype html>
         <html>
            <head>
@@ -47,7 +52,7 @@ def oak():
         </html>"""
 
 count = 0
-@app.route('/lab1/counter') # добавляем еще 1 декоратор-роут, чтобы ф-я срабатывала на разные адреса
+@app.route('/lab1/counter')
 def counter():
     global count
     count += 1
@@ -55,11 +60,11 @@ def counter():
         <html>
            <body>
                <p>Сколько раз вы сюда заходили: """ + str(count) + """</p>
-               <a href="/lab1/reset_counter">Сбросить счетчик</a> <!-- Ссылка на сброс счетчика -->
+               <a href="/lab1/reset_counter">Сбросить счетчик</a>
            </body>
         </html>"""
 
-@app.route('/lab1/reset_counter') # новый роут для сброса счетчика
+@app.route('/lab1/reset_counter')
 def reset_counter():
     global count
     count = 0
@@ -67,15 +72,11 @@ def reset_counter():
         <html>
            <body>
                <p>Счетчик сброшен!</p>
-               <a href="/lab1/counter">Назад к счетчику</a> <!-- Ссылка для возврата на страницу счетчика -->
+               <a href="/lab1/counter">Назад к счетчику</a>
            </body>
         </html>"""
 
-@app.route("/info")
-def info():
-    return redirect("/author")
-
-@app.route ('/lab1/created') #добавляем еще 1 декоратор-роут,чтобы ф-я срабатывала на разные адреса
+@app.route('/lab1/created')
 def created():
     return """<!doctype html>
         <html>
