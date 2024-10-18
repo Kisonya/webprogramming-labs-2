@@ -242,3 +242,10 @@ def custom():
         "X-Custom-Header-2": "Student-Custom-Value2"   # Нестандартный заголовок 2
     }
 
+@app.route('/lab2/a/')
+def a():
+    return 'ok'
+
+@app.route('/lab2/a')
+def a2():
+    return 'ok'
