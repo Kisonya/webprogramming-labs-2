@@ -1,7 +1,29 @@
 from flask import Flask, url_for, redirect
 app = Flask(__name__)  # создаем объект
 
-@app.route("/")  # указываем путь
+@app.route("/")  # добавляем маршрут для "/"
+@app.route("/index")  # добавляем маршрут для "/index"
+def index():
+    return """<!doctype html>
+        <html>
+           <head>
+               <title>НГТУ, ФБ, Лабораторные работы</title>
+           </head>
+           <body>
+               <header>
+                   <h1>НГТУ, ФБ, WEB-программирование, часть 2. Список лабораторных</h1>
+               </header>
+               <nav>
+                   <ul>
+                       <li><a href="/lab1">Первая лабораторная</a></li> <!-- Ссылка на первую лабораторную -->
+                   </ul>
+               </nav>
+               <footer>
+                   <p>Скобель Софья Валентиновна, ФБ-21, 3 курс, 2024</p> <!-- Подвал с ФИО -->
+               </footer>
+           </body>
+        </html>"""
+
 @app.route("/lab1/web")  # изменяем роут с /web на /lab1/web
 def web():
     return """<!doctype html>
