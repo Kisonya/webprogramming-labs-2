@@ -1,0 +1,22 @@
+body {
+    background-color: #f0f8ff; /* Цвет фона */
+    color: #333; /* Цвет текста */
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center; /* Выравнивание заголовка по центру */
+    color: #4682b4; /* Цвет заголовка */
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px; /* Ширина картинки */
+    height: auto; /* Автоматическая высота */
+}
+
+p {
+    text-align: center; /* Выравнивание текста по центру */
+}
