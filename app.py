@@ -351,3 +351,30 @@ def lab2():
 def filters():
     phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
     return render_template('filter.html', phrase=phrase)
+
+@app.route('/lab2/calc/<int:a>/<int:b>')
+def calc(a, b):
+    return f'''
+    <!doctype html>
+    <html>
+        <body>
+            <h1>Расчёт с параметрами:</h1>
+            <ul>
+                <li>{a} + {b} = {a + b}</li>
+                <li>{a} - {b} = {a - b}</li>
+                <li>{a} * {b} = {a * b}</li>
+                <li>{a} / {b} = {a / b if b != 0 else "∞ (деление на ноль)"}</li>
+                <li>{a} ^ {b} = {a ** b}</li>
+            </ul>
+            <a href="/lab2/calc">Вернуться к калькулятору по умолчанию</a>
+        </body>
+    </html>
+    '''
+
+@app.route('/lab2/calc/')
+def calc_default():
+    return redirect(url_for('calc', a=1, b=1))
+
+@app.route('/lab2/calc/<int:a>')
+def calc_single(a):
+    return redirect(url_for('calc', a=a, b=1))
