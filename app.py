@@ -378,3 +378,20 @@ def calc_default():
 @app.route('/lab2/calc/<int:a>')
 def calc_single(a):
     return redirect(url_for('calc', a=a, b=1))
+
+books = [
+    {'author': 'Лев Толстой', 'title': 'Война и мир', 'genre': 'Роман', 'pages': 1225},
+    {'author': 'Фёдор Достоевский', 'title': 'Преступление и наказание', 'genre': 'Роман', 'pages': 671},
+    {'author': 'Михаил Булгаков', 'title': 'Мастер и Маргарита', 'genre': 'Фантастика', 'pages': 480},
+    {'author': 'Иван Тургенев', 'title': 'Отцы и дети', 'genre': 'Роман', 'pages': 316},
+    {'author': 'Николай Гоголь', 'title': 'Мёртвые души', 'genre': 'Роман', 'pages': 352},
+    {'author': 'Александр Пушкин', 'title': 'Евгений Онегин', 'genre': 'Поэма', 'pages': 240},
+    {'author': 'Антон Чехов', 'title': 'Вишнёвый сад', 'genre': 'Пьеса', 'pages': 154},
+    {'author': 'Максим Горький', 'title': 'На дне', 'genre': 'Пьеса', 'pages': 160},
+    {'author': 'Борис Пастернак', 'title': 'Доктор Живаго', 'genre': 'Роман', 'pages': 592},
+    {'author': 'Владимир Набоков', 'title': 'Лолита', 'genre': 'Роман', 'pages': 336}
+]
+
+@app.route('/lab2/books')
+def show_books():
+    return render_template('books.html', books=books)
