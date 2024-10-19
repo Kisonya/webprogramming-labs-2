@@ -395,3 +395,15 @@ books = [
 @app.route('/lab2/books')
 def show_books():
     return render_template('books.html', books=books)
+
+cats = [
+    {'name': 'Барсик', 'description': 'Ленивый котик, который любит спать целый день.', 'image': 'static/cat1.jpg'},
+    {'name': 'Мурзик', 'description': 'Очень активный и любит играть с игрушками.', 'image': 'static/cat2.jpg'},
+    {'name': 'Снежок', 'description': 'Белоснежный котик с мягкой шерстью.', 'image': 'static/cat3.jpg'},
+    {'name': 'Рыжик', 'description': 'Забавный рыжий кот, обожает бегать за мышкой.', 'image': 'static/cat4.jpg'},
+    {'name': 'Черныш', 'description': 'Серьёзный и важный кот, всегда сохраняет спокойствие.', 'image': 'static/cat5.jpg'}
+]
+
+@app.route('/lab2/cats')
+def show_cats():
+    return render_template('cats.html', cats=cats)

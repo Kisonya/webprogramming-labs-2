@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список котиков</title>
+    <style>
+        .cat {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 300px;
+            text-align: center;
+        }
+        .cat img {
+            width: 100%;
+            height: auto;
+        }
+        .cat-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Список котиков</h1>
+    <div class="cat-container">
+        {% for cat in cats %}
+        <div class="cat">
+            <h2>{{ cat.name }}</h2>
+            <img src="{{ url_for('static', filename=cat.image.split('/')[-1]) }}" alt="Изображение кота {{ cat.name }}">
+            <p>{{ cat.description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
