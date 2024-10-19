@@ -4,25 +4,8 @@ app = Flask(__name__)  # создаем объект
 @app.route("/")  # добавляем маршрут для "/"
 @app.route("/index")  # добавляем маршрут для "/index"
 def index():
-    return """<!doctype html>
-        <html>
-           <head>
-               <title>НГТУ, ФБ, Лабораторные работы</title>
-           </head>
-           <body>
-               <header>
-                   <h1>НГТУ, ФБ, WEB-программирование, часть 2. Список лабораторных</h1>
-               </header>
-               <nav>
-                   <ul>
-                       <li><a href="/lab1">Первая лабораторная</a></li> <!-- Ссылка на первую лабораторную -->
-                   </ul>
-               </nav>
-               <footer>
-                   <p>Скобель Софья Валентиновна, ФБ-21, 3 курс, 2024</p> <!-- Подвал с ФИО -->
-               </footer>
-           </body>
-        </html>"""
+    return render_template('index.html')
+
 
 @app.route("/lab1")  # Маршрут для страницы первой лабораторной
 def lab1():
@@ -242,6 +225,12 @@ def custom():
         "X-Custom-Header-2": "Student-Custom-Value2"   # Нестандартный заголовок 2
     }
 
+#   ВТОРАЯ ЛАБОРАТОРНАЯ РАБОТА!!!!!!!!!!!!
+
+@app.route('/lab2/')
+def lab2():
+    return render_template('lab2.html')
+
 @app.route('/lab2/a/')
 def a():
     return 'ok'
@@ -343,9 +332,6 @@ def example():
         fruits=fruits
     )
 
-@app.route('/lab2/')
-def lab2():
-    return render_template('lab2.html')
 
 @app.route('/lab2/filters')
 def filters():
