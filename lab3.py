@@ -11,9 +11,9 @@ def lab():
 @lab3.route('/lab3/cookie')
 def cookie():
     resp = make_response('Установка cookie', 200)
-    resp.set_cookie('name', 'Alex')
+    resp.set_cookie('name', 'Sofia')
     resp.set_cookie('age', '20')
-    resp.set_cookie('name_color', 'magenta')
+    resp.set_cookie('name_color', 'red')
     return resp
 
 
