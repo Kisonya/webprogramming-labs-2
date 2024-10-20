@@ -70,4 +70,4 @@ def pay():
 @lab3.route('/lab3/success')
 def success():
     price = request.args.get('price')
-    return f"Ваш заказ на сумму {price} рублей успешно оплачен. Ожидайте доставку."
+    return render_template('lab3/success.html', price=price)
