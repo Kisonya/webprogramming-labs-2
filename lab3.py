@@ -1,5 +1,5 @@
 from flask import Blueprint, url_for, redirect, render_template
-lab2 = Blueprint('lab3', __name__)
+lab3 = Blueprint('lab3', __name__)
 
 @lab2.route('/lab3/')
 def lab():
