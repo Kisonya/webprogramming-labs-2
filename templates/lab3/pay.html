@@ -1,23 +1,35 @@
-<form action="/lab3/success" method="get">
-    <div>Номер банковской карты:</div>
-    <label>
-        <input type="text" name="card" pattern="\d{16}">
-    </label>
+{% extends "base.html" %}
 
-    <div>Имя держателя карты:</div>
-    <label>
-        <input type="text" name="name">
-    </label>
+{% block lab_title %}Лабораторная работа 3{% endblock %}
 
-    <div>Номер CVV:</div>
-    <label>
-        <input type="text" name="cvv" size="3" pattern="\d{3}">
-    </label>
+{% block main %}
+<h1>Оплата</h1>
 
-    <input type="hidden" name="price" value="{{ price }}"> <!-- Передаем сумму заказа -->
+<div class="payment-summary">
+    Сумма к оплате: <span class="price">{{ price }} рублей</span>
+</div>
 
-    <div>
-        <button type="submit">Оплатить</button>
-        <a href="/lab3/order">Отказаться</a>
+<form action="/lab3/success" method="get" class="payment-form">
+    <div class="form-group">
+        <label>Номер банковской карты:</label>
+        <input type="text" name="card" pattern="\d{16}" placeholder="Введите номер карты" required>
+    </div>
+
+    <div class="form-group">
+        <label>Имя держателя карты:</label>
+        <input type="text" name="name" placeholder="Введите имя держателя" required>
+    </div>
+
+    <div class="form-group">
+        <label>Номер CVV:</label>
+        <input type="text" name="cvv" size="3" pattern="\d{3}" placeholder="CVV" required>
+    </div>
+
+    <input type="hidden" name="price" value="{{ price }}">
+
+    <div class="form-actions">
+        <button type="submit" class="btn-submit">Оплатить</button>
+        <a href="/lab3/order" class="btn-cancel">Отказаться</a>
     </div>
 </form>
+{% endblock %}
