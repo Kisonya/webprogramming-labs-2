@@ -182,3 +182,25 @@ div {
 .btn-cancel:hover {
     text-decoration: underline;
 }
+
+.order-success {
+    margin-top: 20px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.btn-new-order {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-new-order:hover {
+    background-color: #0056b3;
+    text-decoration: none;
+}
