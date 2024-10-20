@@ -20,7 +20,7 @@ flower_list = ['роза', 'тюльпан', 'незабудка', 'ромашк
 def add_flower(name=None):
     if not name:
         return "400: Вы не задали имя цветка", 400  # Возвращаем ошибку 400, если имя не указано
-    flower_list.lab2end(name)
+    flower_list.append(name)
     return f'''
     <!doctype html>
     <html>
