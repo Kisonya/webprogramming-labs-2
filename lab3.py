@@ -102,6 +102,20 @@ def settings():
     resp = make_response(render_template('lab3/settings.html', color=color, bg_color=bg_color, font_size=font_size))
     return resp  # Возвращаем страницу настроек с установленными стилями
 
+@lab3.route('/lab3/clear_settings')
+def clear_settings():
+    # Создаем ответ с перенаправлением на страницу настроек после очистки
+    resp = make_response(redirect('/lab3/settings'))
+
+    # Удаляем куки, связанные с настройками
+    resp.delete_cookie('color')
+    resp.delete_cookie('bg_color')
+    resp.delete_cookie('font_size')
+
+    # Возвращаем ответ с удаленными куками
+    return resp
+
+
 
 @lab3.route('/lab3/ticket', methods=['GET', 'POST'])
 def ticket():
