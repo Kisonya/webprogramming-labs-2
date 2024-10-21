@@ -101,3 +101,57 @@ def settings():
 
     resp = make_response(render_template('lab3/settings.html', color=color, bg_color=bg_color, font_size=font_size))
     return resp  # Возвращаем страницу настроек с установленными стилями
+
+
+@lab3.route('/lab3/ticket', methods=['GET', 'POST'])
+def ticket():
+    if request.method == 'POST':
+        # Получаем данные формы
+        fio = request.form.get('fio')
+        polka = request.form.get('polka')
+        with_bed = request.form.get('with_bed') == 'on'
+        with_baggage = request.form.get('with_baggage') == 'on'
+        age = int(request.form.get('age', 0))
+        departure = request.form.get('departure')
+        destination = request.form.get('destination')
+        travel_date = request.form.get('travel_date')
+        insurance = request.form.get('insurance') == 'on'
+
+        # Проверяем возраст
+        if age < 1 or age > 120:
+            return "Ошибка: возраст должен быть от 1 до 120 лет.", 400
+
+        # Рассчитываем стоимость
+        if age < 18:
+            ticket_type = 'Детский билет'
+            price = 700  # Детский билет
+        else:
+            ticket_type = 'Взрослый билет'
+            price = 1000  # Взрослый билет
+
+        # Увеличиваем стоимость в зависимости от выбора полки
+        if polka in ['нижняя', 'нижняя боковая']:
+            price += 100
+
+        # Увеличиваем стоимость за бельё
+        if with_bed:
+            price += 75
+
+        # Увеличиваем стоимость за багаж
+        if with_baggage:
+            price += 250
+
+        # Увеличиваем стоимость за страховку
+        if insurance:
+            price += 150
+
+        # Возвращаем страницу с билетом
+        return render_template('ticket.html', 
+                               fio=fio, polka=polka, with_bed=with_bed, 
+                               with_baggage=with_baggage, age=age, 
+                               departure=departure, destination=destination, 
+                               travel_date=travel_date, insurance=insurance, 
+                               ticket_type=ticket_type, price=price)
+
+    # Если GET-запрос, рендерим форму
+    return render_template('ticket_form.html')

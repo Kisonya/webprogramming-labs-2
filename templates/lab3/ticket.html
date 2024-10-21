@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block lab_title %}Ваш билет{% endblock %}
+
+{% block main %}
+    <h1>Ваш билет</h1>
+    
+    <div>
+        <strong>ФИО:</strong> {{ fio }}
+    </div>
+    <div>
+        <strong>Возраст:</strong> {{ age }} ({{ ticket_type }})
+    </div>
+    <div>
+        <strong>Полка:</strong> {{ polka }}
+    </div>
+    <div>
+        <strong>С бельём:</strong> {{ 'Да' if with_bed else 'Нет' }}
+    </div>
+    <div>
+        <strong>С багажом:</strong> {{ 'Да' if with_baggage else 'Нет' }}
+    </div>
+    <div>
+        <strong>Пункт выезда:</strong> {{ departure }}
+    </div>
+    <div>
+        <strong>Пункт назначения:</strong> {{ destination }}
+    </div>
+    <div>
+        <strong>Дата поездки:</strong> {{ travel_date }}
+    </div>
+    <div>
+        <strong>Страховка:</strong> {{ 'Да' if insurance else 'Нет' }}
+    </div>
+    
+    <h2>Итоговая стоимость билета: {{ price }} руб.</h2>
+{% endblock %}

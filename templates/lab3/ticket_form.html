@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block lab_title %}Форма Железнодорожного Билета{% endblock %}
+
+{% block main %}
+    <h1>Заполните данные для покупки билета</h1>
+    
+    <form action="/lab3/ticket" method="post">
+        <div>
+            <label>ФИО пассажира:</label>
+            <input type="text" name="fio" required>
+        </div>
+
+        <div>
+            <label>Полка:</label>
+            <select name="polka" required>
+                <option value="нижняя">Нижняя</option>
+                <option value="верхняя">Верхняя</option>
+                <option value="нижняя боковая">Нижняя боковая</option>
+                <option value="верхняя боковая">Верхняя боковая</option>
+            </select>
+        </div>
+
+        <div>
+            <label><input type="checkbox" name="with_bed"> С бельём</label>
+        </div>
+
+        <div>
+            <label><input type="checkbox" name="with_baggage"> С багажом</label>
+        </div>
+
+        <div>
+            <label>Возраст:</label>
+            <input type="number" name="age" min="1" max="120" required>
+        </div>
+
+        <div>
+            <label>Пункт выезда:</label>
+            <input type="text" name="departure" required>
+        </div>
+
+        <div>
+            <label>Пункт назначения:</label>
+            <input type="text" name="destination" required>
+        </div>
+
+        <div>
+            <label>Дата поездки:</label>
+            <input type="date" name="travel_date" required>
+        </div>
+
+        <div>
+            <label><input type="checkbox" name="insurance"> Нужна ли страховка</label>
+        </div>
+
+        <div>
+            <button type="submit">Купить билет</button>
+        </div>
+    </form>
+{% endblock %}
