@@ -146,7 +146,7 @@ def ticket():
             price += 150
 
         # Возвращаем страницу с билетом
-        return render_template('ticket.html', 
+        return render_template('lab3/ticket.html', 
                                fio=fio, polka=polka, with_bed=with_bed, 
                                with_baggage=with_baggage, age=age, 
                                departure=departure, destination=destination, 
@@ -154,4 +154,4 @@ def ticket():
                                ticket_type=ticket_type, price=price)
 
     # Если GET-запрос, рендерим форму
-    return render_template('ticket_form.html')
+    return render_template('lab3/ticket_form.html')
