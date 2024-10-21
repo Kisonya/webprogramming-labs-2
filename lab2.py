@@ -98,7 +98,7 @@ def example():
         {'name': 'манго', 'price': 321}
     ]
     return render_template(
-        'example.html', 
+        'lab2/example.html', 
         name=name, 
         lab_num=lab_num, 
         group=group, 
@@ -110,7 +110,7 @@ def example():
 @lab2.route('/lab2/filters')
 def filters():
     phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
-    return render_template('filter.html', phrase=phrase)
+    return render_template('lab2/filter.html', phrase=phrase)
 
 @lab2.route('/lab2/calc/<int:a>/<int:b>')
 def calc(a, b):
@@ -154,16 +154,16 @@ books = [
 
 @lab2.route('/lab2/books')
 def show_books():
-    return render_template('books.html', books=books)
+    return render_template('lab2/books.html', books=books)
 
 cats = [
-    {'name': 'Барсик', 'description': 'Ленивый котик, который любит спать целый день.', 'image': 'static/cat1.jpg'},
-    {'name': 'Мурзик', 'description': 'Очень активный и любит играть с игрушками.', 'image': 'static/cat2.jpg'},
-    {'name': 'Снежок', 'description': 'Белоснежный котик с мягкой шерстью.', 'image': 'static/cat3.jpg'},
-    {'name': 'Рыжик', 'description': 'Забавный рыжий кот, обожает бегать за мышкой.', 'image': 'static/cat4.jpg'},
-    {'name': 'Черныш', 'description': 'Серьёзный и важный кот, всегда сохраняет спокойствие.', 'image': 'static/cat5.jpg'}
+    {'name': 'Барсик', 'description': 'Ленивый котик, который любит спать целый день.', 'image': 'static/lab2/cat1.jpg'},
+    {'name': 'Мурзик', 'description': 'Очень активный и любит играть с игрушками.', 'image': 'static/lab2/cat2.jpg'},
+    {'name': 'Снежок', 'description': 'Белоснежный котик с мягкой шерстью.', 'image': 'static/lab2/cat3.jpg'},
+    {'name': 'Рыжик', 'description': 'Забавный рыжий кот, обожает бегать за мышкой.', 'image': 'static/lab2/cat4.jpg'},
+    {'name': 'Черныш', 'description': 'Серьёзный и важный кот, всегда сохраняет спокойствие.', 'image': 'static/lab2/cat5.jpg'}
 ]
 
 @lab2.route('/lab2/cats')
 def show_cats():
-    return render_template('cats.html', cats=cats)
+    return render_template('lab2/cats.html', cats=cats)
