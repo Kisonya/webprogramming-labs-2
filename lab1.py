@@ -72,8 +72,8 @@ def info():
 # Оставшиеся маршруты
 @lab1.route('/lab1/oak')
 def oak():
-    path = url_for("static", filename="oak.jpg")
-    css_path = url_for("static", filename="lab1.css")
+    path = url_for("static", filename="lab1/oak.jpg")
+    css_path = url_for("static", filename="lab1/lab1.css")
     return """<!doctype html>
         <html>
            <head>
@@ -126,8 +126,8 @@ def created():
 
 @lab1.route("/error404")
 def error404(err=None):
-    css_path = url_for("static", filename="error.css")
-    img_path = url_for("static", filename="404_image.jpg")
+    css_path = url_for("static", filename="lab1/error.css")
+    img_path = url_for("static", filename="lab1/404_image.jpg")
     return """<!doctype html>
         <html>
            <head>
@@ -190,7 +190,7 @@ def error500():
 @lab1.route("/lab1/custom")  # Новый роут на выбор студента
 def custom():
     # Указываем путь к изображению
-    img_path = url_for("static", filename="9.jpg")
+    img_path = url_for("static", filename="lab1/9.jpg")
     
     # HTML-контент с текстом и картинкой
     content = """
