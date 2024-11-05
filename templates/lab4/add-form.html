@@ -10,7 +10,9 @@
     </form>
     {% if error %}
         {{ error }}
+        <a href="/lab4/">Вернуться назад</a>
     {% elif result is not none %}
         <p>{{ x1 }} + {{ x2 }} = {{ result }}</p>
+        <a href="/lab4/">Вернуться назад</a>
     {% endif %}
 {% endblock %}
