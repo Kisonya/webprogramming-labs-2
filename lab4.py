@@ -26,21 +26,35 @@ def div():
     result = x1 / x2
     return render_template('lab4/div.html', x1=x1, x2=x2, result=result)
 
-@lab4.route('/lab4/add-form', methods=['POST'])
+@lab4.route('/lab4/add-form', methods=['GET'])
+def add_form():
+    return render_template('lab4/add-form.html')
+
+@lab4.route('/lab4/add', methods=['POST'])
 def add():
-    x1 = request.form.get('x1') or 0  # Если поле пустое, принимаем его как 0
+    x1 = request.form.get('x1') or 0
     x2 = request.form.get('x2') or 0
     result = int(x1) + int(x2)
     return render_template('lab4/add-form.html', x1=x1, x2=x2, result=result)
 
 
+
+@lab4.route('/lab4/multiply-form', methods=['GET'])
+def multiply_form():
+    return render_template('lab4/multiply-form.html')
+
 @lab4.route('/lab4/multiply', methods=['POST'])
 def multiply():
-    x1 = request.form.get('x1') or 1  # Если поле пустое, принимаем его как 1
+    x1 = request.form.get('x1') or 1
     x2 = request.form.get('x2') or 1
     result = int(x1) * int(x2)
     return render_template('lab4/multiply-form.html', x1=x1, x2=x2, result=result)
 
+
+
+@lab4.route('/lab4/subtract-form', methods=['GET'])
+def subtract_form():
+    return render_template('lab4/subtract-form.html')
 
 @lab4.route('/lab4/subtract', methods=['POST'])
 def subtract():
@@ -52,6 +66,11 @@ def subtract():
     return render_template('lab4/subtract-form.html', x1=x1, x2=x2, result=result)
 
 
+
+@lab4.route('/lab4/power-form', methods=['GET'])
+def power_form():
+    return render_template('lab4/power-form.html')
+
 @lab4.route('/lab4/power', methods=['POST'])
 def power():
     x1 = request.form.get('x1')
@@ -62,3 +81,4 @@ def power():
         return render_template('lab4/power-form.html', error='Оба поля не могут быть равны нулю для операции возведения в степень!')
     result = int(x1) ** int(x2)
     return render_template('lab4/power-form.html', x1=x1, x2=x2, result=result)
+
