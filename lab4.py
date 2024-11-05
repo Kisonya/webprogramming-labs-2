@@ -26,7 +26,7 @@ def div():
     result = x1 / x2
     return render_template('lab4/div.html', x1=x1, x2=x2, result=result)
 
-@lab4.route('/lab4/add', methods=['POST'])
+@lab4.route('/lab4/add-form', methods=['POST'])
 def add():
     x1 = request.form.get('x1') or 0  # Если поле пустое, принимаем его как 0
     x2 = request.form.get('x2') or 0
