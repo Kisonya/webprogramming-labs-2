@@ -89,7 +89,7 @@ def clear_flowers():
 
 @lab2.route('/lab2/example')  # Маршрут для страницы с примером
 def example():
-    name, lab_num, group, course = 'Иван Иванов', 2, 'ФБИ-00', 3
+    name, lab_num, group, course = 'Софья Скобель', 2, 'ФБИ-21', 3
     fruits = [
         {'name': 'яблоки', 'price': 100},
         {'name': 'груши', 'price': 120},
