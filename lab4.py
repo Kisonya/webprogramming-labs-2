@@ -110,7 +110,7 @@ def login():
     password = request.form.get('password')
 
     if login == 'Sonya' and password == '2006':
-        return render_template('lab4/login.html', login=login, , authorized=True)
+        return render_template('lab4/login.html', login=login, authorized=True)
 
     error = 'Неверные логин и/или пароль'
     return render_template('lab4/login.html', error=error, authorized=False)
