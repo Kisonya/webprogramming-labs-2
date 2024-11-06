@@ -214,4 +214,4 @@ def products_search():
         except ValueError:
             error = "Пожалуйста, введите корректные значения для минимальной и максимальной цены."
 
-    return render_template('products.html', products=filtered_products, error=error)
+    return render_template('lab3/products.html', products=filtered_products, error=error)
