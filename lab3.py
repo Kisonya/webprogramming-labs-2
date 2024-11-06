@@ -196,7 +196,7 @@ products = [
 ]
 
 
-@lab3.route('/products', methods=['GET', 'POST'])
+@lab3.route('/lab3/products', methods=['GET', 'POST'])
 def products_search():
     filtered_products = []
     error = None
