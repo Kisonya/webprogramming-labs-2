@@ -95,8 +95,9 @@ def tree():
 
     if operation == 'cut' and tree_count > 0:
         tree_count -= 1
-    elif operation == 'plant':
+    elif operation == 'plant' and tree_count < 10:
         tree_count += 1
 
     return redirect(url_for('lab4.tree'))
+
 
