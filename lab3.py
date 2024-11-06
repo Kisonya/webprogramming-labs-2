@@ -116,6 +116,7 @@ def clear_settings():
     return resp
 
 
+
 @lab3.route('/lab3/ticket', methods=['GET', 'POST'])
 def ticket():
     if request.method == 'POST':
