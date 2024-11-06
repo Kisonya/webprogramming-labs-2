@@ -169,3 +169,49 @@ def ticket():
 
     # Если GET-запрос, рендерим форму
     return render_template('lab3/ticket_form.html')
+
+
+# Список смартфонов
+products = [
+    {"name": "iPhone 13", "price": 799, "brand": "Apple", "color": "Black"},
+    {"name": "Samsung Galaxy S21", "price": 699, "brand": "Samsung", "color": "White"},
+    {"name": "OnePlus 9", "price": 729, "brand": "OnePlus", "color": "Blue"},
+    {"name": "Google Pixel 6", "price": 599, "brand": "Google", "color": "Green"},
+    {"name": "Sony Xperia 5 III", "price": 949, "brand": "Sony", "color": "Black"},
+    {"name": "Xiaomi Mi 11", "price": 649, "brand": "Xiaomi", "color": "Purple"},
+    {"name": "Huawei P40", "price": 749, "brand": "Huawei", "color": "Gray"},
+    {"name": "Oppo Find X3", "price": 899, "brand": "Oppo", "color": "White"},
+    {"name": "Nokia G20", "price": 199, "brand": "Nokia", "color": "Blue"},
+    {"name": "Motorola Edge", "price": 499, "brand": "Motorola", "color": "Red"},
+    {"name": "Realme GT", "price": 549, "brand": "Realme", "color": "Yellow"},
+    {"name": "Asus ROG Phone 5", "price": 999, "brand": "Asus", "color": "Black"},
+    {"name": "Vivo X60", "price": 579, "brand": "Vivo", "color": "Blue"},
+    {"name": "ZTE Axon 30", "price": 499, "brand": "ZTE", "color": "Gray"},
+    {"name": "LG Velvet", "price": 399, "brand": "LG", "color": "Pink"},
+    {"name": "Honor 50", "price": 489, "brand": "Honor", "color": "Green"},
+    {"name": "Lenovo Legion Phone Duel", "price": 849, "brand": "Lenovo", "color": "Black"},
+    {"name": "Black Shark 4", "price": 429, "brand": "Black Shark", "color": "Black"},
+    {"name": "Meizu 18", "price": 599, "brand": "Meizu", "color": "White"},
+    {"name": "HTC U20", "price": 459, "brand": "HTC", "color": "Gray"},
+]
+
+
+@lab3.route('/products', methods=['GET', 'POST'])
+def products_search():
+    filtered_products = []
+    error = None
+
+    if request.method == 'POST':
+        try:
+            min_price = float(request.form.get('min_price', 0))
+            max_price = float(request.form.get('max_price', float('inf')))
+
+            # Фильтрация товаров по заданному диапазону цен
+            filtered_products = [
+                product for product in products 
+                if min_price <= product["price"] <= max_price
+            ]
+        except ValueError:
+            error = "Пожалуйста, введите корректные значения для минимальной и максимальной цены."
+
+    return render_template('products.html', products=filtered_products, error=error)

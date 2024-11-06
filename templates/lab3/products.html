@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block lab %}Поиск товаров{% endblock %}
+
+{% block main %}
+    <h1>Поиск товаров</h1>
+    <form method="post">
+        <div>
+            <label for="min_price">Мин. цена:</label>
+            <input type="number" id="min_price" name="min_price" step="0.01" required>
+        </div>
+        <div>
+            <label for="max_price">Макс. цена:</label>
+            <input type="number" id="max_price" name="max_price" step="0.01" required>
+        </div>
+        <button type="submit">Искать</button>
+    </form>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if products %}
+        <h2>Результаты поиска:</h2>
+        <ul>
+            {% for product in products %}
+                <li>
+                    <strong>{{ product.name }}</strong> - {{ product.price }} руб.
+                    <br>Бренд: {{ product.brand }}
+                    <br>Цвет: {{ product.color }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif products is not defined or products == [] %}
+        <p>Товары не найдены в указанном диапазоне цен.</p>
+    {% endif %}
+{% endblock %}
