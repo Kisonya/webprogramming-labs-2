@@ -116,11 +116,6 @@ def clear_settings():
     return resp
 
 
-@lab3.route('/lab3/ticket_form')
-def ticket_form():
-    return render_template('lab3/ticket_form.html')
-
-
 @lab3.route('/lab3/ticket', methods=['GET', 'POST'])
 def ticket():
     if request.method == 'POST':
