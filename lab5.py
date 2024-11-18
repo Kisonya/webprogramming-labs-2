@@ -41,6 +41,7 @@ def register():
 
     # Вставка нового пользователя
     cur.execute(f"INSERT INTO users (login, password) VALUES ('{login}', '{password}');")
+    conn.commit()
 
     # Закрытие подключения
     cur.close()
