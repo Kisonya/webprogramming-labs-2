@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа 5</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='lab5.css') }}">
+</head>
+<body>
+    <header>
+        <h1>База знаний</h1>
+        <nav>
+            <a href="{{ url_for('lab5.list_articles') }}">Список статей</a>
+            <a href="{{ url_for('lab5.create_article') }}">Создать статью</a>
+            <a href="{{ url_for('lab5.login') }}">Войти</a>
+            <a href="{{ url_for('lab5.register') }}">Регистрация</a>
+            <span>{{ user }}</span>
+        </nav>
+    </header>
+    <main>
+        <p>Добро пожаловать в базу знаний. Выберите действие из меню.</p>
+    </main>
+</body>
+</html>
