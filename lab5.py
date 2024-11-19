@@ -284,34 +284,34 @@ def list_users():
     return render_template('lab5/users.html', users=users)
 
 
-# Вывод публичных статей (is_public = 1)
-@lab5.route('/lab5/public_articles', methods=['GET'])
-def public_articles():
-    conn, cur = db_connect()
+# # Вывод публичных статей (is_public = 1)
+# @lab5.route('/lab5/public_articles', methods=['GET'])
+# def public_articles():
+#     conn, cur = db_connect()
 
-    # Запрос для получения всех публичных статей
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("""
-            SELECT a.title, a.article_text, u.login AS author 
-            FROM articles a
-            JOIN users u ON a.user_id = u.id
-            WHERE a.is_public = 1
-            ORDER BY a.id ASC;
-        """)
-    else:
-        cur.execute("""
-            SELECT a.title, a.article_text, u.login AS author 
-            FROM articles a
-            JOIN users u ON a.user_id = u.id
-            WHERE a.is_public = 1
-            ORDER BY a.id ASC;
-        """)
+#     # Запрос для получения всех публичных статей
+#     if current_app.config['DB_TYPE'] == 'postgres':
+#         cur.execute("""
+#             SELECT a.title, a.article_text, u.login AS author 
+#             FROM articles a
+#             JOIN users u ON a.user_id = u.id
+#             WHERE a.is_public = 1
+#             ORDER BY a.id ASC;
+#         """)
+#     else:
+#         cur.execute("""
+#             SELECT a.title, a.article_text, u.login AS author 
+#             FROM articles a
+#             JOIN users u ON a.user_id = u.id
+#             WHERE a.is_public = 1
+#             ORDER BY a.id ASC;
+#         """)
 
-    public_articles = cur.fetchall()
-    db_close(conn, cur)
+#     public_articles = cur.fetchall()
+#     db_close(conn, cur)
 
-    # Если публичных статей нет, отображаем сообщение
-    if not public_articles:
-        return render_template('lab5/public_articles.html', articles=[], message="Публичные статьи отсутствуют")
+#     # Если публичных статей нет, отображаем сообщение
+#     if not public_articles:
+#         return render_template('lab5/public_articles.html', articles=[], message="Публичные статьи отсутствуют")
 
-    return render_template('lab5/public_articles.html', articles=public_articles)
+#     return render_template('lab5/public_articles.html', articles=public_articles)
