@@ -4,14 +4,10 @@
 
 {% block main %}
     <h1>Зарегистрированные пользователи</h1>
-    {% if users|length > 0 %}
-        <ul>
-            {% for user in users %}
-                <li>{{ user['login'] }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>{{ message }}</p>
-    {% endif %}
+    <ul>
+        {% for user in users %}
+            <li>{{ user['login'] }}</li>
+        {% endfor %}
+    </ul>
     <a href="{{ url_for('lab5.index') }}">Назад</a>
 {% endblock %}

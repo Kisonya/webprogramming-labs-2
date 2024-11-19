@@ -204,29 +204,69 @@ def list_articles():
     return render_template('lab5/articles.html', articles=articles)
 
 
-# @lab5.route('/lab5/users')
-# def list_users():
-#     try:
-#         conn, cur = db_connect()  # Подключение к базе данных
-#         cur.execute("SELECT login FROM users")  # Запрос на получение логинов
-#         users = cur.fetchall()  # Получаем данные
+# Удаление статьи
+@lab5.route('/lab5/delete/<int:article_id>', methods=['POST'])
+def delete_article(article_id):
+    login = session.get('login')
+    if not login:
+        return redirect(url_for('lab5.login'))
 
-#         # Преобразуем данные в список словарей (на случай SQLite)
-#         if current_app.config['DB_TYPE'] == 'sqlite':
-#             users = [dict(row) for row in users]
+    conn, cur = db_connect()
 
-#         db_close(conn, cur)  # Закрытие подключения
+    # Удаление статьи
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("DELETE FROM articles WHERE id=%s;", (article_id,))
+    else:
+        cur.execute("DELETE FROM articles WHERE id=?;", (article_id,))
 
-#         # Если пользователей нет
-#         if not users:
-#             return render_template('users.html', users=[], message="Нет зарегистрированных пользователей")
-
-#         # Если пользователи есть
-#         return render_template('users.html', users=users)
-
-#     except Exception as e:
-#         # Логируем ошибку и возвращаем сообщение
-#         print(f"Ошибка в маршруте /lab5/users: {e}")
-#         return f"Ошибка: {e}", 500
+    db_close(conn, cur)
+    return redirect(url_for('lab5.list_articles'))
 
 
+# Редактирование статьи
+@lab5.route('/lab5/edit/<int:article_id>', methods=['GET', 'POST'])
+def edit_article(article_id):
+    login = session.get('login')
+    if not login:
+        return redirect(url_for('lab5.login'))
+
+    conn, cur = db_connect()
+
+    if request.method == 'GET':
+        # Получение данных статьи
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT * FROM articles WHERE id=%s;", (article_id,))
+        else:
+            cur.execute("SELECT * FROM articles WHERE id=?;", (article_id,))
+
+        article = cur.fetchone()
+        db_close(conn, cur)
+
+        if not article:
+            return "Статья не найдена", 404
+
+        return render_template('lab5/edit_article.html', article=article)
+
+    # Сохранение изменений
+    title = request.form.get('title')
+    article_text = request.form.get('article_text')
+
+    if not (title and article_text):
+        return render_template('lab5/edit_article.html', error="Заполните все поля", article={"id": article_id})
+
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("UPDATE articles SET title=%s, article_text=%s WHERE id=%s;", (title, article_text, article_id))
+    else:
+        cur.execute("UPDATE articles SET title=?, article_text=? WHERE id=?;", (title, article_text, article_id))
+
+    db_close(conn, cur)
+    return redirect(url_for('lab5.list_articles'))
+
+
+@lab5.route('/lab5/users')
+def list_users():
+    conn, cur = db_connect()
+    cur.execute("SELECT login FROM users")
+    users = cur.fetchall()
+    db_close(conn, cur)
+    return render_template('users.html', users=users)

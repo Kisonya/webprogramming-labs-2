@@ -8,7 +8,6 @@
         <nav>
             <a href="{{ url_for('lab5.list_articles') }}" class="nav-button">Список статей</a>
             <a href="{{ url_for('lab5.create') }}" class="nav-button">Создать статью</a>
-            <!-- <!-- <a href="{{ url_for('lab5.users') }}" class="nav-button">Список пользователей</a>  -->
             <a href="{{ url_for('lab5.login') }}" class="nav-button">Войти</a>
             <a href="{{ url_for('lab5.register') }}" class="nav-button">Регистрация</a>
             {% if session.get('login') %}
