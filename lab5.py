@@ -204,11 +204,22 @@ def list_articles():
     return render_template('lab5/articles.html', articles=articles)
 
 
-# Список зарегистрированных пользователей
 @lab5.route('/lab5/users')
 def list_users():
-    conn, cur = db_connect()
-    cur.execute("SELECT login FROM users")  # Получение списка всех логинов
-    users = cur.fetchall()
-    db_close(conn, cur)
-    return render_template('users.html', users=users)
+    try:
+        conn, cur = db_connect()  # Подключение к базе данных
+        cur.execute("SELECT login FROM users")  # Выполнение запроса
+        users = cur.fetchall()  # Получение данных
+        db_close(conn, cur)  # Закрытие соединения
+
+        # Если список пользователей пуст, передаём пустой список в шаблон
+        if not users:
+            return render_template('users.html', users=[], message="Нет зарегистрированных пользователей")
+
+        return render_template('users.html', users=users)
+
+    except Exception as e:
+        # Логирование ошибки в консоль для отладки
+        print(f"Ошибка в маршруте /lab5/users: {e}")
+        return f"Ошибка: {e}", 500
+
