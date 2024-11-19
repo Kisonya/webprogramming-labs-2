@@ -122,7 +122,6 @@ def logout():
 
 
 # Создание новой статьи
-# Создание новой статьи
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
 def create():
     login = session.get('login')  # Проверяем, авторизован ли пользователь
@@ -141,53 +140,57 @@ def create():
 
     conn, cur = db_connect()
 
-    # Если пользователь авторизован
-    if login:
-        # Получаем ID пользователя
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
-        else:
-            cur.execute("SELECT id FROM users WHERE login=?;", (login,))
-
-        user = cur.fetchone()
-        if not user:
-            db_close(conn, cur)
-            return "Ошибка: пользователь не найден.", 400
-
-        user_id = user['id']
-
-        # Создаем статью с привязкой к пользователю
+    if is_public:
+        # Публичный пост — user_id всегда NULL
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute("""
                 INSERT INTO articles (user_id, title, article_text, is_public)
-                VALUES (%s, %s, %s, %s);
-            """, (user_id, title, article_text, is_public))
+                VALUES (NULL, %s, %s, TRUE);
+            """, (title, article_text))
         else:
             cur.execute("""
                 INSERT INTO articles (user_id, title, article_text, is_public)
-                VALUES (?, ?, ?, ?);
-            """, (user_id, title, article_text, is_public))
-
-    # Если пользователь не авторизован
+                VALUES (NULL, ?, ?, 1);
+            """, (title, article_text))
     else:
-        # Неавторизованный пользователь может создавать только публичные посты
-        if not is_public:
-            db_close(conn, cur)
-            return render_template('lab5/create_article.html', error="Неавторизованный пользователь может создать только публичный пост", login=None)
+        # Личный пост — user_id заполняется только для авторизованных пользователей
+        if login:
+            # Получаем ID пользователя
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+            else:
+                cur.execute("SELECT id FROM users WHERE login=?;", (login,))
 
-        # Создаем статью без привязки к user_id
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("""
-                INSERT INTO articles (user_id, title, article_text, is_public)
-                VALUES (NULL, %s, %s, %s);
-            """, (title, article_text, is_public))
+            user = cur.fetchone()
+            if not user:
+                db_close(conn, cur)
+                return "Ошибка: пользователь не найден.", 400
+
+            user_id = user['id']
+
+            # Сохраняем личный пост
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("""
+                    INSERT INTO articles (user_id, title, article_text, is_public)
+                    VALUES (%s, %s, %s, FALSE);
+                """, (user_id, title, article_text))
+            else:
+                cur.execute("""
+                    INSERT INTO articles (user_id, title, article_text, is_public)
+                    VALUES (?, ?, ?, 0);
+                """, (user_id, title, article_text))
         else:
-            cur.execute("""
-                INSERT INTO articles (user_id, title, article_text, is_public)
-                VALUES (NULL, ?, ?, ?);
-            """, (title, article_text, is_public))
+            # Неавторизованные пользователи не могут создавать личные посты
+            db_close(conn, cur)
+            return render_template(
+                'lab5/create_article.html',
+                error="Неавторизованный пользователь может создать только публичный пост",
+                login=None
+            )
 
     db_close(conn, cur)
+
+    # Перенаправление после успешного создания
     return redirect(url_for('lab5.list_articles') if login else url_for('lab5.public_articles'))
 
 
