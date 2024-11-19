@@ -1,44 +1,65 @@
+/* Общие стили */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
+/* Шапка сайта */
 header {
-    background-color: #d0e9f5;
-    padding: 10px;
-    text-align: center;
-    border-bottom: 2px solid #c0c0c0;
+    background-color: #0073e6;
+    color: white;
+    padding: 10px 20px;
 }
 
 header h1 {
     margin: 0;
-    font-size: 24px;
-    color: #333;
 }
 
 nav {
-    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 nav a {
-    margin: 0 10px;
+    color: white;
     text-decoration: none;
-    color: #0066cc;
-    font-size: 14px;
-    border: 1px solid #0066cc;
-    padding: 5px 10px;
-    border-radius: 4px;
+    margin-right: 15px;
 }
 
 nav a:hover {
-    background-color: #0066cc;
-    color: white;
+    text-decoration: underline;
 }
 
-nav span {
-    font-weight: bold;
-    margin-left: 20px;
-    color: #555;
+/* Основной контент */
+main {
+    padding: 20px;
+}
+
+/* Статьи */
+.article {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: white;
+}
+
+.article h2 {
+    margin: 0;
+    color: #0073e6;
+}
+
+button {
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #005bb5;
 }

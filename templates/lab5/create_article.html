@@ -4,18 +4,26 @@
 
 {% block main %}
     <h1>Создание статьи</h1>
+    <!-- Форма создания статьи -->
     <form method="post">
         <div>
+            <!-- Поле для ввода названия статьи -->
             <label>
                 Название статьи:
-                <input type="text" maxlength="50" name="title">
+                <input type="text" maxlength="50" name="title" required>
             </label>
         </div>
         <div>
-            <textarea name="article_text"></textarea>
+            <!-- Поле для ввода текста статьи -->
+            <textarea name="article_text" required></textarea>
         </div>
         <div>
-            <button type="submit">Готово</button>
+            <!-- Вывод ошибки, если форма заполнена некорректно -->
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            <button type="submit">Готово</button> <!-- Кнопка для отправки формы -->
         </div>
     </form>
+    <a href="{{ url_for('lab5.index') }}">Назад</a> <!-- Ссылка для возврата на главную страницу -->
 {% endblock %}
