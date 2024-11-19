@@ -204,29 +204,29 @@ def list_articles():
     return render_template('lab5/articles.html', articles=articles)
 
 
-@lab5.route('/lab5/users')
-def list_users():
-    try:
-        conn, cur = db_connect()  # Подключение к базе данных
-        cur.execute("SELECT login FROM users")  # Запрос на получение логинов
-        users = cur.fetchall()  # Получаем данные
+# @lab5.route('/lab5/users')
+# def list_users():
+#     try:
+#         conn, cur = db_connect()  # Подключение к базе данных
+#         cur.execute("SELECT login FROM users")  # Запрос на получение логинов
+#         users = cur.fetchall()  # Получаем данные
 
-        # Преобразуем данные в список словарей (на случай SQLite)
-        if current_app.config['DB_TYPE'] == 'sqlite':
-            users = [dict(row) for row in users]
+#         # Преобразуем данные в список словарей (на случай SQLite)
+#         if current_app.config['DB_TYPE'] == 'sqlite':
+#             users = [dict(row) for row in users]
 
-        db_close(conn, cur)  # Закрытие подключения
+#         db_close(conn, cur)  # Закрытие подключения
 
-        # Если пользователей нет
-        if not users:
-            return render_template('users.html', users=[], message="Нет зарегистрированных пользователей")
+#         # Если пользователей нет
+#         if not users:
+#             return render_template('users.html', users=[], message="Нет зарегистрированных пользователей")
 
-        # Если пользователи есть
-        return render_template('users.html', users=users)
+#         # Если пользователи есть
+#         return render_template('users.html', users=users)
 
-    except Exception as e:
-        # Логируем ошибку и возвращаем сообщение
-        print(f"Ошибка в маршруте /lab5/users: {e}")
-        return f"Ошибка: {e}", 500
+#     except Exception as e:
+#         # Логируем ошибку и возвращаем сообщение
+#         print(f"Ошибка в маршруте /lab5/users: {e}")
+#         return f"Ошибка: {e}", 500
 
 
