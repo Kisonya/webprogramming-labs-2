@@ -267,6 +267,10 @@ def edit_article(article_id):
 def list_users():
     conn, cur = db_connect()
     cur.execute("SELECT login FROM users")
-    users = cur.fetchall()
+    users = cur.fetchall()  # Получаем список кортежей
     db_close(conn, cur)
+
+    # Преобразуем список кортежей в список словарей для удобства
+    users = [{'login': user[0]} for user in users]
+
     return render_template('users.html', users=users)
