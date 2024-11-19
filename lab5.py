@@ -4,6 +4,23 @@ from psycopg2.extras import RealDictCursor
 
 lab5 = Blueprint('lab5', __name__)
 
+def db_connect():
+    conn = psycopg2.connect(
+        host='127.0.0.1',
+        database='ivan_ivanov_knowledge_base',
+        user='ivan_ivanov_knowledge_base',
+        password='123'
+    )
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    return conn, cur
+
+
+def db_close(conn, cur):
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
 # Заготовки маршрутов
 @lab5.route('/lab5/')
 def index():
@@ -14,6 +31,7 @@ def index():
 @lab5.route('/lab5/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
+        # Отображение страницы регистрации, если запрос GET
         return render_template('lab5/register.html')
 
     # Получение данных из формы
@@ -22,85 +40,59 @@ def register():
 
     # Проверка на заполненность полей
     if not (login or password):
+        # Если одно из полей пустое, выводим ошибку
         return render_template('lab5/register.html', error='Заполните все поля')
 
     # Подключение к базе данных
-    conn = psycopg2.connect(
-        host='127.0.0.1',
-        database='kisonya_knowledge_base',
-        user='kisonya_knowledge_base',
-        password='123'
-    )
-    cur = conn.cursor()
+    conn, cur = db_connect()
 
     # Проверка существующего пользователя
     cur.execute(f"SELECT login FROM users WHERE login='{login}';")
     if cur.fetchone():
-        cur.close()
-        conn.close()
+        # Если пользователь уже существует, закрываем соединение и выводим ошибку
+        db_close(conn, cur)
         return render_template('lab5/register.html', error='Такой пользователь уже существует')
 
     # Вставка нового пользователя
     cur.execute(f"INSERT INTO users (login, password) VALUES ('{login}', '{password}');")
-    conn.commit()
+    conn.commit()  # Подтверждаем изменения в базе данных
 
     # Закрытие подключения
-    cur.close()
-    conn.close()
+    db_close(conn, cur)
 
+    # Переход на страницу успешной регистрации
     return render_template('lab5/success.html', login=login)
 
 
 @lab5.route('/lab5/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        # Отображение страницы с формой входа
-        return render_template('lab5/login.html', error=None)
+        return render_template('lab5/login.html')
 
-    # Получение данных из формы
     login = request.form.get('login')
     password = request.form.get('password')
 
-    # Проверка на пустые поля
-    if not login or not password:
-        return render_template('lab5/login.html', error="Заполните все поля")
+    if not (login and password):
+        return render_template('lab5/login.html', error='Заполните все поля')
 
-    try:
-        # Подключение к базе данных
-        conn = psycopg2.connect(
-            host='127.0.0.1',
-            database='kisonya_knowledge_base',
-            user='kisonya_knowledge_base',
-            password='123'
-        )
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+    conn, cur = db_connect()  # Подключение к базе данных
 
-        # Проверка пользователя в базе данных
-        cur.execute(f"SELECT * FROM users WHERE login = %s", (login,))
-        user = cur.fetchone()
+    cur.execute(f"SELECT * FROM users WHERE login='{login}';")
+    user = cur.fetchone()
 
-        # Если пользователь не найден
-        if not user:
-            cur.close()
-            conn.close()
-            return render_template('lab5/login.html', error="Логин и/или пароль неверны")
+    if not user:  # Если пользователь не найден
+        db_close(conn, cur)
+        return render_template('lab5/login.html', error='Логин и/или пароль неверны')
 
-        # Проверка пароля
-        if user['password'] != password:
-            cur.close()
-            conn.close()
-            return render_template('lab5/login.html', error="Логин и/или пароль неверны")
+    if user['password'] != password:  # Если пароли не совпадают
+        db_close(conn, cur)
+        return render_template('lab5/login.html', error='Логин и/или пароль неверны')
 
-        # Сохранение данных пользователя в сессии
-        session['login'] = login
+    session['login'] = login  # Сохраняем логин в сессии
 
-        cur.close()
-        conn.close()
+    db_close(conn, cur)  # Закрытие соединения с базой данных
+    return render_template('lab5/success_login.html', login=login)
 
-        # Переход на страницу успешного входа
-        return render_template('lab5/success_login.html', login=login)
-    except Exception as e:
-        return render_template('lab5/login.html', error="Ошибка подключения к базе данных")
 
 
 @lab5.route('/lab5/list')
