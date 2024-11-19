@@ -1,20 +1,32 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Софья Скобель. Лабораторная работа №5</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='lab5/lab5.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/x-icon">
 
-{% block lab %}Лабораторная работа 5{% endblock %}
-
-{% block main %}
-<h1>Функции лабораторной работы 5</h1>
-<div>Тема лабораторной работы - База знаний. Список доступных функций:</div>
-<ol>
-    <li><a href="{{ url_for('lab5.list_articles') }}">Список статей</a></li> <!-- Ссылка на список статей -->
-    <li><a href="{{ url_for('lab5.create') }}">Создать статью</a></li> <!-- Ссылка на создание статьи -->
-    <li><a href="{{ url_for('lab5.login') }}">Войти</a></li> <!-- Ссылка на страницу входа -->
-    <li><a href="{{ url_for('lab5.register') }}">Регистрация</a></li> <!-- Ссылка на регистрацию -->
-    {% if session.get('login') %}
-        <li><a href="{{ url_for('lab5.logout') }}">Выйти</a></li> <!-- Ссылка на выход из системы -->
-        <li>Вы вошли как: {{ session.get('login') }}</li> <!-- Имя текущего пользователя -->
-    {% else %}
-        <li>Вы вошли как: anonymous</li> <!-- Если пользователь не авторизован -->
-    {% endif %}
-</ol>
-{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>База знаний</h1>
+        <!-- Навигация -->
+        <nav>
+            <a href="{{ url_for('lab5.list_articles') }}">Список статей</a> <!-- Ссылка на список статей -->
+            <a href="{{ url_for('lab5.create') }}">Создать статью</a> <!-- Ссылка на создание статьи -->
+            <a href="{{ url_for('lab5.login') }}">Войти</a> <!-- Ссылка на страницу входа -->
+            <a href="{{ url_for('lab5.register') }}">Регистрация</a> <!-- Ссылка на регистрацию -->
+            {% if session.get('login') %}
+                <a href="{{ url_for('lab5.logout') }}">Выйти</a> <!-- Ссылка на выход из системы -->
+                <span>Вы вошли как: {{ session.get('login') }}</span> <!-- Имя текущего пользователя -->
+            {% else %}
+                <span>Вы вошли как: anonymous</span> <!-- Если пользователь не авторизован -->
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        <p>Добро пожаловать в базу знаний. Выберите действие из меню.</p>
+    </main>
+</body>
+</html>
