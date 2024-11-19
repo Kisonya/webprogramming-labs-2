@@ -81,6 +81,7 @@ def register():
     db_close(conn, cur)
     return render_template('lab5/success.html', login=login)
 
+
 # Вход в систему
 @lab5.route('/lab5/login', methods=['GET', 'POST'])
 def login():
@@ -112,11 +113,13 @@ def login():
     db_close(conn, cur)
     return render_template('lab5/success_login.html', login=login)
 
+
 # Выход из системы
 @lab5.route('/lab5/logout')
 def logout():
     session.clear()  # Очищаем сессию
     return redirect(url_for('lab5.index'))
+
 
 # Создание новой статьи
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
@@ -161,16 +164,17 @@ def create():
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
 
+
 # Список статей пользователя
 @lab5.route('/lab5/list', methods=['GET'])
 def list_articles():
-    login = session.get('login')
-    if not login:
-        return redirect(url_for('lab5.login'))
+    login = session.get('login')  # Получаем текущего пользователя
+    if not login:  # Проверяем авторизацию
+        return redirect(url_for('lab5.login'))  # Перенаправляем на страницу входа
 
     conn, cur = db_connect()
 
-    # Получение ID пользователя
+    # Получение ID текущего пользователя
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
     else:
@@ -183,21 +187,31 @@ def list_articles():
 
     user_id = user['id']
 
-    # Получение статей пользователя
+    # Запрос на получение статей пользователя, сортированных по is_favorite
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT * FROM articles WHERE user_id=%s;", (user_id,))
+        cur.execute("""
+            SELECT * FROM articles 
+            WHERE user_id=%s 
+            ORDER BY is_favorite DESC, id ASC;
+        """, (user_id,))
     else:
-        cur.execute("SELECT * FROM articles WHERE user_id=?;", (user_id,))
+        cur.execute("""
+            SELECT * FROM articles 
+            WHERE user_id=? 
+            ORDER BY is_favorite DESC, id ASC;
+        """, (user_id,))
 
     articles = cur.fetchall()
 
     db_close(conn, cur)
 
-    # Если нет статей, выводим сообщение
+    # Если статей нет, выводим сообщение
     if not articles:
         return render_template('lab5/articles.html', articles=[], message="У вас пока нет статей")
 
     return render_template('lab5/articles.html', articles=articles)
+
+
 
 # Удаление статьи
 @lab5.route('/lab5/delete/<int:article_id>', methods=['POST'])
@@ -216,6 +230,7 @@ def delete_article(article_id):
 
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
+
 
 # Редактирование статьи
 @lab5.route('/lab5/edit/<int:article_id>', methods=['GET', 'POST'])
@@ -255,3 +270,48 @@ def edit_article(article_id):
 
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
+
+
+# Страница с выводом всех зарегистрированных пользователей
+@lab5.route('/lab5/users')
+def list_users():
+    conn, cur = db_connect()  # Подключение к базе данных
+    # Запрос на получение всех логинов из таблицы users
+    cur.execute("SELECT login FROM users")
+    users = cur.fetchall()
+    db_close(conn, cur)  # Закрытие соединения с базой
+    # Передаем список пользователей в шаблон
+    return render_template('lab5/users.html', users=users)
+
+
+# Вывод публичных статей (is_public = 1)
+@lab5.route('/lab5/public_articles', methods=['GET'])
+def public_articles():
+    conn, cur = db_connect()
+
+    # Запрос для получения всех публичных статей
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("""
+            SELECT a.title, a.article_text, u.login AS author 
+            FROM articles a
+            JOIN users u ON a.user_id = u.id
+            WHERE a.is_public = 1
+            ORDER BY a.id ASC;
+        """)
+    else:
+        cur.execute("""
+            SELECT a.title, a.article_text, u.login AS author 
+            FROM articles a
+            JOIN users u ON a.user_id = u.id
+            WHERE a.is_public = 1
+            ORDER BY a.id ASC;
+        """)
+
+    public_articles = cur.fetchall()
+    db_close(conn, cur)
+
+    # Если публичных статей нет, отображаем сообщение
+    if not public_articles:
+        return render_template('lab5/public_articles.html', articles=[], message="Публичные статьи отсутствуют")
+
+    return render_template('lab5/public_articles.html', articles=public_articles)

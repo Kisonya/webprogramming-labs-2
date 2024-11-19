@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block lab %}Публичные статьи{% endblock %}
+
+{% block main %}
+    <h1>Публичные статьи</h1>
+    {% if articles|length > 0 %}
+        {% for article in articles %}
+        <div class="article-container">
+            <h2>{{ article['title'] }}</h2> <!-- Заголовок статьи -->
+            <blockquote>{{ article['article_text'] }}</blockquote> <!-- Текст статьи -->
+            <p><strong>Автор:</strong> {{ article['author'] }}</p> <!-- Автор статьи -->
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>{{ message }}</p> <!-- Если статей нет -->
+    {% endif %}
+    <a href="{{ url_for('lab5.index') }}">Назад</a> <!-- Ссылка на главную -->
+{% endblock %}

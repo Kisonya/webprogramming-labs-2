@@ -9,7 +9,13 @@
         {# Если есть статьи, проходим по ним циклом #}
         {% for article in articles %}
         <div class="article-container">
-            <h2>{{ article['title'] }}</h2> {# Заголовок статьи #}
+            <h2>
+                {{ article['title'] }} 
+                {# Если статья любимая, добавляем значок или текст #}
+                {% if article['is_favorite'] %}
+                    <span style="color: gold;">★ Любимая</span>
+                {% endif %}
+            </h2>
             <blockquote>{{ article['article_text'] }}</blockquote> {# Текст статьи #}
             <div class="article-actions">
                 <!-- Кнопка для удаления -->
