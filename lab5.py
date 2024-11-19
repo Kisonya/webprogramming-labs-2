@@ -116,39 +116,37 @@ def create():
     title = request.form.get('title')
     article_text = request.form.get('article_text')
 
-    # Проверка на заполненность полей
-    if not (title and article_text):
-        return render_template('lab5/create_article.html', error="Заполните все поля")
+    # # Проверка на заполненность полей
+    # if not (title and article_text):
+    #     return render_template('lab5/create_article.html', error="Заполните все поля")
 
     # Подключение к базе данных
     conn, cur = db_connect()
 
-    try:
-        # Получение ID пользователя по логину
-        cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
-        user = cur.fetchone()
+    # Получение ID пользователя по логину
+    cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
+    login_id = cur.fetchone()["id"]
 
-        if not user:
-            db_close(conn, cur)
-            return "Ошибка: пользователь не найден.", 400
+    # if not user:
+    #     db_close(conn, cur)
+    #     return "Ошибка: пользователь не найден.", 400
 
-        user_id = user["id"]
+    # user_id = user["id"]
 
         # Вставка статьи в базу данных
-        cur.execute(
-            "INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
-            (user_id, title, article_text)
-        )
+    cur.execute(
+        f"INSERT INTO articles (user_id, title, article_text) VALUES ({login_id}, '{title}', '{article_text}');"
+    )
 
         # Закрытие подключения
-        db_close(conn, cur)
+    db_close(conn, cur)
 
         # Перенаправление на главную страницу
-        return redirect('/lab5')
+    return redirect('/lab5')
 
-    except Exception as e:
-        db_close(conn, cur)
-        return f"Произошла ошибка: {e}", 500
+    # except Exception as e:
+    #     db_close(conn, cur)
+    #     return f"Произошла ошибка: {e}", 500
 
 
 
