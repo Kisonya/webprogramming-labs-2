@@ -10,8 +10,6 @@
             <a href="{{ url_for('lab5.create') }}" class="nav-button">Создать статью</a>
             <a href="{{ url_for('lab5.login') }}" class="nav-button">Войти</a>
             <a href="{{ url_for('lab5.register') }}" class="nav-button">Регистрация</a>
-            <a href="{{ url_for('lab5.users') }}" class="nav-button">Список пользователей</a>
-            <!-- <a href="{{ url_for('lab5.public_articles') }}" class="nav-button">Публичные статьи</a> -->
             {% if session.get('login') %}
                 <span class="user-info">Вы вошли как: {{ session.get('login') }}</span>
                 <a href="{{ url_for('lab5.logout') }}" class="nav-button">Выйти</a>
@@ -20,7 +18,7 @@
             {% endif %}
         </nav>
     </div>
-    <main>
-        <p>Добро пожаловать в базу знаний. Выберите действие из меню.</p>
-    </main>
+<main>
+    <p>Добро пожаловать в базу знаний. Выберите действие из меню.</p>
+</main>
 {% endblock %}
