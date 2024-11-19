@@ -11,11 +11,13 @@
         <div class="article-container">
             <h2>{{ article['title'] }}</h2> {# Заголовок статьи #}
             <blockquote>{{ article['article_text'] }}</blockquote> {# Текст статьи #}
-            <div class="article-actions"> {# Блок для кнопок действий (удалить, редактировать) #}
+            <div class="article-actions">
+                <!-- Кнопка для удаления -->
                 <form action="{{ url_for('lab5.delete_article', article_id=article['id']) }}" method="post" style="display: inline;">
-                    <button type="submit" class="delete-button">Удалить</button> {# Кнопка для удаления статьи #}
+                    <button type="submit" class="delete-button">Удалить</button>
                 </form>
-                <a href="{{ url_for('lab5.edit_article', article_id=article['id']) }}" class="edit-button">Редактировать</a> {# Ссылка для редактирования статьи #}
+                <!-- Кнопка для редактирования -->
+                <a href="{{ url_for('lab5.edit_article', article_id=article['id']) }}" class="edit-button">Редактировать</a>
             </div>
         </div>
         {% endfor %}

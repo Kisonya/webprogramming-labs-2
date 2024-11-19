@@ -32,19 +32,23 @@
 
 /* Стили для кнопки редактирования */
 .edit-button {
+    display: inline-block; /* Отображение кнопки как блока */
     padding: 8px 12px; /* Внутренние отступы */
     border: none; /* Убираем рамку */
     border-radius: 5px; /* Скругленные углы */
     text-decoration: none; /* Убираем подчеркивание текста */
     color: white; /* Цвет текста */
-    background-color: #007bff; /* Синий цвет для редактирования */
+    background-color: #007bff; /* Синий цвет для кнопки редактирования */
     cursor: pointer; /* Курсор-указатель при наведении */
     transition: background-color 0.3s; /* Плавный переход цвета фона */
+    font-size: 14px; /* Размер текста */
+    margin-left: 10px; /* Отступ слева, чтобы кнопки не слипались */
 }
 
 .edit-button:hover {
     background-color: #0056b3; /* Темно-синий цвет при наведении */
 }
+
 
 /* Стили для ссылки "Назад" */
 .back-link {
