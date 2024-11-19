@@ -119,20 +119,32 @@ def create():
     # Подключение к базе данных
     conn, cur = db_connect()
 
-    # Получение ID пользователя по логину
-    cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
-    login_id = cur.fetchone()["id"]
+    try:
+        # Получение ID пользователя по логину
+        cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+        user = cur.fetchone()
 
-    # Вставка статьи в базу данных
-    cur.execute(f"INSERT INTO articles (user_id, title, article_text) \
-                VALUES ({login_id}, '{title}', '{article_text}');")
+        if not user:
+            db_close(conn, cur)
+            return "Ошибка: пользователь не найден.", 400
 
+        user_id = user["id"]
 
-    # Закрытие подключения
-    db_close(conn, cur)
+        # Вставка статьи в базу данных
+        cur.execute(
+            "INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
+            (user_id, title, article_text)
+        )
 
-    # Перенаправление на главную страницу
-    return redirect('/lab5')
+        # Закрытие подключения
+        db_close(conn, cur)
+
+        # Перенаправление на главную страницу
+        return redirect('/lab5')
+
+    except Exception as e:
+        db_close(conn, cur)
+        return f"Произошла ошибка: {e}", 500
 
 
 @lab5.route('/lab5/list')
