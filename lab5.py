@@ -170,9 +170,10 @@ def create():
 
     # Если пользователь не авторизован
     else:
-        # Неавторизованный пользователь может создавать только публичные статьи
+        # Неавторизованный пользователь может создавать только публичные посты
         if not is_public:
-            return render_template('lab5/create_article.html', error="Неавторизованный пользователь может создать только публичный пост")
+            db_close(conn, cur)
+            return render_template('lab5/create_article.html', error="Неавторизованный пользователь может создать только публичный пост", login=None)
 
         # Создаем статью без привязки к user_id
         if current_app.config['DB_TYPE'] == 'postgres':
