@@ -4,25 +4,32 @@
 
 {% block main %}
     <h1>Создание статьи</h1>
-    <!-- Форма создания статьи -->
     <form method="post">
         <div>
-            <!-- Поле для ввода названия статьи -->
             <label>
                 Название статьи:
                 <input type="text" maxlength="50" name="title" required>
             </label>
         </div>
         <div>
-            <textarea name="article_text" rows="10" cols="50" placeholder="Введите текст статьи..."></textarea>
-        </div>        
+            <textarea name="article_text" rows="10" cols="50" placeholder="Введите текст статьи..." required></textarea>
+        </div>
+        {% if login %}
         <div>
-            <!-- Вывод ошибки, если форма заполнена некорректно -->
+            <!-- Только авторизованный пользователь может выбирать видимость статьи -->
+            <label>
+                <input type="checkbox" name="is_public"> Сделать статью публичной
+            </label>
+        </div>
+        {% else %}
+        <p>Неавторизованный пользователь может создать только публичный пост.</p>
+        {% endif %}
+        <div>
             {% if error %}
                 <p style="color: red;">{{ error }}</p>
             {% endif %}
-            <button type="submit">Готово</button> <!-- Кнопка для отправки формы -->
+            <button type="submit">Готово</button>
         </div>
     </form>
-    <a href="{{ url_for('lab5.index') }}">Назад</a> <!-- Ссылка для возврата на главную страницу -->
+    <a href="{{ url_for('lab5.index') }}">Назад</a>
 {% endblock %}

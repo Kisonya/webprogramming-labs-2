@@ -122,47 +122,72 @@ def logout():
 
 
 # Создание новой статьи
+# Создание новой статьи
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
 def create():
-    login = session.get('login')
-    if not login:
-        return redirect(url_for('lab5.login'))
+    login = session.get('login')  # Проверяем, авторизован ли пользователь
 
     if request.method == 'GET':
-        return render_template('lab5/create_article.html')
+        return render_template('lab5/create_article.html', login=login)
 
+    # Получение данных из формы
     title = request.form.get('title')
     article_text = request.form.get('article_text')
+    is_public = request.form.get('is_public') == 'on'  # True, если галочка установлена
 
-    # Проверка на пустые поля
-    if not (title and article_text):
-        return render_template('lab5/create_article.html', error="Заполните все поля")
+    # Проверка заполненности полей
+    if not title or not article_text:
+        return render_template('lab5/create_article.html', error="Заполните все поля", login=login)
 
     conn, cur = db_connect()
 
-    # Получение ID пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    # Если пользователь авторизован
+    if login:
+        # Получаем ID пользователя
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+        else:
+            cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+
+        user = cur.fetchone()
+        if not user:
+            db_close(conn, cur)
+            return "Ошибка: пользователь не найден.", 400
+
+        user_id = user['id']
+
+        # Создаем статью с привязкой к пользователю
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("""
+                INSERT INTO articles (user_id, title, article_text, is_public)
+                VALUES (%s, %s, %s, %s);
+            """, (user_id, title, article_text, is_public))
+        else:
+            cur.execute("""
+                INSERT INTO articles (user_id, title, article_text, is_public)
+                VALUES (?, ?, ?, ?);
+            """, (user_id, title, article_text, is_public))
+
+    # Если пользователь не авторизован
     else:
-        cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+        # Неавторизованный пользователь может создавать только публичные статьи
+        if not is_public:
+            return render_template('lab5/create_article.html', error="Неавторизованный пользователь может создать только публичный пост")
 
-    user = cur.fetchone()
-    if not user:
-        db_close(conn, cur)
-        return "Ошибка: пользователь не найден.", 400
-
-    user_id = user['id']
-
-    # Вставка новой статьи
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
-                    (user_id, title, article_text))
-    else:
-        cur.execute("INSERT INTO articles (user_id, title, article_text) VALUES (?, ?, ?);",
-                    (user_id, title, article_text))
+        # Создаем статью без привязки к user_id
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("""
+                INSERT INTO articles (user_id, title, article_text, is_public)
+                VALUES (NULL, %s, %s, %s);
+            """, (title, article_text, is_public))
+        else:
+            cur.execute("""
+                INSERT INTO articles (user_id, title, article_text, is_public)
+                VALUES (NULL, ?, ?, ?);
+            """, (title, article_text, is_public))
 
     db_close(conn, cur)
-    return redirect(url_for('lab5.list_articles'))
+    return redirect(url_for('lab5.list_articles') if login else url_for('lab5.public_articles'))
 
 
 # Список статей пользователя
