@@ -116,22 +116,12 @@ def create():
     title = request.form.get('title')
     article_text = request.form.get('article_text')
 
-    # # Проверка на заполненность полей
-    # if not (title and article_text):
-    #     return render_template('lab5/create_article.html', error="Заполните все поля")
-
     # Подключение к базе данных
     conn, cur = db_connect()
 
     # Получение ID пользователя по логину
     cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
     login_id = cur.fetchone()["id"]
-
-    # if not user:
-    #     db_close(conn, cur)
-    #     return "Ошибка: пользователь не найден.", 400
-
-    # user_id = user["id"]
 
         # Вставка статьи в базу данных
     cur.execute(
@@ -143,11 +133,6 @@ def create():
 
         # Перенаправление на главную страницу
     return redirect('/lab5')
-
-    # except Exception as e:
-    #     db_close(conn, cur)
-    #     return f"Произошла ошибка: {e}", 500
-
 
 
 @lab5.route('/lab5/list', methods=['GET'])
@@ -161,12 +146,14 @@ def list_articles():
     # Подключение к базе данных
     conn, cur = db_connect()
 
-        # Получение ID пользователя по логину
-    cur.execute("SELECT id FROM users WHERE login = '{login}';")
-    login_id = cur.fetchone()["id"]
+    # Получение ID пользователя по логину
+    cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+    user = cur.fetchone()
 
-        # Получение статей пользователя
-    cur.execute("SELECT * FROM articles WHERE login_id = '{login_id}';")
+    user_id = user["id"]
+
+    # Получение статей пользователя
+    cur.execute("SELECT * FROM articles WHERE user_id = %s;", (user_id,))
     articles = cur.fetchall()
 
         # Закрытие подключения
