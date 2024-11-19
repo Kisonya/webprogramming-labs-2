@@ -124,86 +124,23 @@ def logout():
 # Создание новой статьи
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
 def create():
-    login = session.get('login')  # Проверяем, авторизован ли пользователь
+    login = session.get('login')
+    if not login:
+        return redirect(url_for('lab5.login'))
 
     if request.method == 'GET':
-        return render_template('lab5/create_article.html', login=login)
+        return render_template('lab5/create_article.html')
 
-    # Получение данных из формы
     title = request.form.get('title')
     article_text = request.form.get('article_text')
-    is_public = request.form.get('is_public') == 'on'  # True, если галочка установлена
 
-    # Проверка заполненности полей
-    if not title or not article_text:
-        return render_template('lab5/create_article.html', error="Заполните все поля", login=login)
-
-    conn, cur = db_connect()
-
-    if is_public:
-        # Публичный пост — user_id всегда NULL
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("""
-                INSERT INTO articles (user_id, title, article_text, is_public)
-                VALUES (NULL, %s, %s, TRUE);
-            """, (title, article_text))
-        else:
-            cur.execute("""
-                INSERT INTO articles (user_id, title, article_text, is_public)
-                VALUES (NULL, ?, ?, 1);
-            """, (title, article_text))
-    else:
-        # Личный пост — user_id заполняется только для авторизованных пользователей
-        if login:
-            # Получаем ID пользователя
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
-            else:
-                cur.execute("SELECT id FROM users WHERE login=?;", (login,))
-
-            user = cur.fetchone()
-            if not user:
-                db_close(conn, cur)
-                return "Ошибка: пользователь не найден.", 400
-
-            user_id = user['id']
-
-            # Сохраняем личный пост
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute("""
-                    INSERT INTO articles (user_id, title, article_text, is_public)
-                    VALUES (%s, %s, %s, FALSE);
-                """, (user_id, title, article_text))
-            else:
-                cur.execute("""
-                    INSERT INTO articles (user_id, title, article_text, is_public)
-                    VALUES (?, ?, ?, 0);
-                """, (user_id, title, article_text))
-        else:
-            # Неавторизованные пользователи не могут создавать личные посты
-            db_close(conn, cur)
-            return render_template(
-                'lab5/create_article.html',
-                error="Неавторизованный пользователь может создать только публичный пост",
-                login=None
-            )
-
-    db_close(conn, cur)
-
-    # Перенаправление после успешного создания
-    return redirect(url_for('lab5.list_articles') if login else url_for('lab5.public_articles'))
-
-
-# Список статей пользователя
-@lab5.route('/lab5/list', methods=['GET'])
-def list_articles():
-    login = session.get('login')  # Получаем текущего пользователя
-    if not login:  # Проверяем авторизацию
-        return redirect(url_for('lab5.login'))  # Перенаправляем на страницу входа
+    # Проверка на пустые поля
+    if not (title and article_text):
+        return render_template('lab5/create_article.html', error="Заполните все поля")
 
     conn, cur = db_connect()
 
-    # Получение ID текущего пользователя
+    # Получение ID пользователя
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
     else:
@@ -216,131 +153,62 @@ def list_articles():
 
     user_id = user['id']
 
-    # Запрос на получение статей пользователя, сортированных по is_favorite
+    # Вставка новой статьи
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("""
-            SELECT * FROM articles 
-            WHERE user_id=%s 
-            ORDER BY is_favorite DESC, id ASC;
-        """, (user_id,))
+        cur.execute("INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
+                    (user_id, title, article_text))
     else:
-        cur.execute("""
-            SELECT * FROM articles 
-            WHERE user_id=? 
-            ORDER BY is_favorite DESC, id ASC;
-        """, (user_id,))
+        cur.execute("INSERT INTO articles (user_id, title, article_text) VALUES (?, ?, ?);",
+                    (user_id, title, article_text))
+
+    db_close(conn, cur)
+    return redirect(url_for('lab5.list_articles'))
+
+
+# Список статей пользователя
+@lab5.route('/lab5/list', methods=['GET'])
+def list_articles():
+    login = session.get('login')
+    if not login:
+        return redirect(url_for('lab5.login'))
+
+    conn, cur = db_connect()
+
+    # Получение ID пользователя
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    else:
+        cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+
+    user = cur.fetchone()
+    if not user:
+        db_close(conn, cur)
+        return "Ошибка: пользователь не найден.", 400
+
+    user_id = user['id']
+
+    # Получение статей пользователя
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM articles WHERE user_id=%s;", (user_id,))
+    else:
+        cur.execute("SELECT * FROM articles WHERE user_id=?;", (user_id,))
 
     articles = cur.fetchall()
 
     db_close(conn, cur)
 
-    # Если статей нет, выводим сообщение
+    # Если нет статей, выводим сообщение
     if not articles:
         return render_template('lab5/articles.html', articles=[], message="У вас пока нет статей")
 
     return render_template('lab5/articles.html', articles=articles)
 
 
-
-# Удаление статьи
-@lab5.route('/lab5/delete/<int:article_id>', methods=['POST'])
-def delete_article(article_id):
-    login = session.get('login')
-    if not login:
-        return redirect(url_for('lab5.login'))
-
-    conn, cur = db_connect()
-
-    # Удаление статьи
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("DELETE FROM articles WHERE id=%s;", (article_id,))
-    else:
-        cur.execute("DELETE FROM articles WHERE id=?;", (article_id,))
-
-    db_close(conn, cur)
-    return redirect(url_for('lab5.list_articles'))
-
-
-# Редактирование статьи
-@lab5.route('/lab5/edit/<int:article_id>', methods=['GET', 'POST'])
-def edit_article(article_id):
-    login = session.get('login')
-    if not login:
-        return redirect(url_for('lab5.login'))
-
-    conn, cur = db_connect()
-
-    if request.method == 'GET':
-        # Получение данных статьи
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM articles WHERE id=%s;", (article_id,))
-        else:
-            cur.execute("SELECT * FROM articles WHERE id=?;", (article_id,))
-
-        article = cur.fetchone()
-        db_close(conn, cur)
-
-        if not article:
-            return "Статья не найдена", 404
-
-        return render_template('lab5/edit_article.html', article=article)
-
-    # Сохранение изменений
-    title = request.form.get('title')
-    article_text = request.form.get('article_text')
-
-    if not (title and article_text):
-        return render_template('lab5/edit_article.html', error="Заполните все поля", article={"id": article_id})
-
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("UPDATE articles SET title=%s, article_text=%s WHERE id=%s;", (title, article_text, article_id))
-    else:
-        cur.execute("UPDATE articles SET title=?, article_text=? WHERE id=?;", (title, article_text, article_id))
-
-    db_close(conn, cur)
-    return redirect(url_for('lab5.list_articles'))
-
-
-# Страница с выводом всех зарегистрированных пользователей
+# Список зарегистрированных пользователей
 @lab5.route('/lab5/users')
 def list_users():
-    conn, cur = db_connect()  # Подключение к базе данных
-    # Запрос на получение всех логинов из таблицы users
-    cur.execute("SELECT login FROM users")
+    conn, cur = db_connect()
+    cur.execute("SELECT login FROM users")  # Получение списка всех логинов
     users = cur.fetchall()
-    db_close(conn, cur)  # Закрытие соединения с базой
-    # Передаем список пользователей в шаблон
-    return render_template('lab5/users.html', users=users)
-
-
-# # Вывод публичных статей (is_public = 1)
-# @lab5.route('/lab5/public_articles', methods=['GET'])
-# def public_articles():
-#     conn, cur = db_connect()
-
-#     # Запрос для получения всех публичных статей
-#     if current_app.config['DB_TYPE'] == 'postgres':
-#         cur.execute("""
-#             SELECT a.title, a.article_text, u.login AS author 
-#             FROM articles a
-#             JOIN users u ON a.user_id = u.id
-#             WHERE a.is_public = 1
-#             ORDER BY a.id ASC;
-#         """)
-#     else:
-#         cur.execute("""
-#             SELECT a.title, a.article_text, u.login AS author 
-#             FROM articles a
-#             JOIN users u ON a.user_id = u.id
-#             WHERE a.is_public = 1
-#             ORDER BY a.id ASC;
-#         """)
-
-#     public_articles = cur.fetchall()
-#     db_close(conn, cur)
-
-#     # Если публичных статей нет, отображаем сообщение
-#     if not public_articles:
-#         return render_template('lab5/public_articles.html', articles=[], message="Публичные статьи отсутствуют")
-
-#     return render_template('lab5/public_articles.html', articles=public_articles)
+    db_close(conn, cur)
+    return render_template('users.html', users=users)

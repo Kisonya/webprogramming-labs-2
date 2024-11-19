@@ -5,10 +5,9 @@
 {% block main %}
     <h1>Зарегистрированные пользователи</h1>
     <ul>
-        <!-- Перебираем список пользователей и отображаем их логины -->
         {% for user in users %}
             <li>{{ user['login'] }}</li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('lab5.index') }}">Назад</a> <!-- Ссылка на главную страницу -->
+    <a href="{{ url_for('lab5.index') }}">Назад</a>
 {% endblock %}
