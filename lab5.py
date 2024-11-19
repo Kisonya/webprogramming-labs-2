@@ -7,8 +7,8 @@ lab5 = Blueprint('lab5', __name__)
 def db_connect():
     conn = psycopg2.connect(
         host='127.0.0.1',
-        database='ivan_ivanov_knowledge_base',
-        user='ivan_ivanov_knowledge_base',
+        database='kisonya_knowledge_base',
+        user='kisonya_knowledge_base',
         password='123'
     )
     cur = conn.cursor(cursor_factory=RealDictCursor)
