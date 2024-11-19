@@ -32,39 +32,29 @@ def index():
 @lab5.route('/lab5/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        # Отображение страницы регистрации, если запрос GET
         return render_template('lab5/register.html')
 
-    # Получение данных из формы
     login = request.form.get('login')
     password = request.form.get('password')
 
-    # Проверка на заполненность полей
     if not (login and password):
         return render_template('lab5/register.html', error='Заполните все поля')
 
-
-    # Подключение к базе данных
     conn, cur = db_connect()
 
     # Проверка существующего пользователя
-    cur.execute(f"SELECT login FROM users WHERE login='{login}';")
+    cur.execute("SELECT login FROM users WHERE login=%s;", (login,))
     if cur.fetchone():
-        # Если пользователь уже существует, закрываем соединение и выводим ошибку
         db_close(conn, cur)
         return render_template('lab5/register.html', error='Такой пользователь уже существует')
 
     # Хэширование пароля
     password_hash = generate_password_hash(password)
 
-    # Вставка нового пользователя с хэшированным паролем
-    cur.execute(f"INSERT INTO users (login, password) VALUES ('{login}', '{password_hash}');")
-    conn.commit()
-
-    # Закрытие подключения
+    # Вставка нового пользователя
+    cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, password_hash))
     db_close(conn, cur)
 
-    # Переход на страницу успешной регистрации
     return render_template('lab5/success.html', login=login)
 
 
@@ -79,64 +69,82 @@ def login():
     if not (login and password):
         return render_template('lab5/login.html', error='Заполните все поля')
 
-    conn, cur = db_connect()  # Подключение к базе данных
+    conn, cur = db_connect()
 
-    cur.execute(f"SELECT * FROM users WHERE login='{login}';")
+    # Получение пользователя
+    cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
     user = cur.fetchone()
 
-    if not user:  # Если пользователь не найден
+    if not user:
         db_close(conn, cur)
         return render_template('lab5/login.html', error='Логин и/или пароль неверны')
 
-    # Проверка пароля с использованием хэша
+    # Проверка пароля
     if not check_password_hash(user['password'], password):
         db_close(conn, cur)
         return render_template('lab5/login.html', error='Логин и/или пароль неверны')
 
-    session['login'] = login  # Сохраняем логин в сессии
-
-    db_close(conn, cur)  # Закрытие соединения с базой данных
+    session['login'] = login
+    db_close(conn, cur)
     return render_template('lab5/success_login.html', login=login)
 
 
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
 def create():
-    # Получаем логин из сессии
     login = session.get('login')
-
-    # Если пользователь не авторизован, перенаправляем на страницу логина
     if not login:
         return redirect('/lab5/login')
 
-    # Если запрос GET, отобразить форму создания статьи
     if request.method == 'GET':
         return render_template('lab5/create_article.html')
 
-    # Получение данных из формы
     title = request.form.get('title')
     article_text = request.form.get('article_text')
 
-    # Подключение к базе данных
     conn, cur = db_connect()
 
-    # Получение ID пользователя по логину
-    cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
-    login_id = cur.fetchone()["id"]
+    # Получение ID пользователя
+    cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    user = cur.fetchone()
 
-        # Вставка статьи в базу данных
-    cur.execute(
-        f"INSERT INTO articles (user_id, title, article_text) VALUES ({login_id}, '{title}', '{article_text}');"
-    )
+    if not user:
+        db_close(conn, cur)
+        return "Ошибка: пользователь не найден.", 400
 
-        # Закрытие подключения
+    user_id = user['id']
+
+    # Вставка статьи
+    cur.execute("INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
+                (user_id, title, article_text))
     db_close(conn, cur)
-
-        # Перенаправление на главную страницу
     return redirect('/lab5')
 
 
 @lab5.route('/lab5/list', methods=['GET'])
 def list_articles():
+    login = session.get('login')
+    if not login:
+        return redirect('/lab5/login')
+
+    conn, cur = db_connect()
+
+    # Получение ID пользователя
+    cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    user = cur.fetchone()
+
+    if not user:
+        db_close(conn, cur)
+        return "Ошибка: пользователь не найден.", 400
+
+    user_id = user['id']
+
+    # Получение статей
+    cur.execute("SELECT * FROM articles WHERE user_id=%s;", (user_id,))
+    articles = cur.fetchall()
+
+    db_close(conn, cur)
+    return render_template('lab5/articles.html', articles=articles)
+
     # Получаем логин пользователя из сессии
     login = session.get('login')
     if not login:
