@@ -208,18 +208,25 @@ def list_articles():
 def list_users():
     try:
         conn, cur = db_connect()  # Подключение к базе данных
-        cur.execute("SELECT login FROM users")  # Выполнение запроса
-        users = cur.fetchall()  # Получение данных
-        db_close(conn, cur)  # Закрытие соединения
+        cur.execute("SELECT login FROM users")  # Запрос на получение логинов
+        users = cur.fetchall()  # Получаем данные
 
-        # Если список пользователей пуст, передаём пустой список в шаблон
+        # Преобразуем данные в список словарей (на случай SQLite)
+        if current_app.config['DB_TYPE'] == 'sqlite':
+            users = [dict(row) for row in users]
+
+        db_close(conn, cur)  # Закрытие подключения
+
+        # Если пользователей нет
         if not users:
             return render_template('users.html', users=[], message="Нет зарегистрированных пользователей")
 
+        # Если пользователи есть
         return render_template('users.html', users=users)
 
     except Exception as e:
-        # Логирование ошибки в консоль для отладки
+        # Логируем ошибку и возвращаем сообщение
         print(f"Ошибка в маршруте /lab5/users: {e}")
         return f"Ошибка: {e}", 500
+
 
