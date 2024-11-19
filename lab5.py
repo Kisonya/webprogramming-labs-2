@@ -1,18 +1,34 @@
-from flask import Blueprint, render_template, request, session, redirect
+from flask import Blueprint, render_template, request, session, redirect, current_app
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import check_password_hash, generate_password_hash
+import sqlite3
+from os import path
 
 lab5 = Blueprint('lab5', __name__)
 
+# Функция для подключения к базе данных
 def db_connect():
-    conn = psycopg2.connect(
-        host='127.0.0.1',
-        database='kisonya_knowledge_base',
-        user='kisonya_knowledge_base',
-        password='123'
-    )
-    cur = conn.cursor(cursor_factory=RealDictCursor)
+    # Проверяем, какой тип базы данных указан в конфигурации
+    if current_app.config['DB_TYPE'] == 'postgres':
+        # Подключение к PostgreSQL
+        conn = psycopg2.connect(
+            host='127.0.0.1',
+            database='kisonya_knowledge_base',  # Имя базы данных
+            user='kisonya_knowledge_base',  # Имя пользователя
+            password='123'  # Пароль
+        )
+        # Создаем курсор с использованием RealDictCursor для возврата данных в виде словаря
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+    else:
+        # Подключение к SQLite
+        dir_path = path.dirname(path.realpath(__file__))  # Определяем путь к текущему файлу
+        db_path = path.join(dir_path, "database.db")  # Создаем путь к файлу SQLite базы данных
+        conn = sqlite3.connect(db_path)  # Подключение к SQLite базе данных
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()  # Создаем стандартный курсор для SQLite
+    
+    # Возвращаем соединение и курсор
     return conn, cur
 
 
