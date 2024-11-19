@@ -116,6 +116,10 @@ def create():
     title = request.form.get('title')
     article_text = request.form.get('article_text')
 
+    # Проверка на заполненность полей
+    if not (title and article_text):
+        return render_template('lab5/create_article.html', error="Заполните все поля")
+
     # Подключение к базе данных
     conn, cur = db_connect()
 
@@ -145,6 +149,7 @@ def create():
     except Exception as e:
         db_close(conn, cur)
         return f"Произошла ошибка: {e}", 500
+
 
 
 @lab5.route('/lab5/list')
