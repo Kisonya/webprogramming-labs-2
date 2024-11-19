@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session, redirect
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -99,12 +99,44 @@ def login():
     return render_template('lab5/success_login.html', login=login)
 
 
+@lab5.route('/lab5/create', methods=['GET', 'POST'])
+def create():
+    # Получаем логин из сессии
+    login = session.get('login')
+
+    # Если пользователь не авторизован, перенаправляем на страницу логина
+    if not login:
+        return redirect('/lab5/login')
+
+    # Если запрос GET, отобразить форму создания статьи
+    if request.method == 'GET':
+        return render_template('lab5/create_article.html')
+
+    # Получение данных из формы
+    title = request.form.get('title')
+    article_text = request.form.get('article_text')
+
+    # Подключение к базе данных
+    conn, cur = db_connect()
+
+    # Получение ID пользователя по логину
+    cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    login_id = cur.fetchone()["id"]
+
+    # Вставка статьи в базу данных
+    cur.execute(f"INSERT INTO articles (user_id, title, article_text) \
+                VALUES ({login_id}, '{title}', '{article_text}');")
+
+
+    # Закрытие подключения
+    db_close(conn, cur)
+
+    # Перенаправление на главную страницу
+    return redirect('/lab5')
+
 
 @lab5.route('/lab5/list')
 def list_articles():
     return render_template('lab5/list.html')
 
 
-@lab5.route('/lab5/create')
-def create_article():
-    return render_template('lab5/create.html')
