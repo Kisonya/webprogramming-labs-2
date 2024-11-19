@@ -43,6 +43,7 @@ def index():
     user = session.get('login', "anonymous")
     return render_template('lab5/lab5.html', login=user)
 
+
 # Регистрация нового пользователя
 @lab5.route('/lab5/register', methods=['GET', 'POST'])
 def register():

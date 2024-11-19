@@ -1,31 +1,30 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Софья Скобель. Лабораторная работа №5</title>
-    <!-- <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/x-icon"> -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='lab5/lab5.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
     <header>
-        <h1>База знаний</h1>
-        <!-- Навигация -->
-        <nav>
-            <a href="{{ url_for('lab5.list_articles') }}">Список статей</a> <!-- Ссылка на список статей -->
-            <a href="{{ url_for('lab5.create') }}">Создать статью</a> <!-- Ссылка на создание статьи -->
-            <a href="{{ url_for('lab5.login') }}">Войти</a> <!-- Ссылка на страницу входа -->
-            <a href="{{ url_for('lab5.register') }}">Регистрация</a> <!-- Ссылка на регистрацию -->
-            {% if session.get('login') %}
-                <a href="{{ url_for('lab5.logout') }}">Выйти</a> <!-- Ссылка на выход из системы -->
-                <span>Вы вошли как: {{ session.get('login') }}</span> <!-- Имя текущего пользователя -->
-            {% else %}
-                <span>Вы вошли как: anonymous</span> <!-- Если пользователь не авторизован -->
-            {% endif %}
-        </nav>
+        <div class="top-nav">
+            <a href="/" class="menu-link">menu</a> <!-- Ссылка на главное меню -->
+            WEB-программирование, часть 2. Лабораторная работа 5
+        </div>
+        <div class="main-nav">
+            <h1>База знаний</h1>
+            <nav>
+                <a href="{{ url_for('lab5.list_articles') }}" class="nav-button">Список статей</a>
+                <a href="{{ url_for('lab5.create') }}" class="nav-button">Создать статью</a>
+                <a href="{{ url_for('lab5.login') }}" class="nav-button">Войти</a>
+                <a href="{{ url_for('lab5.register') }}" class="nav-button">Регистрация</a>
+                {% if session.get('login') %}
+                    <span class="user-info">Вы вошли как: {{ session.get('login') }}</span>
+                    <a href="{{ url_for('lab5.logout') }}" class="nav-button">Выйти</a>
+                {% else %}
+                    <span class="user-info">Anonymous</span>
+                {% endif %}
+            </nav>
+        </div>
     </header>
     <main>
         <p>Добро пожаловать в базу знаний. Выберите действие из меню.</p>
     </main>
-</body>
-</html>
+{% endblock %}

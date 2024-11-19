@@ -204,3 +204,102 @@ div {
     background-color: #0056b3;
     text-decoration: none;
 }
+
+/* Стили для шапки */
+header {
+    background-color: #007bff; /* Синий фон для шапки */
+    color: white; /* Белый цвет текста */
+    padding: 15px 20px; /* Внутренние отступы */
+    display: flex; /* Выравниваем элементы в линии */
+    justify-content: space-between; /* Раздвигаем элементы по краям */
+    align-items: center; /* Центрируем элементы по вертикали */
+    border-bottom: 2px solid #0056b3; /* Нижняя рамка */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тень для шапки */
+}
+
+/* Логотип или название в шапке */
+header h1 {
+    font-size: 24px; /* Размер текста */
+    margin: 0; /* Убираем отступы */
+}
+
+/* Навигация в шапке */
+header nav {
+    display: flex; /* Выравниваем ссылки в линию */
+    gap: 15px; /* Пробел между ссылками */
+}
+
+/* Стили для ссылок в шапке */
+header nav a {
+    color: white; /* Белый цвет текста */
+    text-decoration: none; /* Убираем подчеркивание текста */
+    font-weight: bold; /* Жирный шрифт */
+    transition: color 0.3s; /* Плавный переход цвета текста */
+}
+
+header nav a:hover {
+    color: #d1e7ff; /* Светло-голубой цвет при наведении */
+}
+
+/* Стили для контейнера статьи */
+.article-container {
+    border: 1px solid #ddd; /* Серый контур */
+    padding: 15px; /* Внутренние отступы */
+    margin-bottom: 20px; /* Отступ между статьями */
+    border-radius: 5px; /* Скругленные углы */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тень для контейнера */
+}
+
+/* Стили для блока с кнопками */
+.article-actions {
+    margin-top: 10px; /* Отступ сверху */
+    display: flex; /* Располагаем кнопки в линию */
+    gap: 10px; /* Расстояние между кнопками */
+}
+
+/* Стили для кнопки удаления */
+.delete-button {
+    padding: 8px 12px; /* Внутренние отступы */
+    border: none; /* Убираем рамку */
+    border-radius: 5px; /* Скругленные углы */
+    text-decoration: none; /* Убираем подчеркивание текста */
+    color: white; /* Цвет текста */
+    background-color: #dc3545; /* Красный цвет для удаления */
+    cursor: pointer; /* Курсор-указатель при наведении */
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+}
+
+.delete-button:hover {
+    background-color: #b02a37; /* Темно-красный цвет при наведении */
+}
+
+/* Стили для кнопки редактирования */
+.edit-button {
+    display: inline-block; /* Отображение кнопки как блока */
+    padding: 8px 12px; /* Внутренние отступы */
+    border: none; /* Убираем рамку */
+    border-radius: 5px; /* Скругленные углы */
+    text-decoration: none; /* Убираем подчеркивание текста */
+    color: white; /* Цвет текста */
+    background-color: #007bff; /* Синий цвет для кнопки редактирования */
+    cursor: pointer; /* Курсор-указатель при наведении */
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+    font-size: 14px; /* Размер текста */
+    margin-left: 10px; /* Отступ слева, чтобы кнопки не слипались */
+}
+
+.edit-button:hover {
+    background-color: #0056b3; /* Темно-синий цвет при наведении */
+}
+
+/* Стили для ссылки "Назад" */
+.back-link {
+    display: inline-block; /* Отображение ссылки как блока */
+    margin-top: 20px; /* Отступ сверху */
+    color: #007bff; /* Синий цвет текста */
+    text-decoration: none; /* Убираем подчеркивание текста */
+}
+
+.back-link:hover {
+    text-decoration: underline; /* Добавляем подчеркивание при наведении */
+}
