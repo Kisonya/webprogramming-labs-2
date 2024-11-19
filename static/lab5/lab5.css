@@ -1,60 +1,59 @@
-/* Общий стиль для кнопок */
-.btn {
-    display: inline-block;
-    padding: 10px 15px;
-    margin: 5px 0;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
+/* Стили для контейнера статьи */
+.article-container {
+    border: 1px solid #ddd; /* Серый контур */
+    padding: 15px; /* Внутренние отступы */
+    margin-bottom: 20px; /* Отступ между статьями */
+    border-radius: 5px; /* Скругленные углы */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тень для контейнера */
 }
 
-/* Стили кнопки "Редактировать" */
-.btn-edit {
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    text-align: center;
-    transition: background-color 0.3s;
-}
-
-.btn-edit:hover {
-    background-color: #0056b3;
-}
-
-/* Стили кнопки "Удалить" */
-.btn-delete {
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    text-align: center;
-    transition: background-color 0.3s;
-}
-
-.btn-delete:hover {
-    background-color: #a71d2a;
-}
-
-/* Стили для кнопки "Назад" */
-.btn-back {
-    background-color: #6c757d;
-    color: #fff;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.btn-back:hover {
-    background-color: #495057;
-}
-
-/* Стиль контейнера действий с статьей */
+/* Стили для блока с кнопками */
 .article-actions {
-    margin-top: 10px;
+    margin-top: 10px; /* Отступ сверху */
+    display: flex; /* Располагаем кнопки в линию */
+    gap: 10px; /* Расстояние между кнопками */
 }
 
-/* Инлайн форма для удаления статьи */
-.inline-form {
-    display: inline;
+/* Стили для кнопки удаления */
+.delete-button {
+    padding: 8px 12px; /* Внутренние отступы */
+    border: none; /* Убираем рамку */
+    border-radius: 5px; /* Скругленные углы */
+    text-decoration: none; /* Убираем подчеркивание текста */
+    color: white; /* Цвет текста */
+    background-color: #dc3545; /* Красный цвет для удаления */
+    cursor: pointer; /* Курсор-указатель при наведении */
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+}
+
+.delete-button:hover {
+    background-color: #b02a37; /* Темно-красный цвет при наведении */
+}
+
+/* Стили для кнопки редактирования */
+.edit-button {
+    padding: 8px 12px; /* Внутренние отступы */
+    border: none; /* Убираем рамку */
+    border-radius: 5px; /* Скругленные углы */
+    text-decoration: none; /* Убираем подчеркивание текста */
+    color: white; /* Цвет текста */
+    background-color: #007bff; /* Синий цвет для редактирования */
+    cursor: pointer; /* Курсор-указатель при наведении */
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+}
+
+.edit-button:hover {
+    background-color: #0056b3; /* Темно-синий цвет при наведении */
+}
+
+/* Стили для ссылки "Назад" */
+.back-link {
+    display: inline-block; /* Отображение ссылки как блока */
+    margin-top: 20px; /* Отступ сверху */
+    color: #007bff; /* Синий цвет текста */
+    text-decoration: none; /* Убираем подчеркивание текста */
+}
+
+.back-link:hover {
+    text-decoration: underline; /* Добавляем подчеркивание при наведении */
 }

@@ -4,22 +4,23 @@
 
 {% block main %}
     <h1>Ваши статьи</h1>
-    <!-- Если у пользователя нет статей, выводим сообщение -->
-    {% if message %}
-        <p>{{ message }}</p>
-    {% else %}
-        <!-- Перебираем и отображаем все статьи пользователя -->
+    {# Проверяем, есть ли статьи у пользователя #}
+    {% if articles|length > 0 %}
+        {# Если есть статьи, проходим по ним циклом #}
         {% for article in articles %}
-            <div class="article">
-                <h2>{{ article['title'] }}</h2> <!-- Заголовок статьи -->
-                <blockquote>{{ article['article_text'] }}</blockquote> <!-- Текст статьи -->
-                <!-- Кнопка для удаления статьи -->
-                <form action="{{ url_for('lab5.delete_article', article_id=article['id']) }}" method="post">
-                    <button type="submit">Удалить</button>
+        <div class="article-container">
+            <h2>{{ article['title'] }}</h2> {# Заголовок статьи #}
+            <blockquote>{{ article['article_text'] }}</blockquote> {# Текст статьи #}
+            <div class="article-actions"> {# Блок для кнопок действий (удалить, редактировать) #}
+                <form action="{{ url_for('lab5.delete_article', article_id=article['id']) }}" method="post" style="display: inline;">
+                    <button type="submit" class="delete-button">Удалить</button> {# Кнопка для удаления статьи #}
                 </form>
-                <!-- Ссылка на редактирование статьи -->
-                <a href="{{ url_for('lab5.edit_article', article_id=article['id']) }}">Редактировать</a>
+                <a href="{{ url_for('lab5.edit_article', article_id=article['id']) }}" class="edit-button">Редактировать</a> {# Ссылка для редактирования статьи #}
             </div>
+        </div>
         {% endfor %}
+    {% else %}
+        <p>У вас пока нет ни одной статьи.</p> {# Если статей нет, отображаем сообщение #}
     {% endif %}
+    <a href="{{ url_for('lab5.index') }}" class="back-link">Назад на главную</a> {# Ссылка для возврата на главную страницу #}
 {% endblock %}
