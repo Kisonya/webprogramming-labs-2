@@ -39,9 +39,9 @@ def register():
     password = request.form.get('password')
 
     # Проверка на заполненность полей
-    if not (login or password):
-        # Если одно из полей пустое, выводим ошибку
+    if not (login and password):
         return render_template('lab5/register.html', error='Заполните все поля')
+
 
     # Подключение к базе данных
     conn, cur = db_connect()
