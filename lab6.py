@@ -5,7 +5,9 @@ lab6 = Blueprint('lab6', __name__)
 
 offices = []
 for i in range(1, 11):
-    offices.append({"number": i, "tenant": ""})
+    # Добавляем стоимость аренды для каждого офиса
+    price = 900 + (i % 3)
+    offices.append({"number": i, "tenant": "", "price": price})
 
 # Главная страница приложения
 @lab6.route('/lab6/')
