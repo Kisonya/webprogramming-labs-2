@@ -1,31 +1,22 @@
 body {
     margin: 0;
-    font-family: Arial, sans-serif; /* Устанавливаем более современный шрифт */
-    background-color: #f4f4f4; /* Светлый фон для всей страницы */
 }
 
 main {
     margin-bottom: 40px;
     padding: 10px;
-    background-color: white; /* Белый фон для основного контента */
-    border-radius: 8px; /* Скругляем углы */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Легкая тень */
 }
 
 header {
     margin-bottom: 30px;
     padding: 20px;
-    background: #3498db; /* Синий фон для шапки */
-    color: white; /* Белый цвет текста */
-    border-radius: 8px 8px 0 0; /* Скругляем верхние углы */
-    text-align: center;
+    background: lightgray;
 }
 
 footer {
     margin-top: 20px;
     padding: 10px;
-    background: #3498db; /* Синий фон для футера */
-    color: white; /* Белый текст */
+    background: lightgray;
     text-align: right;
     position: fixed;
     bottom: 0;
@@ -39,11 +30,42 @@ footer {
     font-weight: bold;
 }
 
+body {
+    margin: 0;
+}
+
+main {
+    margin-bottom: 40px;
+    padding: 10px;
+}
+
+header {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: lightgray;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 10px;
+    background: lightgray;
+    text-align: right;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Новые стили для улучшения внешнего вида */
 h1 {
     color: #2c3e50;
     text-align: center;
-    font-size: 28px; /* Увеличиваем размер заголовка */
-    margin-bottom: 20px;
 }
 
 form {
@@ -58,8 +80,6 @@ form {
 label {
     display: block;
     margin-bottom: 10px;
-    font-size: 16px; /* Увеличиваем размер текста для меток */
-    font-weight: bold;
 }
 
 input[type="radio"],
@@ -74,8 +94,6 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px; /* Увеличиваем размер шрифта для кнопок */
-    transition: background-color 0.3s ease;
 }
 
 button:hover {
@@ -87,7 +105,6 @@ a {
     margin-top: 20px;
     color: #3498db;
     text-decoration: none;
-    font-size: 16px; /* Увеличиваем размер шрифта для ссылок */
 }
 
 a:hover {
@@ -102,12 +119,11 @@ div {
 .payment-summary {
     font-size: 18px;
     margin-bottom: 20px;
-    color: #333; /* Темный цвет текста для читаемости */
 }
 
 .price {
     font-weight: bold;
-    color: #28a745; /* Зеленый для отображения цен */
+    color: green;
 }
 
 .payment-form {
@@ -196,7 +212,6 @@ div {
     font-size: 14px; /* Размер текста */
     display: flex; /* Flexbox для выравнивания */
     justify-content: space-between; /* Распределяем ссылки равномерно */
-    border-radius: 5px; /* Скругляем углы */
 }
 
 .top-nav .menu-link {
@@ -249,4 +264,44 @@ div {
     margin-left: 20px; /* Отступ от кнопок */
     font-size: 14px; /* Размер текста */
     color: #333; /* Темный текст */
+}
+
+
+/* Стили для списка офисов */
+#office-list {
+    list-style-type: none; /* Убираем стандартные маркеры списка */
+    padding: 0; /* Убираем внутренние отступы */
+    margin: 20px 0; /* Отступы сверху и снизу */
+    font-size: 16px; /* Размер шрифта */
+    color: #333; /* Цвет текста */
+}
+
+#office-list li {
+    margin-bottom: 10px; /* Отступ между элементами списка */
+    padding: 10px; /* Внутренний отступ */
+    background-color: #f9f9f9; /* Светлый фон */
+    border-radius: 5px; /* Скругленные углы */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
+}
+
+#office-list li:hover {
+    background-color: #e0f7fa; /* Цвет фона при наведении */
+    cursor: pointer; /* Курсор в виде руки */
+}
+
+/* Стили для общей стоимости */
+#total-cost {
+    font-size: 18px; /* Размер шрифта */
+    font-weight: bold; /* Жирный текст */
+    color: #2c3e50; /* Темный цвет для текста */
+    background-color: #ecf0f1; /* Светлый фон */
+    padding: 15px; /* Внутренние отступы */
+    border-radius: 8px; /* Скругленные углы */
+    margin-top: 20px; /* Отступ сверху */
+    text-align: center; /* Выравнивание по центру */
+}
+
+#total-cost span {
+    color: #27ae60; /* Зеленый цвет для суммы */
+    font-size: 20px; /* Больший размер шрифта для суммы */
 }
