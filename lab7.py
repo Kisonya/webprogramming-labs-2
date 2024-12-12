@@ -48,7 +48,7 @@ def get_film(id):
     return films[id]
 
 
-@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+@lab7.route('/lab7/rest-api/films/del/<int:id>', methods=['DELETE'])
 def del_film(id):
     # Проверяем, находится ли id в корректном диапазоне
     if id < 0 or id >= len(films):
@@ -57,3 +57,4 @@ def del_film(id):
     # Удаляем фильм с указанным ID
     del films[id]
     return '', 204
+
