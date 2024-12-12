@@ -55,7 +55,7 @@ def delete_film(id):
     return '', 204
 
 
-@lab7.route('/lab7/rest-api/films/update/<int:id>', methods=['PUT'])
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
 def put_film(id):
     if id < 0 or id >= len(films):
         return {"error": "Фильм с указанным ID не найден"}, 404
