@@ -46,12 +46,14 @@ def get_film(id):
     return films[id]
 
 # API: Удаление фильма
-@lab7.route('/lab7/rest-api/films/del/<int:id>', methods=['DELETE'])
-def del_film(id):
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+def delete_film(id):
     if id < 0 or id >= len(films):
         return {"error": "Фильм с указанным ID не найден"}, 404
+    
     del films[id]
     return '', 204
+
 
 @lab7.route('/lab7/rest-api/films/update/<int:id>', methods=['PUT'])
 def put_film(id):
