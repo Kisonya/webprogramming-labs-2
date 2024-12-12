@@ -61,3 +61,17 @@ def put_film(id):
     film = request.get_json()  # Получаем данные из тела запроса
     films[id] = film  # Обновляем фильм в списке
     return films[id]  # Возвращаем обновленный фильм
+
+
+@lab7.route('/lab7/rest-api/films/', methods=['POST'])
+def add_film():
+    # Получаем данные из тела запроса
+    film = request.get_json()
+    if not film:
+        return {"error": "Пустое тело запроса или некорректные данные"}, 400
+
+    # Добавляем фильм в список
+    films.append(film)
+
+    # Возвращаем индекс нового фильма
+    return {"id": len(films) - 1}, 201
