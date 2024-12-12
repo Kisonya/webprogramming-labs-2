@@ -112,6 +112,11 @@ function sendFilm() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(film)
-    });
+    })
+
+    .then(() => {
+        fillFilmList(); // Обновляем таблицу
+        hideModal();    // Закрываем модальное окно
+    })
 }
 
