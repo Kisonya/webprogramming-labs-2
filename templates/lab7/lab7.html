@@ -5,17 +5,77 @@
 {% block script %}
 <script src="{{ url_for('static', filename='lab7/main.js') }}"></script>
 <style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table th, table td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+    }
+
+    table th {
+        background-color: #f4f4f4;
+    }
+
+    table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    button {
+        padding: 5px 10px;
+        margin: 0 5px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
     .modal {
         display: none;
         z-index: 100;
-        box-shadow: 3px 3px 5px black;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         background: white;
         width: 400px;
         left: 50%;
-        top: 220px;
+        top: 20%;
         margin-left: -200px;
         position: absolute;
         padding: 20px;
+        border-radius: 8px;
+    }
+
+    .modal label {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .modal textarea, .modal input {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    .modal button {
+        width: 48%;
+    }
+
+    .modal button:first-child {
+        margin-right: 4%;
     }
     .error-message {
         color: red;
