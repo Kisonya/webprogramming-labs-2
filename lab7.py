@@ -46,3 +46,14 @@ def get_film(id):
     if id < 0 or id >= len(films):
         return {"error": "Фильм с указанным ID не найден"}, 404
     return films[id]
+
+
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+def del_film(id):
+    # Проверяем, находится ли id в корректном диапазоне
+    if id < 0 or id >= len(films):
+        return {"error": "Фильм с указанным ID не найден"}, 404
+    
+    # Удаляем фильм с указанным ID
+    del films[id]
+    return '', 204
