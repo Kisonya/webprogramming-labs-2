@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 lab7 = Blueprint('lab7', __name__)
 
@@ -25,7 +25,7 @@ films = [
         "title": "Parasite",
         "title_ru": "Паразиты",
         "year": 2019,
-        "description": "Алчность и классовая дискриминация угрожают новой симбиотической связи между богатой семьей и бедной семьёй."
+        "description": "Алчность и классовая дискриминация угрожают новой симбиотической связи между богатой семьёй и бедной семьёй."
     }
 ]
 
@@ -33,12 +33,10 @@ films = [
 def main():
     return render_template('lab7/lab7.html', films=films)
 
-
 # API: Получение списка всех фильмов
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
 def get_films():
     return films
-
 
 # API: Получение информации о конкретном фильме по ID
 @lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
@@ -47,14 +45,20 @@ def get_film(id):
         return {"error": "Фильм с указанным ID не найден"}, 404
     return films[id]
 
-
+# API: Удаление фильма
 @lab7.route('/lab7/rest-api/films/del/<int:id>', methods=['DELETE'])
 def del_film(id):
-    # Проверяем, находится ли id в корректном диапазоне
     if id < 0 or id >= len(films):
         return {"error": "Фильм с указанным ID не найден"}, 404
-    
-    # Удаляем фильм с указанным ID
     del films[id]
     return '', 204
 
+# API: Обновление фильма
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
+def put_film(id):
+    if id < 0 or id >= len(films):
+        return {"error": "Фильм с указанным ID не найден"}, 404
+    
+    film = request.get_json()  # Получаем данные из запроса
+    films[id] = film  # Обновляем фильм в списке
+    return films[id]  # Возвращаем обновленный фильм
