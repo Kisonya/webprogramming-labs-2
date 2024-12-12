@@ -60,20 +60,17 @@ def put_film(id):
     if id < 0 or id >= len(films):
         return {"error": "Фильм с указанным ID не найден"}, 404
 
-    film = request.get_json()  # Получаем данные из тела запроса
-    films[id] = film  # Обновляем фильм в списке
-    return films[id]  # Возвращаем обновленный фильм
+    film = request.get_json()
+    if film['description'] == '':
+        return {'description': 'Заполните описание'}, 400
+    films[id] = film
+    return films[id]
 
 
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
-    # Получаем данные из тела запроса
     film = request.get_json()
-    if not film:
-        return {"error": "Пустое тело запроса или некорректные данные"}, 400
-
-    # Добавляем фильм в список
+    if film['description'] == '':
+        return {'description': 'Заполните описание'}, 400
     films.append(film)
-
-    # Возвращаем индекс нового фильма
-    return {"id": len(films) - 1}, 201
+    return films[-1], 201
