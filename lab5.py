@@ -10,6 +10,7 @@ lab5 = Blueprint('lab5', __name__)
 
 # Функция для подключения к базе данных
 def db_connect():
+    print(f"DB_TYPE: {current_app.config['DB_TYPE']}")  # Отладочный вывод
     # Проверяем, какая база данных используется
     if current_app.config['DB_TYPE'] == 'postgres':
         # Подключение к PostgreSQL
