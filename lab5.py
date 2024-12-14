@@ -4,18 +4,17 @@ from psycopg2.extras import RealDictCursor
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 from os import path
+import os
+
 
 # Создание Blueprint для работы с маршрутом "lab5"
 lab5 = Blueprint('lab5', __name__)
 
 # Функция для подключения к базе данных
 def db_connect():
-    # Отладочный вывод для проверки, какой тип БД используется
-    print(f"DB_TYPE from app.config: {current_app.config['DB_TYPE']}")  # Отладочный вывод
-
-    # Проверяем, какая база данных используется
-    if current_app.config['DB_TYPE'] == 'postgres':
-        print("Trying to connect to PostgreSQL...")  # Отладочный вывод
+    db_type = os.environ.get('DB_TYPE', 'sqlite')  # Жёсткая установка по умолчанию
+    print(f"DB_TYPE from os.environ: {db_type}")
+    if db_type == 'postgres':
         # Подключение к PostgreSQL
         conn = psycopg2.connect(
             host='127.0.0.1',
@@ -23,19 +22,17 @@ def db_connect():
             user='kisonya_knowledge_base',
             password='123'
         )
-        # Создаем курсор с поддержкой словарей
         cur = conn.cursor(cursor_factory=RealDictCursor)
     else:
-        print("Trying to connect to SQLite...")  # Отладочный вывод
         # Подключение к SQLite
         dir_path = path.dirname(path.realpath(__file__))
         db_path = path.join(dir_path, "database.db")
-        print(f"Using SQLite DB path: {db_path}")  # Отладочный вывод
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
     return conn, cur
+
 
 
 # Функция для закрытия подключения к базе данных

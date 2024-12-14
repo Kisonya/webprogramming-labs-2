@@ -1,5 +1,9 @@
 from dotenv import load_dotenv
 load_dotenv()
+
+print(f"Loaded SECRET_KEY: {os.getenv('SECRET_KEY')}")
+print(f"Loaded DB_TYPE: {os.getenv('DB_TYPE')}")  # Проверка, подгрузился ли sqlite
+
 from flask import Flask, url_for, redirect, render_template
 from lab1 import lab1
 from lab2 import lab2
