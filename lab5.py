@@ -10,9 +10,12 @@ lab5 = Blueprint('lab5', __name__)
 
 # Функция для подключения к базе данных
 def db_connect():
-    print(f"DB_TYPE: {current_app.config['DB_TYPE']}")  # Отладочный вывод
+    # Отладочный вывод для проверки, какой тип БД используется
+    print(f"DB_TYPE from app.config: {current_app.config['DB_TYPE']}")  # Отладочный вывод
+
     # Проверяем, какая база данных используется
     if current_app.config['DB_TYPE'] == 'postgres':
+        print("Trying to connect to PostgreSQL...")  # Отладочный вывод
         # Подключение к PostgreSQL
         conn = psycopg2.connect(
             host='127.0.0.1',
@@ -23,14 +26,17 @@ def db_connect():
         # Создаем курсор с поддержкой словарей
         cur = conn.cursor(cursor_factory=RealDictCursor)
     else:
+        print("Trying to connect to SQLite...")  # Отладочный вывод
         # Подключение к SQLite
         dir_path = path.dirname(path.realpath(__file__))
         db_path = path.join(dir_path, "database.db")
+        print(f"Using SQLite DB path: {db_path}")  # Отладочный вывод
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
     return conn, cur
+
 
 # Функция для закрытия подключения к базе данных
 def db_close(conn, cur):
