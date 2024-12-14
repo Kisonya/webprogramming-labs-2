@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, url_for, redirect, render_template
 from lab1 import lab1
 from lab2 import lab2
