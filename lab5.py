@@ -6,7 +6,6 @@ import sqlite3
 from os import path
 import os
 
-
 # Создание Blueprint для работы с маршрутом "lab5"
 lab5 = Blueprint('lab5', __name__)
 
@@ -34,7 +33,6 @@ def db_connect():
     return conn, cur
 
 
-
 # Функция для закрытия подключения к базе данных
 def db_close(conn, cur):
     conn.commit()
@@ -46,7 +44,6 @@ def db_close(conn, cur):
 def index():
     user = session.get('login', "anonymous")
     return render_template('lab5/lab5.html', login=user)
-
 
 # Регистрация нового пользователя
 @lab5.route('/lab5/register', methods=['GET', 'POST'])
@@ -64,7 +61,7 @@ def register():
     conn, cur = db_connect()
 
     # Проверка на существование пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("SELECT login FROM users WHERE login=%s;", (login,))
     else:
         cur.execute("SELECT login FROM users WHERE login=?;", (login,))
@@ -77,14 +74,13 @@ def register():
     password_hash = generate_password_hash(password)
 
     # Сохранение нового пользователя в базу данных
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, password_hash))
     else:
         cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (login, password_hash))
 
     db_close(conn, cur)
     return render_template('lab5/success.html', login=login)
-
 
 # Вход в систему
 @lab5.route('/lab5/login', methods=['GET', 'POST'])
@@ -102,7 +98,7 @@ def login():
     conn, cur = db_connect()
 
     # Поиск пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
     else:
         cur.execute("SELECT * FROM users WHERE login=?;", (login,))
@@ -117,13 +113,11 @@ def login():
     db_close(conn, cur)
     return render_template('lab5/success_login.html', login=login)
 
-
 # Выход из системы
 @lab5.route('/lab5/logout')
 def logout():
     session.clear()  # Очищаем сессию
     return redirect(url_for('lab5.index'))
-
 
 # Создание новой статьи
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
@@ -145,7 +139,7 @@ def create():
     conn, cur = db_connect()
 
     # Получение ID пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
     else:
         cur.execute("SELECT id FROM users WHERE login=?;", (login,))
@@ -158,7 +152,7 @@ def create():
     user_id = user['id']
 
     # Вставка новой статьи
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
                     (user_id, title, article_text))
     else:
@@ -167,7 +161,6 @@ def create():
 
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
-
 
 # Список статей пользователя
 @lab5.route('/lab5/list', methods=['GET'])
@@ -179,7 +172,7 @@ def list_articles():
     conn, cur = db_connect()
 
     # Получение ID пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
     else:
         cur.execute("SELECT id FROM users WHERE login=?;", (login,))
@@ -192,7 +185,7 @@ def list_articles():
     user_id = user['id']
 
     # Получение статей пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("SELECT * FROM articles WHERE user_id=%s;", (user_id,))
     else:
         cur.execute("SELECT * FROM articles WHERE user_id=?;", (user_id,))
@@ -207,7 +200,6 @@ def list_articles():
 
     return render_template('lab5/articles.html', articles=articles)
 
-
 # Удаление статьи
 @lab5.route('/lab5/delete/<int:article_id>', methods=['POST'])
 def delete_article(article_id):
@@ -218,14 +210,13 @@ def delete_article(article_id):
     conn, cur = db_connect()
 
     # Удаление статьи
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("DELETE FROM articles WHERE id=%s;", (article_id,))
     else:
         cur.execute("DELETE FROM articles WHERE id=?;", (article_id,))
 
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
-
 
 # Редактирование статьи
 @lab5.route('/lab5/edit/<int:article_id>', methods=['GET', 'POST'])
@@ -238,7 +229,7 @@ def edit_article(article_id):
 
     if request.method == 'GET':
         # Получение данных статьи
-        if current_app.config['DB_TYPE'] == 'postgres':
+        if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
             cur.execute("SELECT * FROM articles WHERE id=%s;", (article_id,))
         else:
             cur.execute("SELECT * FROM articles WHERE id=?;", (article_id,))
@@ -258,7 +249,7 @@ def edit_article(article_id):
     if not (title and article_text):
         return render_template('lab5/edit_article.html', error="Заполните все поля", article={"id": article_id})
 
-    if current_app.config['DB_TYPE'] == 'postgres':
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
         cur.execute("UPDATE articles SET title=%s, article_text=%s WHERE id=%s;", (title, article_text, article_id))
     else:
         cur.execute("UPDATE articles SET title=?, article_text=? WHERE id=?;", (title, article_text, article_id))
