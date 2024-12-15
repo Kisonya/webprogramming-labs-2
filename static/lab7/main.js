@@ -103,19 +103,11 @@ function editFilm(id) {
 
 function sendFilm() {
     const id = document.getElementById('id').value;
-    const title = document.getElementById('title').value.trim();
-    const titleRu = document.getElementById('title-ru').value.trim();
-    const year = document.getElementById('year').value.trim();
-    const description = document.getElementById('description').value.trim();
-
-    // Если оригинальное название пустое, а русское название заполнено, копируем его
-    const finalTitle = title || titleRu;
-
     const film = {
-        title: finalTitle,
-        title_ru: titleRu,
-        year: year,
-        description: description
+        title: document.getElementById('title').value,
+        title_ru: document.getElementById('title-ru').value,
+        year: document.getElementById('year').value,
+        description: document.getElementById('description').value
     };
 
     const url = `/lab7/rest-api/films/${id}`;
@@ -129,20 +121,23 @@ function sendFilm() {
         body: JSON.stringify(film)
     })
     .then(function (resp) {
-        if (resp.ok) {
-            fillFilmList(); // Обновляем список фильмов
-            hideModal();    // Закрываем модальное окно
-            return {};
-        }
-        return resp.json(); // Возвращаем ошибки валидации
-    })
-    .then(function (errors) {
-        if (errors.title_ru) {
-            alert(errors.title_ru); // Показываем ошибку для русского названия
-        }
-        if (errors.description) {
-            document.getElementById('description-error').innerText = errors.description; // Ошибка описания
-        }
+        return resp.json().then(function (data) {
+            if (!resp.ok) {
+                // Обновляем ошибки на форме
+                if (data.title_ru) {
+                    alert(data.title_ru);
+                }
+                if (data.year) {
+                    alert(data.year);
+                }
+                if (data.description) {
+                    document.getElementById('description-error').innerText = data.description;
+                }
+                return;
+            }
+            fillFilmList();
+            hideModal();
+        });
     })
     .catch(function (error) {
         console.error('Ошибка:', error);
