@@ -13,10 +13,7 @@ lab5 = Blueprint('lab5', __name__)
 # Функция для подключения к базе данных
 def db_connect():
     db_type = os.environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
-    print(f"DB_TYPE is set to: {db_type}")
-
     if db_type == 'sqlite':  # Если явно указана SQLite
-        print("Using SQLite...")
         dir_path = path.dirname(path.realpath(__file__))
         db_path = path.join(dir_path, "database.db")
         print(f"SQLite database path: {db_path}")
@@ -24,7 +21,6 @@ def db_connect():
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
     else:  # По умолчанию PostgreSQL
-        print("Using PostgreSQL...")
         try:
             conn = psycopg2.connect(
                 host='127.0.0.1',
