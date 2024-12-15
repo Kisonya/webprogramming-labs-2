@@ -96,18 +96,26 @@ def put_film(id):
 
     film = request.get_json()  # Получаем данные фильма из запроса
 
+    # Если оригинальное название пустое, заполняем его русским названием
+    if not film.get('title', '').strip() and film.get('title_ru', '').strip():
+        film['title'] = film['title_ru']
+
     # Выполняем валидацию
     errors = validate_film(film)  # Проверяем данные фильма на корректность
     if errors:
         return errors, 400  # Возвращаем ошибки валидации, если они есть
 
     films[id] = film  # Обновляем данные фильма
-    return films[id]  # Возвращаем обновлённые данные фильма
+    return films[id]
 
 # API: Добавление нового фильма
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
     film = request.get_json()  # Получаем данные нового фильма из запроса
+
+    # Если оригинальное название пустое, заполняем его русским названием
+    if not film.get('title', '').strip() and film.get('title_ru', '').strip():
+        film['title'] = film['title_ru']
 
     # Выполняем валидацию
     errors = validate_film(film)  # Проверяем данные фильма на корректность
