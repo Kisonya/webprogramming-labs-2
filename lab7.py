@@ -10,29 +10,27 @@ lab7 = Blueprint('lab7', __name__)
 # Функция подключения к базе данных
 def db_connect():
     db_type = os.environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
-    
-    if db_type == 'sqlite':
-        # Подключение к SQLite
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        db_path = os.path.join(dir_path, "database.db")
+    if db_type == 'sqlite':  # Если явно указана SQLite
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, "database.db")
+        print(f"SQLite database path: {db_path}")
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-    else:
-        # Подключение к PostgreSQL
+    else:  # По умолчанию PostgreSQL
         try:
             conn = psycopg2.connect(
-                host='127.0.0.1',  # Убедитесь, что здесь правильный хост
-                database='kisonya_knowledge_base',  # Название БД из 5-й лабораторной
+                host='127.0.0.1',
+                database='kisonya_knowledge_base',
                 user='kisonya_knowledge_base',
                 password='123',
-                client_encoding='utf8'  # Явно задаём кодировку
+                options='-c client_encoding=UTF8'  # Указываем кодировку клиента
             )
             cur = conn.cursor(cursor_factory=RealDictCursor)
         except Exception as e:
             print(f"Error connecting to PostgreSQL: {e}")
             raise
-    
+
     return conn, cur
 
 # Валидация данных фильма
