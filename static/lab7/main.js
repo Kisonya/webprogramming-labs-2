@@ -53,13 +53,13 @@ function deleteFilm(id, title) {
 
     fetch(`/lab7/rest-api/films/${id}`, { method: 'DELETE' })
         .then(function () {
-            fillFilmList();
+            fillFilmList(); // Обновляем список фильмов после удаления
         });
 }
 
 function showModal() {
     document.querySelector('div.modal').style.display = 'block';
-    clearErrors(); // Очищаем предыдущие ошибки
+    document.getElementById('description-error').innerText = ''; // Очистка сообщения об ошибке
 }
 
 function hideModal() {
@@ -96,19 +96,24 @@ function editFilm(id) {
 
 function sendFilm() {
     const id = document.getElementById('id').value;
+    const titleRu = document.getElementById('title-ru').value.trim();
+    const title = document.getElementById('title').value.trim();
+
+    // Проверка: если оригинальное название пустое, копируем из русского названия
+    let finalTitle = title;
+    if (title === '' && titleRu !== '') {
+        finalTitle = titleRu;
+        document.getElementById('title').value = finalTitle; // Обновляем поле в форме
+    }
+
     const film = {
-        title: document.getElementById('title').value.trim(),
-        title_ru: document.getElementById('title-ru').value.trim(),
+        title: finalTitle,
+        title_ru: titleRu,
         year: document.getElementById('year').value.trim(),
         description: document.getElementById('description').value.trim()
     };
 
-    // Если оригинальное название пустое, но русское название заполнено
-    if (!film.title && film.title_ru) {
-        film.title = film.title_ru;
-    }
-
-    const url = id === '' ? `/lab7/rest-api/films/` : `/lab7/rest-api/films/${id}`;
+    const url = `/lab7/rest-api/films/${id}`;
     const method = id === '' ? 'POST' : 'PUT';
 
     fetch(url, {
@@ -118,43 +123,30 @@ function sendFilm() {
         },
         body: JSON.stringify(film)
     })
-        .then(function (resp) {
-            if (resp.ok) {
-                fillFilmList();
-                hideModal();
-                return {};
-            }
-            return resp.json();
-        })
-        .then(function (errors) {
-            if (errors) {
-                displayErrors(errors);
-            }
-        })
-        .catch(function (error) {
-            console.error('Ошибка:', error);
-        });
-}
-
-function clearErrors() {
-    document.getElementById('title-error').innerText = '';
-    document.getElementById('title-ru-error').innerText = '';
-    document.getElementById('description-error').innerText = '';
-}
-
-function displayErrors(errors) {
-    clearErrors();
-
-    if (errors.title) {
-        document.getElementById('title-error').innerText = errors.title;
-    }
-    if (errors.title_ru) {
-        document.getElementById('title-ru-error').innerText = errors.title_ru;
-    }
-    if (errors.description) {
-        document.getElementById('description-error').innerText = errors.description;
-    }
-    if (errors.year) {
-        alert(errors.year); // Ошибки для года выводятся через alert
-    }
+    .then(function (resp) {
+        if (resp.ok) {
+            fillFilmList();
+            hideModal();
+            return {};
+        }
+        return resp.json();
+    })
+    .then(function (errors) {
+        // Отображение ошибок в форме
+        if (errors.title_ru) {
+            document.getElementById('title-ru-error').innerText = errors.title_ru;
+        }
+        if (errors.title) {
+            document.getElementById('title-error').innerText = errors.title;
+        }
+        if (errors.year) {
+            document.getElementById('year-error').innerText = errors.year;
+        }
+        if (errors.description) {
+            document.getElementById('description-error').innerText = errors.description;
+        }
+    })
+    .catch(function (error) {
+        console.error('Ошибка:', error);
+    });
 }
