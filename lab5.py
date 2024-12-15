@@ -12,30 +12,33 @@ lab5 = Blueprint('lab5', __name__)
 
 # Функция для подключения к базе данных
 def db_connect():
-    db_type = os.environ.get('DB_TYPE', 'sqlite')  # Жёсткая установка по умолчанию
-    print(f"Loaded DB_TYPE from environment: '{db_type}'")  # Печать для отладки
-    if db_type not in ['postgres', 'sqlite']:
-        print("Warning: DB_TYPE has invalid value! Falling back to SQLite.")
+    db_type = os.environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
+    print(f"DB_TYPE is set to: {db_type}")
 
-    if db_type == 'postgres':
-        print("Connecting to PostgreSQL...")
-        conn = psycopg2.connect(
-            host='127.0.0.1',
-            database='kisonya_knowledge_base',
-            user='kisonya_knowledge_base',
-            password='123'
-        )
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-    else:
-        print("Connecting to SQLite...")
+    if db_type == 'sqlite':  # Если явно указана SQLite
+        print("Using SQLite...")
         dir_path = path.dirname(path.realpath(__file__))
         db_path = path.join(dir_path, "database.db")
-        print(f"SQLite DB Path: {db_path}")
+        print(f"SQLite database path: {db_path}")
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
+    else:  # По умолчанию PostgreSQL
+        print("Using PostgreSQL...")
+        try:
+            conn = psycopg2.connect(
+                host='127.0.0.1',
+                database='kisonya_knowledge_base',
+                user='kisonya_knowledge_base',
+                password='123'
+            )
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+        except Exception as e:
+            print(f"Error connecting to PostgreSQL: {e}")
+            raise
 
     return conn, cur
+
 
 
 # Функция для закрытия подключения к базе данных
