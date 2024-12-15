@@ -103,11 +103,19 @@ function editFilm(id) {
 
 function sendFilm() {
     const id = document.getElementById('id').value;
+    const title = document.getElementById('title').value.trim();
+    const titleRu = document.getElementById('title-ru').value.trim();
+    const year = document.getElementById('year').value.trim();
+    const description = document.getElementById('description').value.trim();
+
+    // Если оригинальное название пустое, а русское название заполнено, копируем его
+    const finalTitle = title || titleRu;
+
     const film = {
-        title: document.getElementById('title').value,
-        title_ru: document.getElementById('title-ru').value,
-        year: document.getElementById('year').value,
-        description: document.getElementById('description').value
+        title: finalTitle,
+        title_ru: titleRu,
+        year: year,
+        description: description
     };
 
     const url = `/lab7/rest-api/films/${id}`;
@@ -122,17 +130,19 @@ function sendFilm() {
     })
     .then(function (resp) {
         if (resp.ok) {
-            fillFilmList();
-            hideModal();
+            fillFilmList(); // Обновляем список фильмов
+            hideModal();    // Закрываем модальное окно
             return {};
         }
-        return resp.json();
+        return resp.json(); // Возвращаем ошибки валидации
     })
     .then(function (errors) {
-        if (errors.title_ru) document.getElementById('title-ru-error').innerText = errors.title_ru;
-        if (errors.title) document.getElementById('title-error').innerText = errors.title;
-        if (errors.year) document.getElementById('year-error').innerText = errors.year;
-        if (errors.description) document.getElementById('description-error').innerText = errors.description;
+        if (errors.title_ru) {
+            alert(errors.title_ru); // Показываем ошибку для русского названия
+        }
+        if (errors.description) {
+            document.getElementById('description-error').innerText = errors.description; // Ошибка описания
+        }
     })
     .catch(function (error) {
         console.error('Ошибка:', error);
