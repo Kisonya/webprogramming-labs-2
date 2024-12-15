@@ -34,7 +34,6 @@ def db_connect():
     return conn, cur
 
 
-
 # Функция для закрытия подключения к базе данных
 def db_close(conn, cur):
     conn.commit()
