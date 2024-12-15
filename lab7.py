@@ -1,19 +1,18 @@
+import os  # Добавляем импорт os для работы с переменными окружения
 from flask import Blueprint, render_template, request, current_app
 from datetime import datetime
 import sqlite3
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from os import path, environ
 
-# Создаём Blueprint для маршрутов лабораторной работы 7
 lab7 = Blueprint('lab7', __name__)
 
 # Функция подключения к базе данных
 def db_connect():
     db_type = os.environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
     if db_type == 'sqlite':  # Если явно указана SQLite
-        dir_path = path.dirname(path.realpath(__file__))
-        db_path = path.join(dir_path, "database.db")
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        db_path = os.path.join(dir_path, "database.db")
         print(f"SQLite database path: {db_path}")
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
