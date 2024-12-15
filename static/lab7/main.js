@@ -46,7 +46,6 @@ function fillFilmList() {
         });
 }
 
-
 function deleteFilm(id, title) {
     if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) {
         return;
@@ -60,7 +59,7 @@ function deleteFilm(id, title) {
 
 function showModal() {
     document.querySelector('div.modal').style.display = 'block';
-    document.getElementById('description-error').innerText = ''; // Очистка сообщения об ошибке
+    clearErrors();
 }
 
 function hideModal() {
@@ -71,6 +70,13 @@ function cancel() {
     hideModal();
 }
 
+function clearErrors() {
+    document.getElementById('title-ru-error').innerText = '';
+    document.getElementById('title-error').innerText = '';
+    document.getElementById('year-error').innerText = '';
+    document.getElementById('description-error').innerText = '';
+}
+
 function addFilm() {
     document.getElementById('id').value = '';
     document.getElementById('title').value = '';
@@ -79,7 +85,6 @@ function addFilm() {
     document.getElementById('description').value = '';
     showModal();
 }
-
 
 function editFilm(id) {
     fetch(`/lab7/rest-api/films/${id}`)
@@ -95,7 +100,6 @@ function editFilm(id) {
             showModal();
         });
 }
-
 
 function sendFilm() {
     const id = document.getElementById('id').value;
@@ -120,14 +124,15 @@ function sendFilm() {
         if (resp.ok) {
             fillFilmList();
             hideModal();
-            return {}; // Возвращаем пустой объект, чтобы не вызвать ошибку
+            return {};
         }
-        return resp.json(); // Возвращаем JSON, если запрос не успешен
+        return resp.json();
     })
     .then(function (errors) {
-        if (errors.description) {
-            document.getElementById('description-error').innerText = errors.description;
-        }
+        if (errors.title_ru) document.getElementById('title-ru-error').innerText = errors.title_ru;
+        if (errors.title) document.getElementById('title-error').innerText = errors.title;
+        if (errors.year) document.getElementById('year-error').innerText = errors.year;
+        if (errors.description) document.getElementById('description-error').innerText = errors.description;
     })
     .catch(function (error) {
         console.error('Ошибка:', error);
