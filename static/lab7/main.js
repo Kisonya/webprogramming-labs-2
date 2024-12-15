@@ -103,13 +103,27 @@ function editFilm(id) {
 
 function sendFilm() {
     const id = document.getElementById('id').value;
+
+    // Собираем данные фильма
+    let title = document.getElementById('title').value.trim();
+    let title_ru = document.getElementById('title-ru').value.trim();
+    const year = document.getElementById('year').value.trim();
+    const description = document.getElementById('description').value.trim();
+
+    // Если оригинальное название пустое, но есть русское название, подставляем его
+    if (title === '' && title_ru !== '') {
+        title = title_ru;
+    }
+
+    // Подготавливаем объект с данными
     const film = {
-        title: document.getElementById('title').value,
-        title_ru: document.getElementById('title-ru').value,
-        year: document.getElementById('year').value,
-        description: document.getElementById('description').value
+        title: title,
+        title_ru: title_ru,
+        year: year,
+        description: description
     };
 
+    // Определяем URL и метод запроса
     const url = `/lab7/rest-api/films/${id}`;
     const method = id === '' ? 'POST' : 'PUT';
 
@@ -123,7 +137,7 @@ function sendFilm() {
     .then(function (resp) {
         return resp.json().then(function (data) {
             if (!resp.ok) {
-                // Обновляем ошибки на форме
+                // Выводим ошибки на форму
                 if (data.title_ru) {
                     alert(data.title_ru);
                 }
