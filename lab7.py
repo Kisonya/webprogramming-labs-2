@@ -4,6 +4,7 @@ from datetime import datetime
 import sqlite3
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from os import path
 
 lab7 = Blueprint('lab7', __name__)
 
