@@ -32,6 +32,7 @@ def db_connect():
 
     return conn, cur
 
+
 # Функция для закрытия подключения к базе данных
 def db_close(conn, cur):
     conn.commit()
@@ -53,19 +54,30 @@ def register():
     login = request.form.get('login')
     password = request.form.get('password')
 
+    # Проверка заполненности полей
     if not (login and password):
         return render_template('lab5/register.html', error='Заполните все поля')
 
     conn, cur = db_connect()
 
-    cur.execute("SELECT login FROM users WHERE login=?;", (login,))
+    # Проверка на существование пользователя
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("SELECT login FROM users WHERE login=%s;", (login,))
+    else:
+        cur.execute("SELECT login FROM users WHERE login=?;", (login,))
 
     if cur.fetchone():
         db_close(conn, cur)
         return render_template('lab5/register.html', error='Такой пользователь уже существует')
 
+    # Хэшируем пароль
     password_hash = generate_password_hash(password)
-    cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (login, password_hash))
+
+    # Сохранение нового пользователя в базу данных
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, password_hash))
+    else:
+        cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (login, password_hash))
 
     db_close(conn, cur)
     return render_template('lab5/success.html', login=login)
@@ -79,11 +91,17 @@ def login():
     login = request.form.get('login')
     password = request.form.get('password')
 
+    # Проверка заполненности полей
     if not (login and password):
         return render_template('lab5/login.html', error='Заполните все поля')
 
     conn, cur = db_connect()
-    cur.execute("SELECT * FROM users WHERE login=?;", (login,))
+
+    # Поиск пользователя
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
+    else:
+        cur.execute("SELECT * FROM users WHERE login=?;", (login,))
 
     user = cur.fetchone()
 
@@ -91,9 +109,15 @@ def login():
         db_close(conn, cur)
         return render_template('lab5/login.html', error='Логин и/или пароль неверны')
 
-    session['login'] = login
+    session['login'] = login  # Сохраняем логин в сессии
     db_close(conn, cur)
     return render_template('lab5/success_login.html', login=login)
+
+# Выход из системы
+@lab5.route('/lab5/logout')
+def logout():
+    session.clear()  # Очищаем сессию
+    return redirect(url_for('lab5.index'))
 
 # Создание новой статьи
 @lab5.route('/lab5/create', methods=['GET', 'POST'])
@@ -108,21 +132,32 @@ def create():
     title = request.form.get('title')
     article_text = request.form.get('article_text')
 
+    # Проверка на пустые поля
     if not (title and article_text):
         return render_template('lab5/create_article.html', error="Заполните все поля")
 
     conn, cur = db_connect()
-    cur.execute("SELECT id FROM users WHERE login=?;", (login,))
-    user = cur.fetchone()
 
+    # Получение ID пользователя
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    else:
+        cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+
+    user = cur.fetchone()
     if not user:
         db_close(conn, cur)
         return "Ошибка: пользователь не найден.", 400
 
-    login_id = user['id']  # Используем login_id вместо user_id
+    login_id = user['id']
 
-    cur.execute("INSERT INTO articles (login_id, title, article_text) VALUES (?, ?, ?);",
-                (login_id, title, article_text))
+    # Вставка новой статьи
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("INSERT INTO articles (login_id, title, article_text) VALUES (%s, %s, %s);",
+                    (login_id, title, article_text))
+    else:
+        cur.execute("INSERT INTO articles (login_id, title, article_text) VALUES (?, ?, ?);",
+                    (login_id, title, article_text))
 
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
@@ -135,20 +170,31 @@ def list_articles():
         return redirect(url_for('lab5.login'))
 
     conn, cur = db_connect()
-    cur.execute("SELECT id FROM users WHERE login=?;", (login,))
-    user = cur.fetchone()
 
+    # Получение ID пользователя
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+    else:
+        cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+
+    user = cur.fetchone()
     if not user:
         db_close(conn, cur)
         return "Ошибка: пользователь не найден.", 400
 
     login_id = user['id']
 
-    cur.execute("SELECT * FROM articles WHERE login_id=?;", (login_id,))
+    # Получение статей пользователя
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("SELECT * FROM articles WHERE login_id=%s;", (login_id,))
+    else:
+        cur.execute("SELECT * FROM articles WHERE login_id=?;", (login_id,))
+
     articles = cur.fetchall()
 
     db_close(conn, cur)
 
+    # Если нет статей, выводим сообщение
     if not articles:
         return render_template('lab5/articles.html', articles=[], message="У вас пока нет статей")
 
@@ -162,7 +208,13 @@ def delete_article(article_id):
         return redirect(url_for('lab5.login'))
 
     conn, cur = db_connect()
-    cur.execute("DELETE FROM articles WHERE id=?;", (article_id,))
+
+    # Удаление статьи
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("DELETE FROM articles WHERE id=%s;", (article_id,))
+    else:
+        cur.execute("DELETE FROM articles WHERE id=?;", (article_id,))
+
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
 
@@ -176,7 +228,12 @@ def edit_article(article_id):
     conn, cur = db_connect()
 
     if request.method == 'GET':
-        cur.execute("SELECT * FROM articles WHERE id=?;", (article_id,))
+        # Получение данных статьи
+        if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+            cur.execute("SELECT * FROM articles WHERE id=%s;", (article_id,))
+        else:
+            cur.execute("SELECT * FROM articles WHERE id=?;", (article_id,))
+
         article = cur.fetchone()
         db_close(conn, cur)
 
@@ -185,13 +242,17 @@ def edit_article(article_id):
 
         return render_template('lab5/edit_article.html', article=article)
 
+    # Сохранение изменений
     title = request.form.get('title')
     article_text = request.form.get('article_text')
 
     if not (title and article_text):
         return render_template('lab5/edit_article.html', error="Заполните все поля", article={"id": article_id})
 
-    cur.execute("UPDATE articles SET title=?, article_text=? WHERE id=?;", (title, article_text, article_id))
+    if os.environ.get('DB_TYPE', 'sqlite') == 'postgres':
+        cur.execute("UPDATE articles SET title=%s, article_text=%s WHERE id=%s;", (title, article_text, article_id))
+    else:
+        cur.execute("UPDATE articles SET title=?, article_text=? WHERE id=?;", (title, article_text, article_id))
 
     db_close(conn, cur)
     return redirect(url_for('lab5.list_articles'))
