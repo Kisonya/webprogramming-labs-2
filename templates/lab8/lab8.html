@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+    <div class="main-nav">
+        <h1>База знаний</h1>
+        <nav>
+            <a href="{{ url_for('lab8.articles') }}" class="nav-button">Список статей</a>
+            <a href="{{ url_for('lab8.create') }}" class="nav-button">Создать статью</a>
+            <a href="{{ url_for('lab8.login') }}" class="nav-button">Войти</a>
+            <a href="{{ url_for('lab8.register') }}" class="nav-button">Регистрация</a>
+            {% if session.get('login') %}
+                <span class="user-info">Вы вошли как: {{ session.get('login') }}</span>
+                <a href="{{ url_for('lab8.logout') }}" class="nav-button">Выйти</a>
+            {% else %}
+                <span class="user-info">Anonymous</span>
+            {% endif %}
+        </nav>
+    </div>
+<main>
+    <p>Добро пожаловать в базу знаний. Выберите действие из меню.</p>
+</main>
+{% endblock %}
