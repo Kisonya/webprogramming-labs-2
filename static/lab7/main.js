@@ -15,10 +15,18 @@ function fillFilmList() {
                 let tdYear = document.createElement('td');
                 let tdActions = document.createElement('td');
 
-                tdTitleRus.innerText = films[i].title_ru;
-                tdTitle.innerHTML = films[i].title === films[i].title_ru
-                    ? ''
-                    : `<i>(${films[i].title})</i>`;
+                // Логика отображения оригинального названия
+                let titleRus = films[i].title_ru;
+                let title = films[i].title;
+                tdTitleRus.innerText = titleRus;
+
+                // Если оригинальное название присутствует и не совпадает с русским, показываем его в скобках
+                if (title && title !== titleRus) {
+                    tdTitle.innerHTML = `<i>(${title})</i>`;
+                } else {
+                    tdTitle.innerHTML = ''; // Если совпадает или пустое, ничего не показываем
+                }
+
                 tdYear.innerText = films[i].year;
 
                 let editButton = document.createElement('button');
@@ -45,6 +53,7 @@ function fillFilmList() {
             }
         });
 }
+
 
 function deleteFilm(id, title) {
     if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) {
