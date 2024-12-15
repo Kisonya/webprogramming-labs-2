@@ -18,9 +18,12 @@ function fillFilmList() {
                 let tdActions = document.createElement('td');
 
                 tdTitleRus.innerText = films[i].title_ru;
-                tdTitle.innerHTML = films[i].title === films[i].title_ru || !films[i].title
-                    ? ''  // Если оригинальное название совпадает с русским или пустое, не показываем
-                    : `<i>(${films[i].title})</i>`;
+
+                // Если оригинальное название не пустое, добавляем его в скобках
+                tdTitle.innerHTML = films[i].title 
+                    ? `<i>(${films[i].title})</i>` 
+                    : '';
+
                 tdYear.innerText = films[i].year;
 
                 let editButton = document.createElement('button');
@@ -61,7 +64,7 @@ function deleteFilm(id, title) {
 
 function showModal() {
     document.querySelector('div.modal').style.display = 'block';
-    document.getElementById('description-error').innerText = '';
+    document.getElementById('description-error').innerText = ''; // Очищаем сообщение об ошибке
 }
 
 function hideModal() {
@@ -73,6 +76,7 @@ function cancel() {
 }
 
 function addFilm() {
+    // Очищаем форму
     document.getElementById('id').value = '';
     document.getElementById('title').value = '';
     document.getElementById('title-ru').value = '';
@@ -101,9 +105,9 @@ function sendFilm() {
     const titleRu = document.getElementById('title-ru').value.trim();
     let title = document.getElementById('title').value.trim();
 
-    // Если оригинальное название пустое, копируем русское название
+    // Если оригинальное название пустое, копируем русское название с символом "*"
     if (!title && titleRu) {
-        title = titleRu;
+        title = `${titleRu}*`;
     }
 
     const film = {
