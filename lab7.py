@@ -1,64 +1,38 @@
-from flask import Blueprint, render_template, request  # Импортируем компоненты Flask
-from datetime import datetime  # Импортируем модуль для работы с датой
+from flask import Blueprint, render_template, request, current_app
+from datetime import datetime
+import sqlite3
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from os import path, environ
 
 # Создаём Blueprint для маршрутов лабораторной работы 7
 lab7 = Blueprint('lab7', __name__)
 
-# Предопределённый список фильмов с данными о них
-films = [
-    {
-        "title": "Inception",
-        "title_ru": "Начало",
-        "year": 2010,
-        "description": "Вор, который крадёт корпоративные секреты с помощью технологий совместного сна, получает шанс искупить свои преступления, внедрив идею в сознание генерального директора."
-    },
-    {
-        "title": "The Matrix",
-        "title_ru": "Матрица",
-        "year": 1999,
-        "description": "Компьютерный хакер узнаёт от загадочных повстанцев правду о своей реальности и о своей роли в войне против её создателей."
-    },
-    {
-        "title": "Interstellar",
-        "title_ru": "Интерстеллар",
-        "year": 2014,
-        "description": "Группа исследователей путешествует через червоточину в космосе в попытке обеспечить выживание человечества."
-    },
-    {
-        "title": "Parasite",
-        "title_ru": "Паразиты",
-        "year": 2019,
-        "description": "Алчность и классовая дискриминация угрожают новой симбиотической связи между богатой семьёй и бедной семьёй."
-    }
-]
+# Функция подключения к базе данных
+def db_connect():
+    db_type = environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
+    if db_type == 'sqlite':  # Подключение к SQLite
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, "database.db")
+        print(f"SQLite database path: {db_path}")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+    else:  # Подключение к PostgreSQL
+        try:
+            conn = psycopg2.connect(
+                host='127.0.0.1',
+                database='lab7_films_db',  # Имя новой БД для фильмов
+                user='kisonya_knowledge_base',
+                password='123'
+            )
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+        except Exception as e:
+            print(f"Error connecting to PostgreSQL: {e}")
+            raise
+    return conn, cur
 
-# Маршрут для отображения страницы
-@lab7.route('/lab7/')
-def main():
-    return render_template('lab7/lab7.html', films=films)
-
-# API: Получение списка всех фильмов
-@lab7.route('/lab7/rest-api/films/', methods=['GET'])
-def get_films():
-    return films
-
-# API: Получение информации о конкретном фильме по ID
-@lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
-def get_film(id):
-    if id < 0 or id >= len(films):
-        return {"error": "Фильм с указанным ID не найден"}, 404
-    return films[id]
-
-# API: Удаление фильма
-@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
-def delete_film(id):
-    if id < 0 or id >= len(films):
-        return {"error": "Фильм с указанным ID не найден"}, 404
-    
-    del films[id]
-    return '', 204
-
-# API: Валидация данных фильма
+# Валидация данных фильма
 def validate_film(film):
     errors = {}
     current_year = datetime.now().year
@@ -69,7 +43,7 @@ def validate_film(film):
 
     # Проверка оригинального названия
     if not film.get('title', '').strip() and film.get('title_ru', '').strip():
-        film['title'] = film['title_ru']
+        film['title'] = film['title_ru'] + '*'
 
     # Проверка года
     try:
@@ -88,37 +62,118 @@ def validate_film(film):
 
     return errors
 
-# API: Добавление нового фильма
+# Главная страница для фильмов
+@lab7.route('/lab7/')
+def main():
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM films;")
+    else:
+        cur.execute("SELECT * FROM films;")
+
+    films = cur.fetchall()
+    conn.close()
+    return render_template('lab7/lab7.html', films=films)
+
+# Получение всех фильмов
+@lab7.route('/lab7/rest-api/films/', methods=['GET'])
+def get_films():
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM films;")
+    else:
+        cur.execute("SELECT * FROM films;")
+
+    films = [dict(row) for row in cur.fetchall()]
+    conn.close()
+    return films
+
+# Получение фильма по ID
+@lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
+def get_film(id):
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
+    else:
+        cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
+
+    film = cur.fetchone()
+    conn.close()
+
+    if not film:
+        return {"error": "Фильм с указанным ID не найден"}, 404
+
+    return dict(film)
+
+# Добавление фильма
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
     film = request.get_json()
-
-    # Устанавливаем оригинальное название, если оно пустое
-    if not film.get('title') and film.get('title_ru'):
-        film['title'] = film['title_ru']
-
     errors = validate_film(film)
     if errors:
         return errors, 400
 
-    films.append(film)
-    return film, 201
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("""
+            INSERT INTO films (title, title_ru, year, description)
+            VALUES (%s, %s, %s, %s)
+            RETURNING *;
+        """, (film['title'], film['title_ru'], film['year'], film['description']))
+    else:
+        cur.execute("""
+            INSERT INTO films (title, title_ru, year, description)
+            VALUES (?, ?, ?, ?);
+        """, (film['title'], film['title_ru'], film['year'], film['description']))
 
-# API: Обновление информации о фильме по ID
+    conn.commit()
+    new_film = cur.fetchone()
+    conn.close()
+    return dict(new_film), 201
+
+# Обновление фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
 def put_film(id):
-    if id < 0 or id >= len(films):
-        return {"error": "Фильм с указанным ID не найден"}, 404
-
     film = request.get_json()
-
-    # Устанавливаем оригинальное название, если оно пустое
-    if not film.get('title') and film.get('title_ru'):
-        film['title'] = film['title_ru']
-
     errors = validate_film(film)
     if errors:
         return errors, 400
 
-    films[id] = film
-    return film
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("""
+            UPDATE films SET title = %s, title_ru = %s, year = %s, description = %s
+            WHERE id = %s RETURNING *;
+        """, (film['title'], film['title_ru'], film['year'], film['description'], id))
+    else:
+        cur.execute("""
+            UPDATE films SET title = ?, title_ru = ?, year = ?, description = ?
+            WHERE id = ?;
+        """, (film['title'], film['title_ru'], film['year'], film['description'], id))
+
+    conn.commit()
+    updated_film = cur.fetchone()
+    conn.close()
+
+    if not updated_film:
+        return {"error": "Фильм с указанным ID не найден"}, 404
+
+    return dict(updated_film)
+
+# Удаление фильма по ID
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+def delete_film(id):
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
+    else:
+        cur.execute("DELETE FROM films WHERE id = ? RETURNING id;", (id,))
+
+    conn.commit()
+    deleted = cur.fetchone()
+    conn.close()
+
+    if not deleted:
+        return {"error": "Фильм с указанным ID не найден"}, 404
+
+    return '', 204

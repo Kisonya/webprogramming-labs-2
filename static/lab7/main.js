@@ -1,15 +1,11 @@
 function fillFilmList() {
-    // Запрашиваем список фильмов с сервера
     fetch('/lab7/rest-api/films/')
-        .then(function (data) {
-            return data.json();
-        })
-        .then(function (films) {
+        .then(response => response.json())
+        .then(films => {
             let tbody = document.getElementById('film-list');
-            tbody.innerHTML = '';
+            tbody.innerHTML = ''; // Очищаем таблицу
 
-            // Заполняем таблицу с фильмами
-            for (let i = 0; i < films.length; i++) {
+            films.forEach((film, i) => {
                 let tr = document.createElement('tr');
 
                 let tdTitleRus = document.createElement('td');
@@ -17,58 +13,41 @@ function fillFilmList() {
                 let tdYear = document.createElement('td');
                 let tdActions = document.createElement('td');
 
-                tdTitleRus.innerText = films[i].title_ru;
-
-                // Если оригинальное название не пустое, добавляем его в скобках
-                tdTitle.innerHTML = films[i].title 
-                    ? `<i>(${films[i].title})</i>` 
-                    : '';
-
-                tdYear.innerText = films[i].year;
+                tdTitleRus.innerText = film.title_ru;
+                tdTitle.innerHTML = film.title ? `<i>(${film.title})</i>` : '';
+                tdYear.innerText = film.year;
 
                 let editButton = document.createElement('button');
                 editButton.innerText = 'редактировать';
-                editButton.onclick = function () {
-                    editFilm(i);
-                };
+                editButton.onclick = () => editFilm(film.id);
 
                 let delButton = document.createElement('button');
                 delButton.innerText = 'Удалить';
-                delButton.onclick = function () {
-                    deleteFilm(i, films[i].title_ru);
-                };
+                delButton.onclick = () => deleteFilm(film.id, film.title_ru);
 
                 tdActions.append(editButton);
                 tdActions.append(delButton);
 
-                tr.append(tdTitleRus);
-                tr.append(tdTitle);
-                tr.append(tdYear);
-                tr.append(tdActions);
-
+                tr.append(tdTitleRus, tdTitle, tdYear, tdActions);
                 tbody.append(tr);
-            }
+            });
         });
 }
 
 function deleteFilm(id, title) {
-    if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) {
-        return;
-    }
+    if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) return;
 
     fetch(`/lab7/rest-api/films/${id}`, { method: 'DELETE' })
-        .then(function () {
-            fillFilmList(); // Обновляем список фильмов после удаления
-        });
+        .then(() => fillFilmList()); // Обновляем список фильмов
 }
 
 function showModal() {
-    document.querySelector('div.modal').style.display = 'block';
-    document.getElementById('description-error').innerText = ''; // Очищаем сообщение об ошибке
+    document.querySelector('.modal').style.display = 'block';
+    document.querySelectorAll('.error-message').forEach(e => e.innerText = '');
 }
 
 function hideModal() {
-    document.querySelector('div.modal').style.display = 'none';
+    document.querySelector('.modal').style.display = 'none';
 }
 
 function cancel() {
@@ -76,7 +55,6 @@ function cancel() {
 }
 
 function addFilm() {
-    // Очищаем форму
     document.getElementById('id').value = '';
     document.getElementById('title').value = '';
     document.getElementById('title-ru').value = '';
@@ -87,11 +65,9 @@ function addFilm() {
 
 function editFilm(id) {
     fetch(`/lab7/rest-api/films/${id}`)
-        .then(function (data) {
-            return data.json();
-        })
-        .then(function (film) {
-            document.getElementById('id').value = id;
+        .then(response => response.json())
+        .then(film => {
+            document.getElementById('id').value = film.id;
             document.getElementById('title').value = film.title;
             document.getElementById('title-ru').value = film.title_ru;
             document.getElementById('year').value = film.year;
@@ -102,49 +78,33 @@ function editFilm(id) {
 
 function sendFilm() {
     const id = document.getElementById('id').value;
-    const titleRu = document.getElementById('title-ru').value.trim();
-    let title = document.getElementById('title').value.trim();
-
-    // Если оригинальное название пустое, копируем русское название с символом "*"
-    if (!title && titleRu) {
-        title = `${titleRu}*`;
-    }
-
     const film = {
-        title: title,
-        title_ru: titleRu,
+        title: document.getElementById('title').value.trim(),
+        title_ru: document.getElementById('title-ru').value.trim(),
         year: document.getElementById('year').value,
-        description: document.getElementById('description').value
+        description: document.getElementById('description').value.trim()
     };
 
-    const url = `/lab7/rest-api/films/${id}`;
-    const method = id === '' ? 'POST' : 'PUT';
+    const url = id ? `/lab7/rest-api/films/${id}` : '/lab7/rest-api/films/';
+    const method = id ? 'PUT' : 'POST';
 
     fetch(url, {
         method: method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(film)
     })
-    .then(function (resp) {
-        if (resp.ok) {
-            fillFilmList();
+    .then(response => {
+        if (response.ok) {
             hideModal();
-            return {};
+            fillFilmList();
         }
-        return resp.json();
+        return response.json();
     })
-    .then(function (errors) {
-        // Выводим ошибки, если они есть
-        if (errors.title_ru) {
-            alert(errors.title_ru);
+    .then(errors => {
+        if (errors) {
+            if (errors.title_ru) document.getElementById('title-ru-error').innerText = errors.title_ru;
+            if (errors.year) document.getElementById('year-error').innerText = errors.year;
+            if (errors.description) document.getElementById('description-error').innerText = errors.description;
         }
-        if (errors.description) {
-            document.getElementById('description-error').innerText = errors.description;
-        }
-    })
-    .catch(function (error) {
-        console.error('Ошибка:', error);
     });
 }
