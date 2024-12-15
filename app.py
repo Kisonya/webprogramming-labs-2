@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv()  # Загружаем переменные окружения из .env файла
 
 from flask import Flask, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy  # Импорт SQLAlchemy для работы с базой данных
@@ -13,28 +13,32 @@ from lab5 import lab5
 from lab6 import lab6
 from lab7 import lab7
 from lab8 import lab8
-from os import path 
+from os import path
 
-app = Flask(__name__)  # создаем объект
+# Создаём объект приложения
+app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')  # Устанавливаем секретный ключ приложения
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')  # Устанавливаем тип базы данных (по умолчанию Postgres)
 
 if app.config['DB_TYPE'] == 'postgres':
-    db_name = 'kisonya_orm'  # Название вашей БД
-    db_user = 'kisonya_orm'  # Имя пользователя
-    db_password = '123'      # Пароль пользователя
-    host_ip = '127.0.0.1'    # Локальный хост
-    host_port = 5432         # Порт PostgreSQL по умолчанию
+    db_name = 'kisonya_orm'  # Название базы данных
+    db_user = 'kisonya_orm'  # Имя пользователя базы данных
+    db_password = '123'      # Пароль пользователя базы данных
+    host_ip = '127.0.0.1'    # Локальный IP-адрес
+    host_port = 5432         # Порт PostgreSQL
 
     # Строка подключения к PostgreSQL
     app.config['SQLALCHEMY_DATABASE_URI'] = \
         f'postgresql://{db_user}:{db_password}@{host_ip}:{host_port}/{db_name}'
 
-else:
+elif app.config['DB_TYPE'] == 'sqlite':
     # Настройка для SQLite
-    dir_path = path.dirname(path.realpath(__file__))  # Получаем путь к текущей директории
-    db_path = path.join(dir_path, "kisonya_orm.db")   # Создаем файл SQLite БД
+    dir_path = path.dirname(path.realpath(__file__))  # Путь к текущей директории
+    db_path = path.join(dir_path, "kisonya_orm.db")   # Путь к SQLite базе данных
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+else:
+    raise ValueError("Unsupported DB_TYPE. Use 'postgres' or 'sqlite'.")  # Обработка ошибки, если указан неизвестный тип БД
+
 
 db.init_app(app)
 
