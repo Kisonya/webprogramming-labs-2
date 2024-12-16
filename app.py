@@ -33,9 +33,10 @@ if app.config['DB_TYPE'] == 'postgres':
 
 elif app.config['DB_TYPE'] == 'sqlite':
     # Настройка для SQLite
-    dir_path = path.dirname(path.realpath(__file__))  # Путь к текущей директории
-    db_path = path.join(dir_path, "kisonya_orm.db")   # Путь к SQLite базе данных
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://kisonya_orm:123@127.0.0.1:5432/kisonya_orm'
+    dir_path = path.dirname(path.realpath(__file__))
+    db_path = path.join(dir_path, "kisonya_orm.db")
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+
 else:
     raise ValueError("Unsupported DB_TYPE. Use 'postgres' or 'sqlite'.")  # Обработка ошибки, если указан неизвестный тип БД
 
