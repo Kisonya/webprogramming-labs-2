@@ -27,6 +27,7 @@ def db_connect():
                 database='kisonya_knowledge_base',
                 user='kisonya_knowledge_base',
                 password='123',
+                options='-c client_encoding=WIN1251'  # Устанавливаем клиентскую кодировку
             )
             cur = conn.cursor(cursor_factory=RealDictCursor)
         except Exception as e:
