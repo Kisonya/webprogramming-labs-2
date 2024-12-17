@@ -1,6 +1,4 @@
 import os
-from dotenv import load_dotenv
-load_dotenv()  # Загружаем переменные окружения из .env файла
 
 from flask import Flask, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy  # Импорт SQLAlchemy для работы с базой данных
