@@ -27,7 +27,7 @@ def db_connect():
                 database='kisonya_knowledge_base',
                 user='kisonya_knowledge_base',
                 password='123',
-                client_encoding='UTF8'
+                options='-c client_encoding=UTF8'
             )
             cur = conn.cursor(cursor_factory=RealDictCursor)
         except Exception as e:
@@ -70,6 +70,9 @@ def main():
     films = cur.fetchall()
     conn.close()
     return render_template('lab7/lab7.html', films=films)
+
+    response.headers['Content-Type'] = 'text/html; charset=UTF-8'
+    return response 
 
 # REST API — Получение всех фильмов
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
