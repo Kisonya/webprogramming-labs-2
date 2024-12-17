@@ -70,7 +70,8 @@ def index():
 @app.errorhandler(404)
 def not_found(err):
     logger.warning("Ошибка 404: Страница не найдена")
-    return redirect(url_for('error404'))
+    return redirect(url_for('lab1.error404'))
+
 
 @app.errorhandler(500)
 def internal_error(err):
