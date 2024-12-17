@@ -9,30 +9,38 @@ from os import path
 lab7 = Blueprint('lab7', __name__)
 
 # Функция подключения к базе данных
+# Функция подключения к базе данных
 def db_connect():
-    db_type = os.environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
-    if db_type == 'sqlite':  # Если явно указана SQLite
-        dir_path = path.dirname(path.realpath(__file__))
-        db_path = path.join(dir_path, "database.db")
+    db_type = os.environ.get('DB_TYPE', 'sqlite')  # По умолчанию SQLite
+
+    if db_type == 'sqlite':  # Если указана SQLite
+        dir_path = path.dirname(path.realpath(__file__))  # Текущая директория
+        db_path = path.join(dir_path, "kisonya_orm.db")  # Путь к БД
         print(f"SQLite database path: {db_path}")
+
         conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
+        conn.row_factory = sqlite3.Row  # Для доступа по ключам
         cur = conn.cursor()
-    else:  # По умолчанию PostgreSQL
+
+    elif db_type == 'postgres':  # Если указана PostgreSQL
         try:
             conn = psycopg2.connect(
-                host='127.0.0.1',
-                database='kisonya_knowledge_base',
-                user='kisonya_knowledge_base',
-                password='123',
-                options='-c client_encoding=UTF8'  # Указываем кодировку клиента
+                host=os.environ.get('POSTGRES_HOST', '127.0.0.1'),
+                database=os.environ.get('POSTGRES_DB', 'kisonya_knowledge_base'),
+                user=os.environ.get('POSTGRES_USER', 'kisonya_knowledge_base'),
+                password=os.environ.get('POSTGRES_PASSWORD', '123'),
+                options='-c client_encoding=UTF8'  # Кодировка
             )
             cur = conn.cursor(cursor_factory=RealDictCursor)
         except Exception as e:
             print(f"Error connecting to PostgreSQL: {e}")
             raise
 
+    else:
+        raise ValueError("Unsupported DB_TYPE. Use 'sqlite' or 'postgres'.")
+
     return conn, cur
+
 
 # Валидация данных фильма
 def validate_film(film):
