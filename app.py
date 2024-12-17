@@ -15,6 +15,7 @@ from os import path
 # Создаём объект приложения
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')
+app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
 
 # Подключение к базе данных
 if os.getenv('DB_TYPE') == 'postgres':
