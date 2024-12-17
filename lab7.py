@@ -1,5 +1,5 @@
-import os  # Добавляем импорт os для работы с переменными окружения
-from flask import Blueprint, render_template, request, current_app, jsonify
+import os
+from flask import Blueprint, render_template, request
 from datetime import datetime
 import sqlite3
 import psycopg2
@@ -8,178 +8,161 @@ from os import path
 
 lab7 = Blueprint('lab7', __name__)
 
-# Проверка на отключение маршрутов
-if os.environ.get("LAB7_DISABLED", "false").lower() == "true":
-    print("lab7 маршруты отключены!")
-else:
-    # Функция подключения к базе данных
-    def db_connect():
-        db_type = os.environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
-        if db_type == 'sqlite':  # Если явно указана SQLite
-            dir_path = path.dirname(path.realpath(__file__))
-            db_path = path.join(dir_path, "database.db")
-            print(f"SQLite database path: {db_path}")
-            conn = sqlite3.connect(db_path)
-            conn.row_factory = sqlite3.Row
-            cur = conn.cursor()
-        else:  # По умолчанию PostgreSQL
-            try:
-                conn = psycopg2.connect(
-                    host='127.0.0.1',
-                    database='kisonya_knowledge_base',
-                    user='kisonya_knowledge_base',
-                    password='123',
-                    options='-c client_encoding=UTF8'  # Указываем кодировку клиента
-                )
-                cur = conn.cursor(cursor_factory=RealDictCursor)
-            except Exception as e:
-                print(f"Error connecting to PostgreSQL: {e}")
-                raise
-
-        return conn, cur
-
-    # Валидация данных фильма
-    def validate_film(film):
-        errors = {}
-        current_year = datetime.now().year
-
-        # Проверка русскоязычного названия
-        if not film.get('title_ru', '').strip():
-            errors['title_ru'] = 'Русское название обязательно для заполнения.'
-
-        # Проверка оригинального названия
-        if not film.get('title', '').strip() and film.get('title_ru', '').strip():
-            film['title'] = film['title_ru'] + '*'
-
-        # Проверка года
+# Функция подключения к базе данных
+def db_connect():
+    db_type = os.environ.get('DB_TYPE', 'postgres')  # По умолчанию PostgreSQL
+    if db_type == 'sqlite':
+        # Подключение к SQLite
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, "database.db")
+        print(f"SQLite database path: {db_path}")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+    else:
+        # Подключение к PostgreSQL
         try:
-            year = int(film.get('year', 0))
-            if year < 1895 or year > current_year:
-                errors['year'] = f'Год должен быть в диапазоне от 1895 до {current_year}.'
-        except ValueError:
-            errors['year'] = 'Год должен быть числом.'
+            conn = psycopg2.connect(
+                host='127.0.0.1',
+                database='kisonya_knowledge_base',
+                user='kisonya_knowledge_base',
+                password='123',
+                options='-c client_encoding=UTF8'
+            )
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+        except Exception as e:
+            print(f"Error connecting to PostgreSQL: {e}")
+            raise
 
-        # Проверка описания
-        description = film.get('description', '')
-        if not description.strip():
-            errors['description'] = 'Описание обязательно для заполнения.'
-        elif len(description) > 2000:
-            errors['description'] = 'Описание не должно превышать 2000 символов.'
+    return conn, cur
 
-        return errors
+# Валидация данных фильма
+def validate_film(film):
+    errors = {}
+    current_year = datetime.now().year
 
-    # Главная страница для фильмов
-    @lab7.route('/lab7/')
-    def main():
-        conn, cur = db_connect()
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM films;")
-        else:
-            cur.execute("SELECT * FROM films;")
+    if not film.get('title_ru', '').strip():
+        errors['title_ru'] = 'Русское название обязательно для заполнения.'
 
-        films = cur.fetchall()
-        conn.close()
-        return render_template('lab7/lab7.html', films=films)
+    if not film.get('title', '').strip() and film.get('title_ru', '').strip():
+        film['title'] = film['title_ru'] + '*'
 
-    # Получение всех фильмов
-    @lab7.route('/lab7/rest-api/films/', methods=['GET'])
-    def get_films():
-        conn, cur = db_connect()
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM films;")
-        else:
-            cur.execute("SELECT * FROM films;")
+    try:
+        year = int(film.get('year', 0))
+        if year < 1895 or year > current_year:
+            errors['year'] = f'Год должен быть в диапазоне от 1895 до {current_year}.'
+    except ValueError:
+        errors['year'] = 'Год должен быть числом.'
 
-        films = [dict(row) for row in cur.fetchall()]
-        conn.close()
-        return films
+    description = film.get('description', '')
+    if not description.strip():
+        errors['description'] = 'Описание обязательно для заполнения.'
+    elif len(description) > 2000:
+        errors['description'] = 'Описание не должно превышать 2000 символов.'
 
-    # Получение фильма по ID
-    @lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
-    def get_film(id):
-        conn, cur = db_connect()
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
-        else:
-            cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
+    return errors
 
-        film = cur.fetchone()
-        conn.close()
+# Главная страница для фильмов
+@lab7.route('/lab7/')
+def main():
+    conn, cur = db_connect()
+    cur.execute("SELECT * FROM films;")
+    films = cur.fetchall()
+    conn.close()
+    return render_template('lab7/lab7.html', films=films)
 
-        if not film:
-            return {"error": "Фильм с указанным ID не найден"}, 404
+# REST API — Получение всех фильмов
+@lab7.route('/lab7/rest-api/films/', methods=['GET'])
+def get_films():
+    conn, cur = db_connect()
+    cur.execute("SELECT * FROM films;")
+    films = [dict(row) for row in cur.fetchall()]
+    conn.close()
+    return films
 
-        return dict(film)
+# REST API — Получение фильма по ID
+@lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
+def get_film(id):
+    conn, cur = db_connect()
+    if os.environ.get('DB_TYPE', 'postgres') == 'postgres':
+        cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
+    else:
+        cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
 
-    # Добавление фильма
-    @lab7.route('/lab7/rest-api/films/', methods=['POST'])
-    def add_film():
-        film = request.get_json()
-        errors = validate_film(film)
-        if errors:
-            return errors, 400
+    film = cur.fetchone()
+    conn.close()
 
-        conn, cur = db_connect()
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("""
-                INSERT INTO films (title, title_ru, year, description)
-                VALUES (%s, %s, %s, %s)
-                RETURNING *;
-            """, (film['title'], film['title_ru'], film['year'], film['description']))
-        else:
-            cur.execute("""
-                INSERT INTO films (title, title_ru, year, description)
-                VALUES (?, ?, ?, ?);
-            """, (film['title'], film['title_ru'], film['year'], film['description']))
+    if not film:
+        return {"error": "Фильм с указанным ID не найден"}, 404
 
-        conn.commit()
-        new_film = cur.fetchone()
-        conn.close()
-        return dict(new_film), 201
+    return dict(film)
 
-    # Обновление фильма по ID
-    @lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
-    def put_film(id):
-        film = request.get_json()
-        errors = validate_film(film)
-        if errors:
-            return errors, 400
+# REST API — Добавление фильма
+@lab7.route('/lab7/rest-api/films/', methods=['POST'])
+def add_film():
+    film = request.get_json()
+    errors = validate_film(film)
+    if errors:
+        return errors, 400
 
-        conn, cur = db_connect()
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("""
-                UPDATE films SET title = %s, title_ru = %s, year = %s, description = %s
-                WHERE id = %s RETURNING *;
-            """, (film['title'], film['title_ru'], film['year'], film['description'], id))
-        else:
-            cur.execute("""
-                UPDATE films SET title = ?, title_ru = ?, year = ?, description = ?
-                WHERE id = ?;
-            """, (film['title'], film['title_ru'], film['year'], film['description'], id))
+    conn, cur = db_connect()
+    if os.environ.get('DB_TYPE', 'postgres') == 'postgres':
+        cur.execute("""
+            INSERT INTO films (title, title_ru, year, description)
+            VALUES (%s, %s, %s, %s) RETURNING *;
+        """, (film['title'], film['title_ru'], film['year'], film['description']))
+    else:
+        cur.execute("""
+            INSERT INTO films (title, title_ru, year, description)
+            VALUES (?, ?, ?, ?);
+        """, (film['title'], film['title_ru'], film['year'], film['description']))
 
-        conn.commit()
-        updated_film = cur.fetchone()
-        conn.close()
+    conn.commit()
+    new_film = cur.fetchone()
+    conn.close()
+    return dict(new_film), 201
 
-        if not updated_film:
-            return {"error": "Фильм с указанным ID не найден"}, 404
+# REST API — Обновление фильма по ID
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
+def put_film(id):
+    film = request.get_json()
+    errors = validate_film(film)
+    if errors:
+        return errors, 400
 
-        return dict(updated_film)
+    conn, cur = db_connect()
+    if os.environ.get('DB_TYPE', 'postgres') == 'postgres':
+        cur.execute("""
+            UPDATE films SET title = %s, title_ru = %s, year = %s, description = %s
+            WHERE id = %s RETURNING *;
+        """, (film['title'], film['title_ru'], film['year'], film['description'], id))
+    else:
+        cur.execute("""
+            UPDATE films SET title = ?, title_ru = ?, year = ?, description = ?
+            WHERE id = ?;
+        """, (film['title'], film['title_ru'], film['year'], film['description'], id))
 
-    # Удаление фильма по ID
-    @lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
-    def delete_film(id):
-        conn, cur = db_connect()
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
-        else:
-            cur.execute("DELETE FROM films WHERE id = ? RETURNING id;", (id,))
+    conn.commit()
+    updated_film = cur.fetchone()
+    conn.close()
 
-        conn.commit()
-        deleted = cur.fetchone()
-        conn.close()
+    if not updated_film:
+        return {"error": "Фильм с указанным ID не найден"}, 404
+    return dict(updated_film)
 
-        if not deleted:
-            return {"error": "Фильм с указанным ID не найден"}, 404
+# REST API — Удаление фильма по ID
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+def delete_film(id):
+    conn, cur = db_connect()
+    if os.environ.get('DB_TYPE', 'postgres') == 'postgres':
+        cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
+    else:
+        cur.execute("DELETE FROM films WHERE id = ? RETURNING id;", (id,))
 
-        return '', 204
+    conn.commit()
+    deleted = cur.fetchone()
+    conn.close()
+
+    if not deleted:
+        return {"error": "Фильм с указанным ID не найден"}, 404
+    return '', 204
