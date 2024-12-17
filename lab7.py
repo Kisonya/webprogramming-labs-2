@@ -69,9 +69,7 @@ def main():
     cur.execute("SELECT * FROM films;")
     films = cur.fetchall()
     conn.close()
-    response = Response(render_template('lab7/lab7.html', films=films))
-    response.headers['Content-Type'] = 'text/html; charset=utf-8'
-    return response
+    return render_template('lab7/lab7.html', films=films)
 
 # REST API — Получение всех фильмов
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
