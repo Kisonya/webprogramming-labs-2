@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, request, redirect  # Основной фреймворк Flask
+from werkzeug.security import generate_password_hash 
+from db import db
+from db.models import users, articles
 
 # Создаём Blueprint для лабораторной работы 8
 lab8 = Blueprint('lab8', __name__, template_folder='templates')
@@ -8,29 +11,37 @@ lab8 = Blueprint('lab8', __name__, template_folder='templates')
 def main():
     return render_template('lab8/lab8.html')
 
-# Маршрут для входа
-@lab8.route('/lab8/login')
-def login():
-    session['login'] = 'User123'  # Временная заглушка для входа
-    return redirect(url_for('lab8.main'))
-
-# Маршрут для выхода
-@lab8.route('/lab8/logout')
-def logout():
-    session.pop('login', None)
-    return redirect(url_for('lab8.main'))
 
 # Маршрут для регистрации
-@lab8.route('/lab8/register')
+@lab8.route('/lab8/register/', methods=['GET', 'POST'])
 def register():
-    return "Страница регистрации"
+    if request.method == 'GET':
+        return render_template('lab8/register.html')
+    
+    # Получаем данные из формы
+    login_form = request.form.get('login')
+    password_form = request.form.get('password')
 
-# Маршрут для списка статей
-@lab8.route('/lab8/articles')
-def articles():
-    return "Список статей"
+    # Проверка на пустые поля
+    if not login_form:
+        return render_template('lab8/register.html', error='Имя пользователя не должно быть пустым')
+    if not password_form:
+        return render_template('lab8/register.html', error='Пароль не должен быть пустым')
 
-# Маршрут для создания статьи
-@lab8.route('/lab8/create')
-def create():
-    return "Страница создания статьи"
+    # Проверка существования пользователя
+    login_exists = users.query.filter_by(login=login_form).first()
+    if login_exists:
+        return render_template('lab8/register.html', error='Такой пользователь уже существует')
+
+    # Хэширование пароля
+    password_hash = generate_password_hash(password_form)
+    new_user = users(login=login_form, password=password_hash)
+    
+    # Добавляем нового пользователя в базу данных
+    db.session.add(new_user)
+    db.session.commit()
+
+    # Перенаправляем на главную страницу
+    return redirect('/lab8/')
+
+
