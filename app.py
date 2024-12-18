@@ -18,7 +18,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-сек
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
 
 # Подключение к базе данных
-if os.getenv('DB_TYPE') == 'postgres':
+if app.config['DB_TYPE'] == 'postgres':
     db_name = 'kisonya_orm'
     db_user = 'kisonya_orm'
     db_password = '123'
