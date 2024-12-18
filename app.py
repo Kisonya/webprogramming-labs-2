@@ -1,7 +1,12 @@
 import os
 from flask import Flask, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
+from os import path
+
 from db import db
+from db.models import users, articles
+from flask_login import LoginManager
+
 from lab1 import lab1
 from lab2 import lab2
 from lab3 import lab3
@@ -10,10 +15,18 @@ from lab5 import lab5
 from lab6 import lab6
 from lab7 import lab7
 from lab8 import lab8
-from os import path
 
 # Создаём объект приложения
 app = Flask(__name__)
+
+login_manager = LoginManager()
+login_manager.login_viev = 'lab8.login'
+login_manager.itit_app(app)
+
+@login_manager.user_loader
+def load_user(login_id):
+    return users.query.get(int(login_id))
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
 

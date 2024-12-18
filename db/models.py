@@ -1,7 +1,8 @@
 from . import db  # Импортируем объект SQLAlchemy
+from flask_login import UserMixin
 
 # Модель таблицы пользователей
-class users(db.Model):
+class users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)  # Уникальный ID пользователя
     login = db.Column(db.String(30), nullable=False, unique=True)  # Логин пользователя (уникальный)
     password = db.Column(db.String(162), nullable=False)  # Хэш пароля (обязательное поле)
