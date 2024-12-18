@@ -77,14 +77,14 @@ def article_list():
 @lab8.route('/lab8/create/', methods=['GET', 'POST'])
 @login_required
 def create_article():
-    """Создание новой статьи"""
+    article = None  # Для нового создания статьи переменная пустая
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('article_text')
 
-        # Проверка заполненности
+        # Проверка на пустые поля
         if not title or not content:
-            return render_template('lab8/create_article.html', error="Заполните все поля")
+            return render_template('lab8/create_article.html', error="Заполните все поля", article=article)
 
         # Создание новой статьи
         new_article = articles(title=title, article_text=content, user_id=current_user.id)
@@ -92,7 +92,8 @@ def create_article():
         db.session.commit()
         return redirect(url_for('lab8.article_list'))
 
-    return render_template('lab8/create_article.html')
+    return render_template('lab8/create_article.html', article=article)
+
 
 
 # Маршрут для редактирования статьи

@@ -3,7 +3,7 @@
 {% block lab %}Лабораторная работа 8{% endblock %}
 
 {% block main %}
-<h1>{{ article.id and "Редактирование статьи" or "Создание статьи" }}</h1>
+<h1>{{ article and "Редактирование статьи" or "Создание статьи" }}</h1>
 <form method="post">
     <div>
         <label>Название статьи:
