@@ -16,31 +16,39 @@ from lab6 import lab6
 from lab7 import lab7
 from lab8 import lab8
 
-# Создаём объект приложения
+# Создаём экземпляр приложения Flask
 app = Flask(__name__)
 
+# Настройка LoginManager для управления сессиями авторизации
 login_manager = LoginManager()
-login_manager.login_viev = 'lab8.login'
-login_manager.init_app(app)
+login_manager.login_view = 'lab8.login'  # Указываем маршрут для страницы входа
+login_manager.init_app(app)  # Связываем LoginManager с приложением Flask
 
+# Функция загрузки пользователя по его ID
 @login_manager.user_loader
 def load_user(login_id):
-    return users.query.get(int(login_id))
+    return users.query.get(int(login_id))  # Возвращаем пользователя по его ID из базы данных
 
+# Настройка секретного ключа приложения
+# Используем значение из переменной окружения или задаём дефолтный ключ
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key').encode('utf-8').decode('latin1')
+
+# Устанавливаем тип базы данных (по умолчанию PostgreSQL)
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
 
-# Подключение к базе данных
-if app.config['DB_TYPE'] == 'postgres':
-    db_name = 'kisonya_orm'
-    db_user = 'kisonya_orm'
-    db_password = '123'
-    host_ip = '127.0.0.1'
-    host_port = 5432
+# Настройка подключения к базе данных
+if app.config['DB_TYPE'] == 'postgres':  # Если выбрана база PostgreSQL
+    db_name = 'kisonya_orm'  # Имя базы данных
+    db_user = 'kisonya_orm'  # Имя пользователя базы данных
+    db_password = '123'  # Пароль пользователя базы данных
+    host_ip = '127.0.0.1'  # IP-адрес хоста базы данных
+    host_port = 5432  # Порт базы данных
+    # Формируем строку подключения для PostgreSQL
     app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{host_ip}:{host_port}/{db_name}'
-else:
-    dir_path = path.dirname(path.realpath(__file__))
-    db_path = path.join(dir_path, "kisonya_orm.db")
+else:  # Если выбрана база SQLite
+    dir_path = path.dirname(path.realpath(__file__))  # Определяем путь к текущему файлу
+    db_path = path.join(dir_path, "kisonya_orm.db")  # Путь к файлу базы SQLite
+    # Формируем строку подключения для SQLite
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 # Инициализация БД
