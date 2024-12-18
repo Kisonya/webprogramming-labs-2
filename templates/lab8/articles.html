@@ -14,5 +14,6 @@
         <a href="{{ url_for('lab8.edit_article', article_id=article.id) }}">Редактировать</a>
     </div>
 {% endfor %}
+<a href="{{ url_for('lab8.create_article') }}" class="nav-button">Добавить статью</a>
 <a href="{{ url_for('lab8.main') }}">Назад на главную</a>
 {% endblock %}
