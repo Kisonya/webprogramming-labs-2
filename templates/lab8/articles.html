@@ -1,10 +1,17 @@
 {% extends "base.html" %}
+{% block lab %}Ваши статьи{% endblock %}
 {% block main %}
-    <h1>Список статей</h1>
-    {% for article in articles %}
-        <div>
-            <h2>{{ article.title }}</h2>
-            <p>{{ article.article_text }}</p>
-        </div>
-    {% endfor %}
+<h1>Ваши статьи</h1>
+{% if articles %}
+    <ul>
+        {% for article in articles %}
+            <li>
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.article_text }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>У вас пока нет статей.</p>
+{% endif %}
 {% endblock %}

@@ -1,8 +1,18 @@
 {% extends "base.html" %}
+{% block lab %}Создание статьи{% endblock %}
 {% block main %}
-    <form action="" method="post">
-        <label>Название статьи: <input type="text" name="title"></label>
-        <label>Текст статьи: <textarea name="content"></textarea></label>
-        <button type="submit">Создать</button>
-    </form>
+<h1>Создание статьи</h1>
+<form method="post">
+    <div>
+        <label>Заголовок: <input type="text" name="title" required></label>
+    </div>
+    <div>
+        <label>Текст статьи:</label>
+        <textarea name="content" rows="5" cols="40" required></textarea>
+    </div>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <button type="submit">Создать статью</button>
+</form>
 {% endblock %}

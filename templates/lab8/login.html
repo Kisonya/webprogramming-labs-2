@@ -12,6 +12,11 @@
             <label>Пароль: <input type="password" name="password" required></label>
         </div>
         <div>
+            <label>
+                <input type="checkbox" name="remember"> Запомнить меня
+            </label>
+        </div>        
+        <div>
             {% if error %}
                 <p style="color: red;">{{ error }}</p>
             {% endif %}
