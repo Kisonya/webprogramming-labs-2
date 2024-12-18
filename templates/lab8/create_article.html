@@ -1,18 +1,24 @@
 {% extends "base.html" %}
-{% block lab %}Создание статьи{% endblock %}
+
+{% block lab %}Лабораторная работа 8{% endblock %}
+
 {% block main %}
-<h1>Создание статьи</h1>
+<h1>{{ article.id and "Редактирование статьи" or "Создание статьи" }}</h1>
 <form method="post">
     <div>
-        <label>Заголовок: <input type="text" name="title" required></label>
+        <label>Название статьи:
+            <input type="text" name="title" value="{{ article.title if article else '' }}" required>
+        </label>
     </div>
     <div>
-        <label>Текст статьи:</label>
-        <textarea name="content" rows="5" cols="40" required></textarea>
+        <label>Текст статьи:
+            <textarea name="article_text" required>{{ article.article_text if article else '' }}</textarea>
+        </label>
     </div>
     {% if error %}
         <p style="color: red;">{{ error }}</p>
     {% endif %}
-    <button type="submit">Создать статью</button>
+    <button type="submit">Сохранить</button>
 </form>
+<a href="{{ url_for('lab8.article_list') }}">Назад к статьям</a>
 {% endblock %}

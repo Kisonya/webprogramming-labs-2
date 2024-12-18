@@ -80,16 +80,52 @@ def create_article():
     """Создание новой статьи"""
     if request.method == 'POST':
         title = request.form.get('title')
-        content = request.form.get('content')
+        content = request.form.get('article_text')
 
-        # Проверка на заполненность полей
+        # Проверка заполненности
         if not title or not content:
-            return render_template('lab8/create_article.html', error='Все поля должны быть заполнены')
+            return render_template('lab8/create_article.html', error="Заполните все поля")
 
-        # Создание статьи
-        new_article = articles(user_id=current_user.id, title=title, article_text=content)
+        # Создание новой статьи
+        new_article = articles(title=title, article_text=content, user_id=current_user.id)
         db.session.add(new_article)
         db.session.commit()
         return redirect(url_for('lab8.article_list'))
 
     return render_template('lab8/create_article.html')
+
+
+# Маршрут для редактирования статьи
+@lab8.route('/lab8/edit/<int:article_id>', methods=['GET', 'POST'])
+@login_required
+def edit_article(article_id):
+    article = articles.query.filter_by(id=article_id, user_id=current_user.id).first()
+    if not article:
+        return redirect(url_for('lab8.article_list'))
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('article_text')
+
+        # Проверка заполненности
+        if not title or not content:
+            return render_template('lab8/create_article.html', error="Заполните все поля", article=article)
+
+        # Обновление статьи
+        article.title = title
+        article.article_text = content
+        db.session.commit()
+        return redirect(url_for('lab8.article_list'))
+
+    return render_template('lab8/create_article.html', article=article)
+
+
+# Маршрут для удаления статьи
+@lab8.route('/lab8/delete/<int:article_id>', methods=['POST'])
+@login_required
+def delete_article(article_id):
+    article = articles.query.filter_by(id=article_id, user_id=current_user.id).first()
+    if article:
+        db.session.delete(article)
+        db.session.commit()
+    return redirect(url_for('lab8.article_list'))
