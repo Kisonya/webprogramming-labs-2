@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 login_manager = LoginManager()
 login_manager.login_viev = 'lab8.login'
-login_manager.itit_app(app)
+login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(login_id):
