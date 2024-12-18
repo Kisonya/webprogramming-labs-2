@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block main %}
+    <h1>Список статей</h1>
+    {% for article in articles %}
+        <div>
+            <h2>{{ article.title }}</h2>
+            <p>{{ article.article_text }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}

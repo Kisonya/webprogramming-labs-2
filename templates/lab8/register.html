@@ -5,23 +5,14 @@
 {% block main %}
 <h1>Регистрация</h1>
 
-<form action="/lab8/register" method="post">
-    <div>
-        <label>
-            Логин: <input type="text" name="login">
-        </label>
-    </div>
-    <div>
-        <label>
-            Пароль: <input type="password" name="password">
-        </label>
-    </div>
-
-    {# Вывод ошибки, если переменная error не пуста #}
+<form action="{{ url_for('lab8.login') }}" method="post">
+    <label>Логин: <input type="text" name="login"></label>
+    <label>Пароль: <input type="password" name="password"></label>
+    <label><input type="checkbox" name="remember"> Запомнить меня</label>
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p style="color:red">{{ error }}</p>
     {% endif %}
-
-    <button type="submit">Зарегистрироваться</button>
+    <button type="submit">Войти</button>
 </form>
+
 {% endblock %}
