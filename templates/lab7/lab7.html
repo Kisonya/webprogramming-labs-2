@@ -88,58 +88,66 @@
 {% block main %}
 <h1>Список фильмов</h1>
 <table>
+    <!-- Заголовок таблицы -->
     <thead>
         <tr>
-            <th colspan="2">Название</th>
-            <th>Год</th>
-            <th>Действие</th>
+            <th colspan="2">Название</th> <!-- Название состоит из двух частей: русское и оригинальное -->
+            <th>Год</th> <!-- Год выпуска фильма -->
+            <th>Действие</th> <!-- Колонка для кнопок действий (редактировать, удалить) -->
         </tr>
     </thead>
-    <tbody id="film-list"></tbody>
+    <tbody id="film-list"></tbody> <!-- Тело таблицы будет заполняться динамически через JavaScript -->
 </table>
 
 <script>
-    fillFilmList();
+    fillFilmList(); <!-- Вызываем функцию для загрузки и отображения списка фильмов -->
 </script>
 
 <div>
-    <button onclick="addFilm()">Добавить фильм</button>
+    <button onclick="addFilm()">Добавить фильм</button> <!-- Кнопка для добавления нового фильма -->
 </div>
 
 <!-- Модальное окно для добавления и редактирования фильма -->
-<div class="modal" style="display: none;">
+<div class="modal" style="display: none;"> <!-- Модальное окно скрыто по умолчанию -->
+    <!-- Поле для хранения ID фильма (скрытое) -->
     <input type="hidden" id="id">
 
+    <!-- Поле для ввода русского названия фильма -->
     <label>
         Название фильма на русском:
-        <input type="text" id="title-ru">
-        <div id="title-ru-error" class="error-message"></div>
+        <input type="text" id="title-ru"> <!-- Поле ввода -->
+        <div id="title-ru-error" class="error-message"></div> <!-- Блок для отображения ошибок валидации -->
     </label>
     <br>
 
+    <!-- Поле для ввода оригинального названия фильма -->
     <label>
         Название фильма на оригинальном языке:
-        <i>(если фильм русский, то оставьте пустым)</i>
-        <input type="text" id="title">
-        <div id="title-error" class="error-message"></div>
+        <i>(если фильм русский, то оставьте пустым)</i> <!-- Подсказка для пользователя -->
+        <input type="text" id="title"> <!-- Поле ввода -->
+        <div id="title-error" class="error-message"></div> <!-- Блок для ошибок валидации -->
     </label>
     <br>
 
+    <!-- Поле для ввода года выпуска фильма -->
     <label>
         Год выпуска:
-        <input type="number" id="year">
-        <div id="year-error" class="error-message"></div>
+        <input type="number" id="year"> <!-- Поле ввода -->
+        <div id="year-error" class="error-message"></div> <!-- Блок для ошибок валидации -->
     </label>
     <br>
 
+    <!-- Поле для ввода описания фильма -->
     <label>
         Описание:
-        <textarea id="description"></textarea>
-        <div id="description-error" class="error-message"></div>
+        <textarea id="description"></textarea> <!-- Поле ввода для описания -->
+        <div id="description-error" class="error-message"></div> <!-- Блок для ошибок валидации -->
     </label>
     <br>
 
-    <button onclick="sendFilm()">OK</button>
-    <button onclick="cancel()">Отмена</button>
+    <!-- Кнопки действий в модальном окне -->
+    <button onclick="sendFilm()">OK</button> <!-- Кнопка для сохранения изменений -->
+    <button onclick="cancel()">Отмена</button> <!-- Кнопка для закрытия модального окна -->
 </div>
 {% endblock %}
+
