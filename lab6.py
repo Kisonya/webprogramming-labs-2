@@ -14,85 +14,101 @@ for i in range(1, 11):
 def main():
     return render_template('lab6/lab6.html')
 
+# Определение маршрута для JSON-RPC API, доступного только через POST запрос
 @lab6.route('/lab6/json-rpc-api/', methods=['POST'])
 def api():
+    # Извлекаем JSON-данные из тела запроса
     data = request.json
+
+    # Извлекаем идентификатор запроса для формирования ответа
     id = data['id']
-    
+
+    # Проверяем, если метод запроса равен "info"
     if data['method'] == 'info':
+        # Возвращаем список офисов в формате JSON-RPC
         return {
-            'jsonrpc': '2.0',
-            'result': offices,
-            'id': id
+            'jsonrpc': '2.0',  # Версия протокола JSON-RPC
+            'result': offices,  # Результат - список офисов
+            'id': id  # ID запроса
         }
 
-    login = session.get('login')
-    if not login:
+    # Проверяем, авторизован ли пользователь
+    login = session.get('login')  # Получаем логин из сессии
+    if not login:  # Если логина нет, возвращаем ошибку
         return {
-            'jsonrpc': '2.0',
+            'jsonrpc': '2.0',  # Версия протокола JSON-RPC
             'error': {
-                'code': 1,
-                'message': 'Unauthorized'
+                'code': 1,  # Код ошибки "Unauthorized"
+                'message': 'Unauthorized'  # Сообщение об ошибке
             },
-            'id': id
+            'id': id  # ID запроса
         }
 
+    # Обрабатываем метод "booking" (бронирование офиса)
     if data['method'] == 'booking':
-        office_number = data['params']
-        for office in offices:
-            if office['number'] == office_number:
-                if office['tenant'] != '':
+        office_number = data['params']  # Получаем номер офиса из параметров запроса
+        for office in offices:  # Перебираем список офисов
+            if office['number'] == office_number:  # Если найден офис с нужным номером
+                if office['tenant'] != '':  # Проверяем, занят ли офис
+                    # Возвращаем ошибку, если офис уже забронирован
                     return {
                         'jsonrpc': '2.0',
                         'error': {
-                            'code': 2,
-                            'message': 'Already booked'
+                            'code': 2,  # Код ошибки "Already booked"
+                            'message': 'Already booked'  # Сообщение об ошибке
                         },
-                        'id': id
+                        'id': id  # ID запроса
                     }
-
+                # Если офис свободен, бронируем его за текущим пользователем
                 office['tenant'] = login
+                # Возвращаем успех бронирования
                 return {
                     'jsonrpc': '2.0',
                     'result': 'success',
                     'id': id
                 }
 
+    # Обрабатываем метод "cancellation" (отмена бронирования)
     if data['method'] == 'cancellation':
-        office_number = data['params']
-        for office in offices:
-            if office['number'] == office_number:
-                if office['tenant'] == '':
+        office_number = data['params']  # Получаем номер офиса из параметров запроса
+        for office in offices:  # Перебираем список офисов
+            if office['number'] == office_number:  # Если найден офис с нужным номером
+                if office['tenant'] == '':  # Проверяем, свободен ли офис
+                    # Возвращаем ошибку, если офис не был забронирован
                     return {
                         'jsonrpc': '2.0',
                         'error': {
-                            'code': 3,
-                            'message': 'Office is not booked'
+                            'code': 3,  # Код ошибки "Office is not booked"
+                            'message': 'Office is not booked'  # Сообщение об ошибке
                         },
-                        'id': id
+                        'id': id  # ID запроса
                     }
-                if office['tenant'] != login:
+                if office['tenant'] != login:  # Проверяем, что офис забронирован текущим пользователем
+                    # Возвращаем ошибку, если пользователь пытается отменить чужое бронирование
                     return {
                         'jsonrpc': '2.0',
                         'error': {
-                            'code': 4,
-                            'message': 'Cannot cancel someone else\'s booking'
+                            'code': 4,  # Код ошибки "Cannot cancel someone else's booking"
+                            'message': 'Cannot cancel someone else\'s booking'  # Сообщение об ошибке
                         },
-                        'id': id
+                        'id': id  # ID запроса
                     }
-
-                office['tenant'] = ''  # Снять аренду
+                # Отменяем бронирование, освобождая офис
+                office['tenant'] = ''
+                # Возвращаем успех отмены бронирования
                 return {
                     'jsonrpc': '2.0',
                     'result': 'Booking cancelled successfully',
                     'id': id
                 }
 
+    # Если метод запроса не найден, возвращаем ошибку
     return {
-        'jsonrpc': '2.0',
+        'jsonrpc': '2.0',  # Версия протокола JSON-RPC
         'error': {
-            'code': -32601,
-            'message': 'Method not found'
+            'code': -32601,  # Код ошибки "Method not found"
+            'message': 'Method not found'  # Сообщение об ошибке
         },
-        'id': id
+        'id': id  # ID запроса
     }
+
