@@ -40,25 +40,25 @@ def register():
     login_user(new_user)
     return redirect(url_for('lab8.main'))
 
-@lab8.route('/lab8/login/', methods=['GET', 'POST'])
+@lab8.route('/lab8/login', methods=['GET', 'POST'])
 def login():
-    """Авторизация пользователя"""
     if request.method == 'GET':
         return render_template('lab8/login.html')
 
-    # Чтение данных из формы
+    # Получаем данные из формы
     login_form = request.form.get('login')
     password_form = request.form.get('password')
-    remember = request.form.get('remember') == 'on'
+    remember_me = request.form.get('remember') == 'on'  # Галочка "Запомнить меня"
 
-    # Проверка пользователя
+    # Поиск пользователя
     user = users.query.filter_by(login=login_form).first()
-    if user and check_password_hash(user.password, password_form):
-        login_user(user, remember=remember)
-        return redirect(url_for('lab8.main'))
 
-    # Ошибка авторизации
-    return render_template('lab8/login.html', error='Неверный логин или пароль')
+    # Проверка пароля
+    if user and check_password_hash(user.password, password_form):
+        login_user(user, remember=remember_me)  # Передаём флаг remember
+        return redirect('/lab8/')
+    
+    return render_template('lab8/login.html', error="Неверный логин или пароль")
 
 @lab8.route('/lab8/logout/')
 @login_required

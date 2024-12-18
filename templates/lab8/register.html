@@ -8,7 +8,6 @@
 <form action="{{ url_for('lab8.login') }}" method="post">
     <label>Логин: <input type="text" name="login"></label>
     <label>Пароль: <input type="password" name="password"></label>
-    <label><input type="checkbox" name="remember"> Запомнить меня</label>
     {% if error %}
         <p style="color:red">{{ error }}</p>
     {% endif %}
