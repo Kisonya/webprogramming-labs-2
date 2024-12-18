@@ -8,10 +8,15 @@
         <nav>
             <a href="{{ url_for('lab8.article_list') }}" class="nav-button">Список статей</a>
             <a href="{{ url_for('lab8.create_article') }}" class="nav-button">Создать статью</a>
-            <a href="{{ url_for('lab8.login') }}" class="nav-button">Войти</a>
-            <a href="{{ url_for('lab8.register') }}" class="nav-button">Регистрация</a>
-
-            <span class="user-info">Anonymous</span>
+            
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('lab8.logout') }}" class="nav-button">Выйти</a>
+                <span class="user-info">Вы вошли как: {{ current_user.login }}</span>
+            {% else %}
+                <a href="{{ url_for('lab8.login') }}" class="nav-button">Войти</a>
+                <a href="{{ url_for('lab8.register') }}" class="nav-button">Регистрация</a>
+                <span class="user-info">Anonymous</span>
+            {% endif %}
         </nav>
     </div>
 <main>

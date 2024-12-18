@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, session  # Основные модули Flask
 from werkzeug.security import generate_password_hash, check_password_hash  # Хэширование паролей
-from flask_login import login_user, login_required, current_user  # Flask-Login для авторизации
+from flask_login import login_user, login_required, current_user, logout_user, login_required  # Flask-Login для авторизации
 from db import db  # Подключение базы данных
 from db.models import users, articles  # Модели пользователей и статей
 
 # Создаём Blueprint для лабораторной работы 8
 lab8 = Blueprint('lab8', __name__, template_folder='templates')
+
 
 # Маршрут для главной страницы lab8
 @lab8.route('/lab8/')
@@ -46,7 +47,7 @@ def register():
     return redirect('/lab8/')
 
 
-# Создаём маршрут (роут) для авторизации пользователя
+# Роут для авторизации пользователя
 @lab8.route('/lab8/login', methods=['GET', 'POST'])
 def login():
     # Если метод GET — показываем форму авторизации
@@ -89,3 +90,13 @@ def create_article():
 
     # Здесь логика создания статьи
     return redirect(url_for('lab8.article_list'))
+
+
+@lab8.route('/lab8/logout')
+@login_required  # Требует, чтобы пользователь был авторизован
+def logout():
+    """
+    Завершает сеанс пользователя и перенаправляет на главную страницу.
+    """
+    logout_user()  # Функция из Flask-Login, которая выполняет выход пользователя
+    return redirect('/lab8/')  # Перенаправляем пользователя на главную страницу
