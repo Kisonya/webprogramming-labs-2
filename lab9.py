@@ -63,5 +63,9 @@ def step5_result():
             gift = 'картину'
             image = 'painting.jpg'
 
-    message = f"Поздравляю тебя, {name}, желаю, чтобы {pronoun} быстро вырос{ending}, был умным и счастливым! Вот тебе подарок — {gift}."
+    if gender == 'male':
+        message = f"Поздравляю тебя, {name}, желаю, чтобы ты быстро вырос, был умным и счастливым! Вот тебе подарок — {gift}."
+    else:
+        message = f"Поздравляю тебя, {name}, желаю, чтобы ты быстро выросла, была умной и счастливой! Вот тебе подарок — {gift}."
+
     return render_template('lab9/result.html', message=message, image=image)
