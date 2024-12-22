@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session, redirect, url_for, make_response
 
 lab9 = Blueprint('lab9', __name__)
 
@@ -7,8 +7,13 @@ user_data = {}
 
 @lab9.route('/lab9/', methods=['GET', 'POST'])
 def step1_name():
+    # Проверяем, есть ли данные о предыдущем поздравлении в cookies
+    last_result = request.cookies.get('last_result')
+    if last_result and request.method == 'GET':
+        return render_template('lab9/last_result.html', last_result=last_result)
+
     if request.method == 'POST':
-        session['name'] = request.form.get('name')  # Сохраняем имя в session
+        session['name'] = request.form.get('name')
         return render_template('lab9/age.html')
     return render_template('lab9/lab9.html')
 
@@ -120,4 +125,17 @@ def step5_result():
         else:
             message = f"Поздравляю вас, {name}, желаю успехов, здоровья и счастья! Вот вам подарок — {gift}."
 
-    return render_template('lab9/result.html', message=message, image=image)
+    # Сохраняем результат в cookies
+    response = make_response(render_template('lab9/result.html', message=message, image=image))
+    response.set_cookie('last_result', f"{message} (Подарок: {gift})", max_age=60 * 60 * 24)  # Храним на 24 часа
+
+    return response
+
+
+@lab9.route('/lab9/reset', methods=['GET'])
+def reset_lab9():
+    # Сброс cookies
+    response = make_response(redirect(url_for('lab9.step1_name')))
+    response.delete_cookie('last_result')
+    session.clear()
+    return response
