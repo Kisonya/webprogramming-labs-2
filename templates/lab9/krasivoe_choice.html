@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 9{% endblock %}
+
+{% block main %}
+<h1>Выберите, что вам нравится</h1>
+<form method="post" action="/lab9/result">
+    <button type="submit" name="final_choice" value="krasivoe">Красивый букет</button>
+    <button type="submit" name="final_choice" value="kartina">Картина</button>
+</form>
+{% endblock %}
