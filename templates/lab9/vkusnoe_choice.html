@@ -14,8 +14,18 @@
 
 {% block main %}
 <h1>Выберите, что вам нравится</h1>
-<form method="post" action="/lab9/result">
-    <button type="submit" name="final_choice" value="sladkoe">Сладкое</button>
-    <button type="submit" name="final_choice" value="sytnoe">Сытное</button>
-</form>
+{% if session.get('interest') == 'vkusnoe' %}
+    <form method="post" action="/lab9/result">
+        <button type="submit" name="final_choice" value="sladkoe">Сладкое</button>
+        <button type="submit" name="final_choice" value="sytnoe">Сытное</button>
+    </form>
+{% elif session.get('interest') == 'krasivoe' %}
+    <form method="post" action="/lab9/result">
+        <button type="submit" name="final_choice" value="krasivoe">Что-то элегантное</button>
+        <button type="submit" name="final_choice" value="originalnoe">Что-то необычное</button>
+    </form>
+{% else %}
+    <p>Интерес пользователя не определен. Пожалуйста, вернитесь назад и выберите интерес.</p>
+    <a href="/lab9/">Вернуться к началу</a>
+{% endif %}
 {% endblock %}

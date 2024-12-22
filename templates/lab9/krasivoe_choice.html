@@ -14,19 +14,19 @@
 
 {% block main %}
 <h1>Выберите, что вам нравится</h1>
-<form method="post" action="/lab9/result">
-    {% if user_data['age'] < 14 and user_data['gender'] == 'male' %}
-        <button type="submit" name="final_choice" value="krasivoe">Конструктор с подсветкой</button>
-        <button type="submit" name="final_choice" value="kartina">Набор для создания моделей машин</button>
-    {% elif user_data['age'] < 14 and user_data['gender'] == 'female' %}
-        <button type="submit" name="final_choice" value="krasivoe">Набор для плетения браслетов</button>
-        <button type="submit" name="final_choice" value="kartina">Набор для создания кукольного домика</button>
-    {% elif user_data['gender'] == 'male' %}
-        <button type="submit" name="final_choice" value="krasivoe">Элегантный настольный органайзер</button>
-        <button type="submit" name="final_choice" value="kartina">Персонализированный кожаный кошелёк</button>
-    {% else %}
-        <button type="submit" name="final_choice" value="krasivoe">Набор дизайнерской косметики</button>
-        <button type="submit" name="final_choice" value="kartina">Сертификат на мастер-класс по керамике</button>
-    {% endif %}
+{% if session['interest'] == 'vkusnoe' %}
+    <h1>Выберите, что вам больше нравится</h1>
+    <form method="post" action="/lab9/result">
+        <button type="submit" name="final_choice" value="sladkoe">Сладкое</button>
+        <button type="submit" name="final_choice" value="sytnoye">Сытное</button>
+    </form>
+{% else %}
+    <h1>Выберите, что вам больше нравится</h1>
+    <form method="post" action="/lab9/result">
+        <button type="submit" name="final_choice" value="krasivoe">Красивое</button>
+        <button type="submit" name="final_choice" value="originalnoe">Оригинальное</button>
+    </form>
+{% endif %}
+
 </form>
 {% endblock %}
