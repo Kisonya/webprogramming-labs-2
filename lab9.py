@@ -10,12 +10,17 @@ def step1_name():
     # Проверяем, есть ли данные о предыдущем поздравлении в cookies
     last_result = request.cookies.get('last_result')
     last_image = request.cookies.get('last_image')
+    
+    # Если данные о предыдущем поздравлении есть и запрос GET, отображаем последнее поздравление
     if last_result and request.method == 'GET':
-        return render_template('lab9/last_result.html', last_result=last_result)
+        return render_template('lab9/result.html', message=last_result, image=last_image)
 
+    # Если запрос POST, сохраняем имя пользователя и переходим к следующему шагу
     if request.method == 'POST':
         session['name'] = request.form.get('name')
         return render_template('lab9/age.html')
+    
+    # Если запрос GET и данных нет, отображаем начальную страницу
     return render_template('lab9/lab9.html')
 
 @lab9.route('/lab9/age', methods=['POST'])
