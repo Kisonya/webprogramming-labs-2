@@ -48,33 +48,65 @@ def step5_result():
     if interest == 'vkusnoe':  # Если выбрано "что-то вкусное"
         if final_choice == 'sladkoe':  # Если выбрано "сладкое"
             if is_child:
-                gift = 'мешочек конфет'
-                image = 'sweets.jpg'
+                if gender == 'male':
+                    gift = 'мешочек конфет с игрушкой-сюрпризом'
+                    image = 'sweets_toy.jpg'
+                else:
+                    gift = 'набор сладостей и брошка'
+                    image = 'sweets_brooch.jpg'
             else:
-                gift = 'коробка элитных шоколадных конфет'
-                image = 'luxury_chocolates.jpg'
+                if gender == 'male':
+                    gift = 'набор премиальных шоколадных батончиков'
+                    image = 'luxury_choco_set.jpg'
+                else:
+                    gift = 'фруктовая корзина с шоколадом'
+                    image = 'fruit_choco_basket.jpg'
         else:  # Если выбрано "сытное"
             if is_child:
-                gift = 'вкусный торт'
-                image = 'cake.jpg'
+                if gender == 'male':
+                    gift = 'набор мини-бургеров'
+                    image = 'mini_burgers.jpg'
+                else:
+                    gift = 'детская пицца с забавным дизайном'
+                    image = 'kids_pizza.jpg'
             else:
-                gift = 'праздничный пирог'
-                image = 'pie.jpg'
+                if gender == 'male':
+                    gift = 'стейк с ароматными специями'
+                    image = 'steak.jpg'
+                else:
+                    gift = 'праздничный сет суши'
+                    image = 'sushi_set.jpg'
     else:  # Если выбрано "что-то красивое"
         if final_choice == 'krasivoe':  # Если выбрано "красивое"
             if is_child:
-                gift = 'яркая игрушка'
-                image = 'toy.jpg'
+                if gender == 'male':
+                    gift = 'набор для создания моделей машин'
+                    image = 'car_model_kit.jpg'
+                else:
+                    gift = 'набор для плетения браслетов'
+                    image = 'bracelet_kit.jpg'
             else:
-                gift = 'букет из роз'
-                image = 'roses.jpg'
+                if gender == 'male':
+                    gift = 'элегантный настольный органайзер'
+                    image = 'desk_organizer.jpg'
+                else:
+                    gift = 'набор дизайнерской косметики'
+                    image = 'makeup_set.jpg'
         else:  # Если выбрано "оригинальное"
             if is_child:
-                gift = 'интересная картина'
-                image = 'painting.jpg'
+                if gender == 'male':
+                    gift = 'конструктор с подсветкой'
+                    image = 'light_constructor.jpg'
+                else:
+                    gift = 'набор для создания кукольного домика'
+                    image = 'dollhouse_kit.jpg'
             else:
-                gift = 'картина известного художника'
-                image = 'artwork.jpg'
+                if gender == 'male':
+                    gift = 'персонализированный кожаный кошелёк'
+                    image = 'leather_wallet.jpg'
+                else:
+                    gift = 'набор украшений ручной работы'
+                    image = 'handmade_jewelry.jpg'
 
     # Генерация поздравления
     if gender == 'male':
