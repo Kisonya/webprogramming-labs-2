@@ -36,30 +36,56 @@ def step5_result():
 
     # Чтение данных из session
     name = session.get('name', 'Гость')
-    age = session.get('age', 'неизвестного возраста')
+    age = session.get('age', 0)
     gender = session.get('gender', 'male')
     interest = session.get('interest', 'unknown')
     final_choice = session.get('final_choice', 'unknown')
 
-    # Генерация поздравления
-    if interest == 'vkusnoe':
-        if final_choice == 'sladkoe':
-            gift = 'мешочек конфет'
-            image = 'sweets.jpg'
-        else:
-            gift = 'вкусный торт'
-            image = 'cake.jpg'
-    else:
-        if final_choice == 'krasivoe':
-            gift = 'красивый букет'
-            image = 'flowers.jpg'
-        else:
-            gift = 'картину'
-            image = 'painting.jpg'
+    # Определяем тип получателя
+    is_child = age < 14  # Если младше 14 лет, считаем ребенком
 
+    # Генерация подарка
+    if interest == 'vkusnoe':  # Если выбрано "что-то вкусное"
+        if final_choice == 'sladkoe':  # Если выбрано "сладкое"
+            if is_child:
+                gift = 'мешочек конфет'
+                image = 'sweets.jpg'
+            else:
+                gift = 'коробка элитных шоколадных конфет'
+                image = 'luxury_chocolates.jpg'
+        else:  # Если выбрано "сытное"
+            if is_child:
+                gift = 'вкусный торт'
+                image = 'cake.jpg'
+            else:
+                gift = 'праздничный пирог'
+                image = 'pie.jpg'
+    else:  # Если выбрано "что-то красивое"
+        if final_choice == 'krasivoe':  # Если выбрано "красивое"
+            if is_child:
+                gift = 'яркая игрушка'
+                image = 'toy.jpg'
+            else:
+                gift = 'букет из роз'
+                image = 'roses.jpg'
+        else:  # Если выбрано "оригинальное"
+            if is_child:
+                gift = 'интересная картина'
+                image = 'painting.jpg'
+            else:
+                gift = 'картина известного художника'
+                image = 'artwork.jpg'
+
+    # Генерация поздравления
     if gender == 'male':
-        message = f"Поздравляю тебя, {name}, желаю, чтобы ты быстро вырос, был умным и счастливым! Вот тебе подарок — {gift}."
+        if is_child:
+            message = f"Поздравляю тебя, {name}, желаю, чтобы ты быстро вырос, был умным и счастливым! Вот тебе подарок — {gift}."
+        else:
+            message = f"Поздравляю вас, {name}, желаю успехов, здоровья и счастья! Вот вам подарок — {gift}."
     else:
-        message = f"Поздравляю тебя, {name}, желаю, чтобы ты быстро выросла, была умной и счастливой! Вот тебе подарок — {gift}."
+        if is_child:
+            message = f"Поздравляю тебя, {name}, желаю, чтобы ты быстро выросла, была умной и счастливой! Вот тебе подарок — {gift}."
+        else:
+            message = f"Поздравляю вас, {name}, желаю успехов, здоровья и счастья! Вот вам подарок — {gift}."
 
     return render_template('lab9/result.html', message=message, image=image)
