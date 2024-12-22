@@ -4,6 +4,12 @@
 
 {% block extra_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='lab9/lab9.css') }}">
+<style>
+    body {
+        background: url('{{ url_for("static", filename="lab9/new_year_bg.jpg") }}') no-repeat center center fixed;
+        background-size: cover;
+    }
+</style>
 {% endblock %}
 
 {% block main %}
