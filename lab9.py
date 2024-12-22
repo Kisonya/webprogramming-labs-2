@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session
 
 lab9 = Blueprint('lab9', __name__)
 
@@ -32,21 +32,17 @@ def step4_interest():
 
 @lab9.route('/lab9/result', methods=['POST'])
 def step5_result():
+    # Получаем данные из session
+    user_data = session.get('user_data', {})
     user_data['final_choice'] = request.form.get('final_choice')
+    session['user_data'] = user_data
 
     # Генерация поздравления
-    name = user_data['name']
-    age = user_data['age']
-    gender = user_data['gender']
-    interest = user_data['interest']
-    final_choice = user_data['final_choice']
-
-    if gender == 'male':
-        pronoun = 'ты'
-        ending = 'лся'
-    else:
-        pronoun = 'ты'
-        ending = 'лась'
+    name = user_data.get('name', 'Гость')
+    age = user_data.get('age', 'неизвестного возраста')
+    gender = user_data.get('gender', 'male')  # Значение по умолчанию
+    interest = user_data.get('interest', 'unknown')
+    final_choice = user_data.get('final_choice', 'unknown')
 
     if interest == 'vkusnoe':
         if final_choice == 'sladkoe':
