@@ -9,6 +9,7 @@ user_data = {}
 def step1_name():
     # Проверяем, есть ли данные о предыдущем поздравлении в cookies
     last_result = request.cookies.get('last_result')
+    last_image = request.cookies.get('last_image')
     if last_result and request.method == 'GET':
         return render_template('lab9/last_result.html', last_result=last_result)
 
@@ -127,15 +128,16 @@ def step5_result():
 
     # Сохраняем результат в cookies
     response = make_response(render_template('lab9/result.html', message=message, image=image))
-    response.set_cookie('last_result', f"{message} (Подарок: {gift})", max_age=60 * 60 * 24)  # Храним на 24 часа
-
+    response.set_cookie('last_result', message, max_age=60 * 60 * 24)  # Храним сообщение на 24 часа
+    response.set_cookie('last_image', image, max_age=60 * 60 * 24)  # Храним путь к изображению на 24 часа
     return response
 
 
 @lab9.route('/lab9/reset', methods=['GET'])
 def reset_lab9():
-    # Сброс cookies
+    # Сброс cookies и перенаправление на начало
     response = make_response(redirect(url_for('lab9.step1_name')))
     response.delete_cookie('last_result')
+    response.delete_cookie('last_image')
     session.clear()
     return response
