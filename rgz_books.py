@@ -10,8 +10,8 @@ from flask import jsonify
 # Создаем Blueprint
 rgz_books = Blueprint('rgz_books', __name__, template_folder='templates')
 
-
 # Главная страница с книгами
+@rgz_books.route('/rgz', methods=['GET'])
 @rgz_books.route('/rgz/books', methods=['GET'])
 def books_list():
     """Страница со списком книг"""
