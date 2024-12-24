@@ -19,7 +19,7 @@ def books_list():
     per_page = 20  # Количество книг на странице
 
     # Получение списка книг с пагинацией
-    books = rgz_books.query.paginate(page=page, per_page=per_page)
+    books = db.session.query(rgz_books).paginate(page=page, per_page=per_page)
 
     # Передаем книги в шаблон
     return render_template('rgz/books_list.html', books=books)
@@ -89,7 +89,7 @@ def edit_book(book_id):
     if not current_user.is_admin:
         return redirect(url_for('rgz_books.books_list'))  # Только администратор может редактировать книги
 
-    book = rgz_books.query.get_or_404(book_id)
+    book = db.session.query(rgz_books).get_or_404(book_id)
 
     if request.method == 'POST':
         title = request.form.get('title')
