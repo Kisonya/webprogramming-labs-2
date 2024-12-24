@@ -46,11 +46,14 @@ def register():
     if login_exists:  # Если пользователь уже существует
         return render_template('lab8/register.html', error='Такой пользователь уже существует')
 
-    # Хэширование пароля и создание пользователя
-    password_hash = generate_password_hash(password_form)  # Хэшируем пароль
-    new_user = users(login=login_form, password=password_hash)  # Создаём нового пользователя
-    db.session.add(new_user)  # Добавляем пользователя в сессию базы данных
-    db.session.commit()  # Сохраняем изменения в базе данных
+    # Хэшируем пароль и создаем пользователя
+    password_hash = generate_password_hash(password_form)
+    print(f"Хэшированный пароль: {password_hash}")  # Отладочное сообщение
+    new_user = users(login=login_form, password=password_hash)
+    db.session.add(new_user)
+    db.session.commit()
+    print(f"Пользователь {login_form} успешно зарегистрирован")
+
 
     # Автоматический логин после регистрации
     login_user(new_user)  # Авторизуем нового пользователя
@@ -71,9 +74,13 @@ def login():
     user = users.query.filter_by(login=login_form).first()  # Ищем пользователя с указанным логином
 
     # Проверка пароля
-    if user and check_password_hash(user.password, password_form):  # Если пользователь найден и пароль верен
-        login_user(user, remember=remember_me)  # Авторизуем пользователя, передаём флаг "Запомнить меня"
-        return redirect('/lab8/')  # Перенаправляем на главную страницу
+    if user and check_password_hash(user.password, password_form):
+        print(f"Авторизация успешна для пользователя: {user.login}")
+        login_user(user, remember=remember_me)
+        return redirect('/lab8/')
+    else:
+        print(f"Ошибка авторизации для логина: {login_form}")
+
 
     # Если данные неверны, отображаем страницу входа с сообщением об ошибке
     return render_template('lab8/login.html', error="Неверный логин или пароль")
