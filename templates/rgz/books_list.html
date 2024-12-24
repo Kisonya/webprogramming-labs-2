@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block lab %}РГЗ: Список книг{% endblock %}
+
+{% block main %}
+<h1>Список книг</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Автор</th>
+            <th>Страницы</th>
+            <th>Издательство</th>
+            <th>Обложка</th>
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <th>Действия</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books.items %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.pages }}</td>
+            <td>{{ book.publisher }}</td>
+            <td>
+                {% if book.cover_image %}
+                <img src="{{ book.cover_image }}" alt="Обложка книги" width="50">
+                {% else %}
+                Нет обложки
+                {% endif %}
+            </td>
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <td>
+                <form action="/rgz/books/delete/{{ book.id }}" method="post">
+                    <button type="submit">Удалить</button>
+                </form>
+                <a href="/rgz/books/edit/{{ book.id }}">Редактировать</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<nav>
+    {% if books.has_prev %}
+    <a href="{{ url_for('rgz_books.books_list', page=books.prev_num) }}">Предыдущая</a>
+    {% endif %}
+    {% if books.has_next %}
+    <a href="{{ url_for('rgz_books.books_list', page=books.next_num) }}">Следующая</a>
+    {% endif %}
+</nav>
+{% endblock %}
