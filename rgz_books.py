@@ -8,11 +8,13 @@ from flask import jsonify
 
 
 # Создаем Blueprint
-rgz_books = Blueprint('rgz_books', __name__, template_folder='templates')
+rgz_books_bp = Blueprint('rgz_books', __name__, template_folder='templates')
+
+print(type(rgz_books))
 
 # Главная страница с книгами
-@rgz_books.route('/rgz', methods=['GET'])
-@rgz_books.route('/rgz/books', methods=['GET'])
+@rgz_books_bp.route('/rgz', methods=['GET'])
+@rgz_books_bp.route('/rgz/books', methods=['GET'])
 def books_list():
     """Страница со списком книг"""
     page = int(request.args.get('page', 1))  # Номер страницы (по умолчанию 1)
@@ -26,7 +28,7 @@ def books_list():
 
 
 # Добавление книги (только для администраторов)
-@rgz_books.route('/rgz/books/add', methods=['GET', 'POST'])
+@rgz_books_bp.route('/rgz/books/add', methods=['GET', 'POST'])
 @login_required
 def add_book():
     if not current_user.is_admin:
@@ -67,7 +69,7 @@ def add_book():
 
 
 # Удаление книги
-@rgz_books.route('/rgz/books/delete/<int:book_id>', methods=['POST'])
+@rgz_books_bp.route('/rgz/books/delete/<int:book_id>', methods=['POST'])
 @login_required
 def delete_book(book_id):
     if not current_user.is_admin:
@@ -83,7 +85,7 @@ def delete_book(book_id):
 
 
 # Редактирование книги
-@rgz_books.route('/rgz/books/edit/<int:book_id>', methods=['GET', 'POST'])
+@rgz_books_bp.route('/rgz/books/edit/<int:book_id>', methods=['GET', 'POST'])
 @login_required
 def edit_book(book_id):
     if not current_user.is_admin:
