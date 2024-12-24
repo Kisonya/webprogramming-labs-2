@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 
 from db import db
-from db.models import users, articles
+from db.models import users, articles, rgz_users, rgz_books
 from flask_login import LoginManager
 
 from lab1 import lab1
