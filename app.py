@@ -1,5 +1,5 @@
 import os
-from flask import Flask, url_for, redirect, render_template
+from flask import Flask, url_for, redirect, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 
@@ -21,10 +21,28 @@ from rgz_books import rgz_books_bp
 # Создаём экземпляр приложения Flask
 app = Flask(__name__)
 
-# Настройка LoginManager для управления сессиями авторизации
 login_manager = LoginManager()
-login_manager.login_view = 'lab8.login'  # Указываем маршрут для страницы входа
-login_manager.init_app(app)  # Связываем LoginManager с приложением Flask
+
+# Динамическое определение маршрута входа
+@login_manager.user_loader
+def load_user(user_id):
+    from db.models import rgz_users
+    return rgz_users.query.get(int(user_id))
+
+@login_manager.unauthorized_handler
+def handle_unauthorized():
+    # Если маршрут принадлежит RGZ
+    if request.path.startswith('/rgz'):
+        return redirect(url_for('rgz_books_bp.login'))  # Вход для RGZ
+
+    # Если маршрут принадлежит Lab8
+    elif request.path.startswith('/lab8'):
+        return redirect(url_for('lab8.login'))  # Вход для Lab8
+
+    # Если не принадлежит ни одному из них
+    return "Unauthorized access", 401
+
+login_manager.init_app(app)
 
 # Функция загрузки пользователя по его ID
 @login_manager.user_loader
