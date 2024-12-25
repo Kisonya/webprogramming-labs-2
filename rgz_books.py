@@ -7,14 +7,55 @@ from db import db
 from db.models import rgz_books, rgz_users
 from flask import jsonify
 import logging
-
+import re
 from flask import current_app as app
 
 
 # Создаем Blueprint
 rgz_books_bp = Blueprint('rgz_books', __name__, template_folder='templates')
 
-print(type(rgz_books))
+
+def is_valid_login(login):
+    # Проверяем, чтобы логин содержал только латинские буквы, цифры и знаки препинания
+    pattern = r'^[a-zA-Z0-9._-]+$'
+    return bool(re.match(pattern, login))
+
+
+
+def is_valid_password(password):
+    # Проверяем, чтобы пароль содержал только латинские буквы, цифры и знаки препинания и был не меньше 6 символов
+    pattern = r'^[a-zA-Z0-9._-]+$'
+    return bool(re.match(pattern, password)) and len(password) >= 6
+
+
+def is_valid_login(login):
+    # Проверяем, чтобы логин содержал только латинские буквы, цифры и знаки препинания
+    pattern = r'^[a-zA-Z0-9._-]+$'
+    return bool(re.match(pattern, login)) and len(login) >= 3  # Минимальная длина логина — 3 символа
+
+
+def is_valid_password(password):
+    # Проверяем, чтобы пароль содержал только латинские буквы, цифры и знаки препинания и был не меньше 6 символов
+    pattern = r'^[a-zA-Z0-9._-]+$'
+    return bool(re.match(pattern, password)) and len(password) >= 6
+
+
+def is_valid_book_data(title, author, pages, publisher):
+    # Проверяем, чтобы все строки были непустыми и содержали только допустимые символы
+    if not title or not re.match(r'^[a-zA-Z0-9а-яА-ЯёЁ .,-]+$', title):
+        return False, "Название книги содержит недопустимые символы или пустое."
+
+    if not author or not re.match(r'^[a-zA-Zа-яА-ЯёЁ .,-]+$', author):
+        return False, "Автор книги содержит недопустимые символы или пустое."
+
+    if not publisher or not re.match(r'^[a-zA-Z0-9а-яА-ЯёЁ .,-]+$', publisher):
+        return False, "Издательство содержит недопустимые символы или пустое."
+
+    if pages <= 0:
+        return False, "Количество страниц должно быть положительным."
+
+    return True, None
+
 
 @rgz_books_bp.route('/rgz', methods=['GET'])
 @rgz_books_bp.route('/rgz/books', methods=['GET'])
@@ -60,8 +101,6 @@ def books_list():
     return render_template('rgz/books_list.html', books=books)
 
 
-
-
 # Добавление книги (только для администраторов)
 @rgz_books_bp.route('/rgz/books/add', methods=['GET', 'POST'])
 @login_required
@@ -76,9 +115,10 @@ def add_book():
         publisher = request.form.get('publisher')
         cover_image = request.files.get('cover_image')
 
-        # Валидация данных
-        if not (title and author and pages and publisher):
-            return render_template('rgz/add_book.html', error="Все поля, кроме обложки, обязательны для заполнения")
+        # Валидация данных книги
+        is_valid, error_message = is_valid_book_data(title, author, pages, publisher)
+        if not is_valid:
+            return render_template('rgz/add_book.html', error=error_message)
 
         # Сохранение обложки (если передана)
         cover_image_path = None
@@ -98,6 +138,7 @@ def add_book():
         )
         db.session.add(new_book)
         db.session.commit()
+        flash('Книга успешно добавлена.')
         return redirect(url_for('rgz_books.books_list'))
 
     return render_template('rgz/add_book.html')
@@ -135,9 +176,10 @@ def edit_book(book_id):
         publisher = request.form.get('publisher')
         cover_image = request.files.get('cover_image')
 
-        # Валидация данных
-        if not (title and author and pages and publisher):
-            return render_template('rgz/edit_book.html', book=book, error="Все поля, кроме обложки, обязательны для заполнения")
+        # Валидация данных книги
+        is_valid, error_message = is_valid_book_data(title, author, pages, publisher)
+        if not is_valid:
+            return render_template('rgz/edit_book.html', book=book, error=error_message)
 
         # Обновление данных книги
         book.title = title
@@ -153,24 +195,28 @@ def edit_book(book_id):
             book.cover_image = cover_image_path
 
         db.session.commit()
+        flash('Книга успешно обновлена.')
         return redirect(url_for('rgz_books.books_list'))
 
     return render_template('rgz/edit_book.html', book=book)
 
 
-# Регистрация пользователя
 @rgz_books_bp.route('/rgz/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         login = request.form.get('login')
         password = request.form.get('password')
 
-        # Проверка на пустые поля
-        if not login or not password:
-            flash('Логин и пароль не могут быть пустыми.')
+        # Валидация данных
+        if not is_valid_login(login):
+            flash('Логин должен содержать только латинские буквы, цифры и знаки препинания, и быть не менее 3 символов.')
             return render_template('rgz/register.html')
 
-        # Проверка существующего пользователя
+        if not is_valid_password(password):
+            flash('Пароль должен содержать только латинские буквы, цифры и знаки препинания, и быть не менее 6 символов.')
+            return render_template('rgz/register.html')
+
+        # Проверка на существование пользователя
         user_exists = rgz_users.query.filter_by(login=login).first()
         if user_exists:
             flash('Пользователь с таким логином уже существует.')
@@ -188,6 +234,7 @@ def register():
         return redirect(url_for('rgz_books.login'))
 
     return render_template('rgz/register.html')
+
 
 
 # Настраиваем логирование
@@ -227,3 +274,24 @@ def logout():
     logout_user()
     flash('Вы успешно вышли из системы.')
     return redirect(url_for('rgz_books.login'))
+
+
+# Удаление аккаунта авторизованным пользователем
+@rgz_books_bp.route('/rgz/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user_id = current_user.id
+    user_login = current_user.login
+
+    # Удаляем аккаунт из базы данных
+    user = rgz_users.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        logout_user()  # Выход из системы после удаления аккаунта
+        flash(f'Ваш аккаунт "{user_login}" успешно удален.')
+        app.logger.info(f'Пользователь {user_login} (id: {user_id}) удалил свой аккаунт.')
+    else:
+        flash('Аккаунт не найден.')
+
+    return redirect(url_for('rgz_books.books_list'))

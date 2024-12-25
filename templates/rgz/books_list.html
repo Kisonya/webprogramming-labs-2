@@ -18,6 +18,13 @@
                 {% if current_user.is_admin %}
                     <li><a href="{{ url_for('rgz_books.add_book') }}" style="text-decoration: none;">Добавить книгу</a></li>
                 {% endif %}
+                <li>
+                    <form action="{{ url_for('rgz_books.delete_account') }}" method="post" style="display: inline;">
+                        <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                            Удалить аккаунт
+                        </button>
+                    </form>
+                </li>
             {% else %}
                 <li><a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a></li>
                 <li><a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a></li>
