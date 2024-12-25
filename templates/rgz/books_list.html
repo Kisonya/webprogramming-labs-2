@@ -79,14 +79,14 @@
         </div>
 
         {% if current_user.is_authenticated and current_user.is_admin %}
-        <div style="display: flex; gap: 10px; margin-top: auto;">
+        <div style="display: flex; justify-content: space-between; margin-top: auto; padding-top: 10px;">
             <a href="{{ url_for('rgz_books.edit_book', book_id=book.id) }}" 
-               style="flex: 1; background: #3498db; color: white; text-decoration: none; padding: 8px 10px; border-radius: 5px; text-align: center; font-size: 14px;">
+               style="background: #3498db; color: white; text-decoration: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; flex: 1; margin-right: 5px; text-align: center;">
                Редактировать
             </a>
             <form action="{{ url_for('rgz_books.delete_book', book_id=book.id) }}" method="post" style="flex: 1;">
                 <button type="submit" 
-                        style="background: #e74c3c; color: white; border: none; padding: 8px 10px; border-radius: 5px; width: 100%; font-size: 14px; cursor: pointer;">
+                        style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; width: 100%;">
                     Удалить
                 </button>
             </form>
@@ -95,6 +95,7 @@
     </div>
     {% endfor %}
 </div>
+
 
 
 <nav style="text-align: center; margin-top: 20px;">
