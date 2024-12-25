@@ -23,23 +23,30 @@ app = Flask(__name__)
 
 login_manager = LoginManager()
 
-# Динамическое определение маршрута входа
+# Определяем логику загрузки пользователя
 @login_manager.user_loader
 def load_user(user_id):
-    from db.models import rgz_users
-    return rgz_users.query.get(int(user_id))
+    # Проверяем текущий маршрут, чтобы определить модель пользователя
+    if request.path.startswith('/rgz'):
+        from db.models import rgz_users
+        return rgz_users.query.get(int(user_id))
+    elif request.path.startswith('/lab8'):
+        from db.models import users
+        return users.query.get(int(user_id))
+    return None
 
+# Обработка неавторизованного доступа
 @login_manager.unauthorized_handler
 def handle_unauthorized():
-    # Если маршрут принадлежит RGZ
+    # Если пользователь пытается получить доступ к RGZ
     if request.path.startswith('/rgz'):
         return redirect(url_for('rgz_books_bp.login'))  # Вход для RGZ
 
-    # Если маршрут принадлежит Lab8
+    # Если пользователь пытается получить доступ к Lab8
     elif request.path.startswith('/lab8'):
         return redirect(url_for('lab8.login'))  # Вход для Lab8
 
-    # Если не принадлежит ни одному из них
+    # Если маршрут не относится к Lab8 или RGZ
     return "Unauthorized access", 401
 
 login_manager.init_app(app)
