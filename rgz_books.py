@@ -8,6 +8,7 @@ from db.models import rgz_books, rgz_users
 from flask import jsonify
 import logging
 
+from flask import current_app as app
 
 
 # Создаем Blueprint
@@ -175,14 +176,16 @@ def login():
 
         # Поиск пользователя в таблице rgz_users
         user = rgz_users.query.filter_by(login=login).first()
-
         if user and check_password_hash(user.password, password):
-            login_user(user)  # Авторизация через Flask-Login
-            flash(f'Вы успешно вошли в систему как {user.login}.')
+            login_user(user)
+            app.logger.info(f"Пользователь {user.login} (id: {user.id}) авторизовался через таблицу 'rgz_users'.")
+            flash(f"Вы успешно вошли в систему как {user.login}.")
             return redirect(url_for('rgz_books.books_list'))
 
         flash('Неверный логин или пароль.')
     return render_template('rgz/login.html')
+
+
 
 
 # Выход пользователя
