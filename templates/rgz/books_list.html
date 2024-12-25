@@ -3,6 +3,20 @@
 {% block lab %}РГЗ: Список книг{% endblock %}
 
 {% block main %}
+<header style="display: flex; justify-content: flex-end; padding: 10px; margin-bottom: 20px;">
+    <nav>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 15px;">
+            {% if current_user.is_authenticated %}
+                <li>Привет, {{ current_user.login }}!</li>
+                <li><a href="{{ url_for('rgz_books.logout') }}" style="text-decoration: none;">Выйти</a></li>
+            {% else %}
+                <li><a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a></li>
+                <li><a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+
 <h1>Список книг</h1>
 
 <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">

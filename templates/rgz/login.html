@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block lab %}РГЗ: Вход{% endblock %}
+
+{% block main %}
+<h1>Вход</h1>
+<form method="post" action="/rgz/login">
+    <label>Логин: <input type="text" name="login" required></label><br>
+    <label>Пароль: <input type="password" name="password" required></label><br>
+    <button type="submit">Войти</button>
+</form>
+<p>Нет аккаунта? <a href="{{ url_for('rgz_books_bp.register') }}">Зарегистрироваться</a></p>
+<a href="{{ url_for('rgz_books_bp.books_list') }}">Вернуться к списку книг</a>
+{% endblock %}
