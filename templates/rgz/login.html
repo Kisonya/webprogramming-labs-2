@@ -9,6 +9,6 @@
     <label>Пароль: <input type="password" name="password" required></label><br>
     <button type="submit">Войти</button>
 </form>
-<p>Нет аккаунта? <a href="{{ url_for('rgz_books_bp.register') }}">Зарегистрироваться</a></p>
-<a href="{{ url_for('rgz_books_bp.books_list') }}">Вернуться к списку книг</a>
+<p>Нет аккаунта? <a href="{{ url_for('rgz_books.register') }}">Зарегистрироваться</a></p>
+<a href="{{ url_for('rgz_books.books_list') }}">Вернуться к списку книг</a>
 {% endblock %}
