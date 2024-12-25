@@ -45,6 +45,16 @@
         Страницы (до):
         <input type="number" name="pages_max" value="{{ request.args.get('pages_max', '') }}" placeholder="Макс">
     </label>
+    <label>
+        Сортировать по:
+        <select name="sort_by" style="padding: 5px;">
+            <option value="" {% if not request.args.get('sort_by') %}selected{% endif %}>Без сортировки</option>
+            <option value="title" {% if request.args.get('sort_by') == 'title' %}selected{% endif %}>Название</option>
+            <option value="author" {% if request.args.get('sort_by') == 'author' %}selected{% endif %}>Автор</option>
+            <option value="pages" {% if request.args.get('sort_by') == 'pages' %}selected{% endif %}>Количество страниц</option>
+            <option value="publisher" {% if request.args.get('sort_by') == 'publisher' %}selected{% endif %}>Издательство</option>
+        </select>
+    </label>
     <button type="submit" style="padding: 5px 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
     <a href="{{ url_for('rgz_books.books_list') }}" style="padding: 5px 10px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; text-decoration: none; cursor: pointer;">Сбросить</a>
 </form>
