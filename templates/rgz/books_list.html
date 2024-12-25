@@ -3,19 +3,36 @@
 {% block lab %}РГЗ: Список книг{% endblock %}
 
 {% block main %}
-<header style="display: flex; justify-content: flex-end; padding: 10px; margin-bottom: 20px;">
+<<header style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 20px;">
+    <div>
+        <h2>Список книг</h2>
+    </div>
     <nav>
         <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 15px;">
             {% if current_user.is_authenticated %}
-                <li>Привет, {{ current_user.login }}!</li>
-                <li><a href="{{ url_for('rgz_books.logout') }}" style="text-decoration: none;">Выйти</a></li>
+                {% if current_user.is_admin %}
+                    <li><span style="color: red; font-weight: bold;">Привет, {{ current_user.login }} (Admin)!</span></li>
+                    <li>
+                        <a href="{{ url_for('rgz_books.add_book') }}" style="background: #4CAF50; color: #fff; padding: 8px 12px; text-decoration: none; border-radius: 5px;">Добавить книгу</a>
+                    </li>
+                {% else %}
+                    <li>Привет, {{ current_user.login }}!</li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('rgz_books.logout') }}" style="text-decoration: none;">Выйти</a>
+                </li>
             {% else %}
-                <li><a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a></li>
-                <li><a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a></li>
+                <li>
+                    <a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a>
+                </li>
             {% endif %}
         </ul>
     </nav>
 </header>
+
 
 <h1>Список книг</h1>
 
@@ -37,16 +54,20 @@
         <p style="margin: 5px 0;"><b>Издательство:</b> {{ book.publisher }}</p>
 
         {% if current_user.is_authenticated and current_user.is_admin %}
-        <div style="margin-top: 10px;">
-            <form action="/rgz/books/delete/{{ book.id }}" method="post" style="display: inline;">
-                <button type="submit" style="background: #e74c3c; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Удалить</button>
+        <div style="margin-top: 10px; display: flex; justify-content: space-between;">
+            <a href="{{ url_for('rgz_books.edit_book', book_id=book.id) }}" 
+               style="background: #3498db; color: #fff; text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 5px;">
+               Редактировать
+            </a>
+            <form action="{{ url_for('rgz_books.delete_book', book_id=book.id) }}" method="post" style="display: inline;">
+                <button type="submit" style="background: #e74c3c; color: #fff; border: none; padding: 5px 10px; border-radius: 5px;">Удалить</button>
             </form>
-            <a href="/rgz/books/edit/{{ book.id }}" style="background: #3498db; color: #fff; text-decoration: none; padding: 5px 10px; border-radius: 5px;">Редактировать</a>
         </div>
         {% endif %}
     </div>
     {% endfor %}
 </div>
+
 
 <nav style="text-align: center; margin-top: 20px;">
     {% if books.has_prev %}
