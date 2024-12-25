@@ -3,6 +3,7 @@
 {% block lab %}РГЗ: Добавить книгу{% endblock %}
 
 {% block main %}
+{% include 'rgz/errors.html' %}
 <h1>Добавить книгу</h1>
 
 <form method="post" action="/rgz/books/add" enctype="multipart/form-data">

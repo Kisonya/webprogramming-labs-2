@@ -79,9 +79,13 @@ def books_list():
     if publisher_filter:
         query = query.filter(rgz_books.publisher.ilike(f"%{publisher_filter}%"))
     if pages_min_filter is not None:
-        query = query.filter(rgz_books.pages >= pages_min_filter)
+        if pages_min_filter < 0:
+            flash("Минимальное количество страниц не может быть отрицательным.", "error")
+            return redirect(url_for('rgz_books.books_list'))
     if pages_max_filter is not None:
-        query = query.filter(rgz_books.pages <= pages_max_filter)
+        if pages_max_filter < 0:
+            flash("Максимальное количество страниц не может быть отрицательным.", "error")
+            return redirect(url_for('rgz_books.books_list'))
 
     # Сортировка
     if sort_by == 'title':
@@ -116,9 +120,12 @@ def add_book():
         cover_image = request.files.get('cover_image')
 
         # Валидация данных книги
-        is_valid, error_message = is_valid_book_data(title, author, pages, publisher)
-        if not is_valid:
-            flash(f'Ошибка: {error_message}', 'error')
+        if not (title and author and pages and publisher):
+            flash("Все поля, кроме обложки, обязательны для заполнения.", "error")
+            return render_template('rgz/add_book.html')
+
+        if pages <= 0:
+            flash("Количество страниц должно быть положительным.", "error")
             return render_template('rgz/add_book.html')
 
         # Сохранение обложки (если передана)
