@@ -29,11 +29,18 @@ def load_user(user_id):
     # Проверяем текущий маршрут, чтобы определить модель пользователя
     if request.path.startswith('/rgz'):
         from db.models import rgz_users
-        return rgz_users.query.get(int(user_id))
+        user = rgz_users.query.get(int(user_id))
+        if user:
+            print(f"DEBUG: Загрузили пользователя {user.login} из таблицы 'rgz_users'")
+        return user
     elif request.path.startswith('/lab8'):
         from db.models import users
-        return users.query.get(int(user_id))
+        user = users.query.get(int(user_id))
+        if user:
+            print(f"DEBUG: Загрузили пользователя {user.login} из таблицы 'users'")
+        return user
     return None
+
 
 # Обработка неавторизованного доступа
 @login_manager.unauthorized_handler

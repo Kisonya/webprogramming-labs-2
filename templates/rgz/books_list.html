@@ -3,36 +3,23 @@
 {% block lab %}РГЗ: Список книг{% endblock %}
 
 {% block main %}
-<header style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 20px;">
-    <div>
-        <h2>Список книг</h2>
-    </div>
+<header style="display: flex; justify-content: flex-end; padding: 10px; margin-bottom: 20px;">
     <nav>
         <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 15px;">
             {% if current_user.is_authenticated %}
                 {% if current_user.is_admin %}
-                    <li><span style="color: red; font-weight: bold;">Привет, {{ current_user.login }} (Admin)!</span></li>
-                    <li>
-                        <a href="{{ url_for('rgz_books.add_book') }}" style="background: #4CAF50; color: #fff; padding: 8px 12px; text-decoration: none; border-radius: 5px;">Добавить книгу</a>
-                    </li>
+                    <li style="color: red; font-weight: bold;">Привет, {{ current_user.login }} (Admin)!</li>
                 {% else %}
                     <li>Привет, {{ current_user.login }}!</li>
                 {% endif %}
-                <li>
-                    <a href="{{ url_for('rgz_books.logout') }}" style="text-decoration: none;">Выйти</a>
-                </li>
+                <li><a href="{{ url_for('rgz_books.logout') }}" style="text-decoration: none;">Выйти</a></li>
             {% else %}
-                <li>
-                    <a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a>
-                </li>
+                <li><a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a></li>
+                <li><a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a></li>
             {% endif %}
         </ul>
     </nav>
 </header>
-
 
 <h1>Список книг</h1>
 

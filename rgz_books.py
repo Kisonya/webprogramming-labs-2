@@ -173,20 +173,15 @@ def login():
         login = request.form.get('login')
         password = request.form.get('password')
 
-        # Поиск пользователя в таблице
+        # Поиск пользователя в таблице rgz_users
         user = rgz_users.query.filter_by(login=login).first()
+
         if user and check_password_hash(user.password, password):
-            login_user(user)
-            
-            # Логируем успешную авторизацию
-            logging.info(f"Пользователь {user.login} (id: {user.id}) авторизовался через таблицу 'rgz_users'.")
-            
-            flash('Вы успешно вошли в систему.')
+            login_user(user)  # Авторизация через Flask-Login
+            flash(f'Вы успешно вошли в систему как {user.login}.')
             return redirect(url_for('rgz_books.books_list'))
 
         flash('Неверный логин или пароль.')
-        return render_template('rgz/login.html')
-
     return render_template('rgz/login.html')
 
 
