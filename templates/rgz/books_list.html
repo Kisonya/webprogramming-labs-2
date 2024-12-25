@@ -61,7 +61,7 @@
 
 <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
     {% for book in books.items %}
-    <div style="border: 1px solid #ccc; border-radius: 10px; width: 200px; margin: 10px; padding: 15px; text-align: center; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+    <div style="border: 1px solid #ccc; border-radius: 10px; width: 200px; margin: 10px; padding: 15px; text-align: center; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); position: relative;">
         <div>
             {% if book.cover_image %}
             <img src="{{ book.cover_image }}" alt="Обложка книги" style="width: 100%; border-radius: 10px;">
@@ -77,13 +77,16 @@
         <p style="margin: 5px 0;"><b>Издательство:</b> {{ book.publisher }}</p>
 
         {% if current_user.is_authenticated and current_user.is_admin %}
-        <div style="margin-top: auto; display: flex; justify-content: space-between;">
+        <div style="position: absolute; bottom: 15px; left: 10px; right: 10px; display: flex; gap: 5px;">
             <a href="{{ url_for('rgz_books.edit_book', book_id=book.id) }}" 
-               style="background: #3498db; color: #fff; text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 5px;">
+               style="flex: 1; background: #3498db; color: white; text-decoration: none; padding: 8px; border-radius: 5px; text-align: center; font-size: 14px;">
                Редактировать
             </a>
-            <form action="{{ url_for('rgz_books.delete_book', book_id=book.id) }}" method="post" style="display: inline;">
-                <button type="submit" style="background: #e74c3c; color: #fff; border: none; padding: 5px 10px; border-radius: 5px;">Удалить</button>
+            <form action="{{ url_for('rgz_books.delete_book', book_id=book.id) }}" method="post" style="flex: 1;">
+                <button type="submit" 
+                        style="background: #e74c3c; color: white; border: none; padding: 8px; border-radius: 5px; width: 100%; font-size: 14px; cursor: pointer;">
+                    Удалить
+                </button>
             </form>
         </div>
         {% endif %}
