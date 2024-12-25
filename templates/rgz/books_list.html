@@ -7,12 +7,17 @@
     <nav>
         <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 15px;">
             {% if current_user.is_authenticated %}
-                {% if current_user.is_admin %}
-                    <li style="color: red; font-weight: bold;">Привет, {{ current_user.login }} (Admin)!</li>
-                {% else %}
-                    <li>Привет, {{ current_user.login }}!</li>
-                {% endif %}
+                <li>
+                    {% if current_user.is_admin %}
+                        <span style="color: red; font-weight: bold;">Админ: {{ current_user.login }}</span>
+                    {% else %}
+                        Привет, {{ current_user.login }}!
+                    {% endif %}
+                </li>
                 <li><a href="{{ url_for('rgz_books.logout') }}" style="text-decoration: none;">Выйти</a></li>
+                {% if current_user.is_admin %}
+                    <li><a href="{{ url_for('rgz_books.add_book') }}" style="text-decoration: none;">Добавить книгу</a></li>
+                {% endif %}
             {% else %}
                 <li><a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a></li>
                 <li><a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a></li>

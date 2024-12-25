@@ -16,11 +16,11 @@ rgz_books_bp = Blueprint('rgz_books', __name__, template_folder='templates')
 
 print(type(rgz_books))
 
-# Главная страница с книгами
 @rgz_books_bp.route('/rgz', methods=['GET'])
 @rgz_books_bp.route('/rgz/books', methods=['GET'])
 def books_list():
     """Страница со списком книг"""
+    app.logger.info(f"Текущий пользователь: {current_user} (id: {current_user.id if current_user.is_authenticated else 'не авторизован'})")
     page = int(request.args.get('page', 1))  # Номер страницы (по умолчанию 1)
     per_page = 20  # Количество книг на странице
 
@@ -184,8 +184,6 @@ def login():
 
         flash('Неверный логин или пароль.')
     return render_template('rgz/login.html')
-
-
 
 
 # Выход пользователя
