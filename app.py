@@ -21,47 +21,35 @@ from rgz_books import rgz_books_bp
 # Создаём экземпляр приложения Flask
 app = Flask(__name__)
 
-login_manager = LoginManager()
+# RGZ LoginManager
+rgz_login_manager = LoginManager()
+rgz_login_manager.init_app(app)
+rgz_login_manager.login_view = 'rgz_books_bp.login'
 
-# Определяем логику загрузки пользователя
-@login_manager.user_loader
-def load_user(user_id):
-    # Проверяем текущий маршрут, чтобы определить модель пользователя
+@rgz_login_manager.user_loader
+def load_rgz_user(user_id):
+    from db.models import rgz_users
+    return rgz_users.query.get(int(user_id))
+
+
+# Lab8 LoginManager
+lab8_login_manager = LoginManager()
+lab8_login_manager.init_app(app)
+lab8_login_manager.login_view = 'lab8.login'
+
+@lab8_login_manager.user_loader
+def load_lab8_user(user_id):
+    from db.models import users
+    return users.query.get(int(user_id))
+
+
+# Установите уникальные cookie для каждого приложения
+@app.before_request
+def set_session_cookie():
     if request.path.startswith('/rgz'):
-        from db.models import rgz_users
-        user = rgz_users.query.get(int(user_id))
-        if user:
-            print(f"DEBUG: Загрузили пользователя {user.login} из таблицы 'rgz_users'")
-        return user
+        app.config['SESSION_COOKIE_NAME'] = 'rgz_session'
     elif request.path.startswith('/lab8'):
-        from db.models import users
-        user = users.query.get(int(user_id))
-        if user:
-            print(f"DEBUG: Загрузили пользователя {user.login} из таблицы 'users'")
-        return user
-    return None
-
-
-# Обработка неавторизованного доступа
-@login_manager.unauthorized_handler
-def handle_unauthorized():
-    # Если пользователь пытается получить доступ к RGZ
-    if request.path.startswith('/rgz'):
-        return redirect(url_for('rgz_books_bp.login'))  # Вход для RGZ
-
-    # Если пользователь пытается получить доступ к Lab8
-    elif request.path.startswith('/lab8'):
-        return redirect(url_for('lab8.login'))  # Вход для Lab8
-
-    # Если маршрут не относится к Lab8 или RGZ
-    return "Unauthorized access", 401
-
-login_manager.init_app(app)
-
-# Функция загрузки пользователя по его ID
-@login_manager.user_loader
-def load_user(user_id):
-    return rgz_users.query.get(int(user_id))  # Возвращаем пользователя по его ID из базы данных
+        app.config['SESSION_COOKIE_NAME'] = 'lab8_session'
 
 # Настройка секретного ключа приложения
 # Используем значение из переменной окружения или задаём дефолтный ключ
