@@ -152,7 +152,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         flash('Регистрация прошла успешно! Теперь войдите в свой аккаунт.')
-        return redirect(url_for('rgz_books_bp.login'))
+        return redirect(url_for('rgz_books.login'))
 
     return render_template('rgz/register.html')
 
