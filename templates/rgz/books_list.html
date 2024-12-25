@@ -37,6 +37,14 @@
         Издательство:
         <input type="text" name="publisher" value="{{ request.args.get('publisher', '') }}" placeholder="Введите издательство">
     </label>
+    <label>
+        Страницы (от):
+        <input type="number" name="pages_min" value="{{ request.args.get('pages_min', '') }}" placeholder="Мин">
+    </label>
+    <label>
+        Страницы (до):
+        <input type="number" name="pages_max" value="{{ request.args.get('pages_max', '') }}" placeholder="Макс">
+    </label>
     <button type="submit" style="padding: 5px 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
     <a href="{{ url_for('rgz_books.books_list') }}" style="padding: 5px 10px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; text-decoration: none; cursor: pointer;">Сбросить</a>
 </form>

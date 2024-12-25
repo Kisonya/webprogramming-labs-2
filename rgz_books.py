@@ -26,6 +26,8 @@ def books_list():
     # Получение параметров фильтров
     author_filter = request.args.get('author')
     publisher_filter = request.args.get('publisher')
+    pages_min_filter = request.args.get('pages_min', type=int)
+    pages_max_filter = request.args.get('pages_max', type=int)
 
     # Базовый запрос
     query = db.session.query(rgz_books)
@@ -35,12 +37,17 @@ def books_list():
         query = query.filter(rgz_books.author.ilike(f"%{author_filter}%"))
     if publisher_filter:
         query = query.filter(rgz_books.publisher.ilike(f"%{publisher_filter}%"))
+    if pages_min_filter is not None:
+        query = query.filter(rgz_books.pages >= pages_min_filter)
+    if pages_max_filter is not None:
+        query = query.filter(rgz_books.pages <= pages_max_filter)
 
     # Пагинация
     books = query.paginate(page=page, per_page=per_page)
 
     # Передаем книги в шаблон
     return render_template('rgz/books_list.html', books=books)
+
 
 
 # Добавление книги (только для администраторов)
