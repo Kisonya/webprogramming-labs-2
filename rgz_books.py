@@ -6,6 +6,7 @@ import os
 from db import db
 from db.models import rgz_books, rgz_users
 from flask import jsonify
+import logging
 
 
 
@@ -157,6 +158,14 @@ def register():
     return render_template('rgz/register.html')
 
 
+# Настраиваем логирование
+logging.basicConfig(
+    filename='rgz_auth.log',  # Имя лог-файла
+    level=logging.INFO,       # Уровень логирования
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+
 # Вход пользователя
 @rgz_books_bp.route('/rgz/login', methods=['GET', 'POST'])
 def login():
@@ -164,10 +173,14 @@ def login():
         login = request.form.get('login')
         password = request.form.get('password')
 
-        # Поиск пользователя
+        # Поиск пользователя в таблице
         user = rgz_users.query.filter_by(login=login).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
+            
+            # Логируем успешную авторизацию
+            logging.info(f"Пользователь {user.login} (id: {user.id}) авторизовался через таблицу 'rgz_users'.")
+            
             flash('Вы успешно вошли в систему.')
             return redirect(url_for('rgz_books.books_list'))
 
@@ -181,6 +194,9 @@ def login():
 @rgz_books_bp.route('/rgz/logout')
 @login_required
 def logout():
+    # Логируем факт выхода пользователя
+    logging.info(f"Пользователь {current_user.login} (id: {current_user.id}) вышел из системы.")
+    
     logout_user()
     flash('Вы успешно вышли из системы.')
-    return redirect(url_for('rgz_books_bp.login'))
+    return redirect(url_for('rgz_books.login'))
