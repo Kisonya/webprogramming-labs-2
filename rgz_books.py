@@ -20,12 +20,24 @@ print(type(rgz_books))
 @rgz_books_bp.route('/rgz/books', methods=['GET'])
 def books_list():
     """Страница со списком книг"""
-    app.logger.info(f"Текущий пользователь: {current_user} (id: {current_user.id if current_user.is_authenticated else 'не авторизован'})")
     page = int(request.args.get('page', 1))  # Номер страницы (по умолчанию 1)
     per_page = 20  # Количество книг на странице
 
-    # Получение списка книг с пагинацией
-    books = db.session.query(rgz_books).paginate(page=page, per_page=per_page)
+    # Получение параметров фильтров
+    author_filter = request.args.get('author')
+    publisher_filter = request.args.get('publisher')
+
+    # Базовый запрос
+    query = db.session.query(rgz_books)
+
+    # Применение фильтров
+    if author_filter:
+        query = query.filter(rgz_books.author.ilike(f"%{author_filter}%"))
+    if publisher_filter:
+        query = query.filter(rgz_books.publisher.ilike(f"%{publisher_filter}%"))
+
+    # Пагинация
+    books = query.paginate(page=page, per_page=per_page)
 
     # Передаем книги в шаблон
     return render_template('rgz/books_list.html', books=books)

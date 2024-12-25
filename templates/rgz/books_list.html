@@ -28,6 +28,19 @@
 
 <h1>Список книг</h1>
 
+<form method="get" action="{{ url_for('rgz_books.books_list') }}" style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <label>
+        Автор:
+        <input type="text" name="author" value="{{ request.args.get('author', '') }}" placeholder="Введите автора">
+    </label>
+    <label>
+        Издательство:
+        <input type="text" name="publisher" value="{{ request.args.get('publisher', '') }}" placeholder="Введите издательство">
+    </label>
+    <button type="submit" style="padding: 5px 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
+    <a href="{{ url_for('rgz_books.books_list') }}" style="padding: 5px 10px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; text-decoration: none; cursor: pointer;">Сбросить</a>
+</form>
+
 <div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
     {% for book in books.items %}
     <div style="border: 1px solid #ccc; border-radius: 10px; width: 200px; margin: 10px; padding: 15px; text-align: center; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
@@ -46,7 +59,7 @@
         <p style="margin: 5px 0;"><b>Издательство:</b> {{ book.publisher }}</p>
 
         {% if current_user.is_authenticated and current_user.is_admin %}
-        <div style="margin-top: 10px; display: flex; justify-content: space-between;">
+        <div style="margin-top: auto; display: flex; justify-content: space-between;">
             <a href="{{ url_for('rgz_books.edit_book', book_id=book.id) }}" 
                style="background: #3498db; color: #fff; text-decoration: none; padding: 5px 10px; border-radius: 5px; margin-right: 5px;">
                Редактировать
@@ -59,7 +72,6 @@
     </div>
     {% endfor %}
 </div>
-
 
 <nav style="text-align: center; margin-top: 20px;">
     {% if books.has_prev %}
