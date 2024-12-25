@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, flash  # flash добавлен
+from flask_login import login_user, logout_user, login_required, current_user  # login_user и logout_user добавлены
+from werkzeug.security import generate_password_hash, check_password_hash  # generate_password_hash и check_password_hash добавлены
 from werkzeug.utils import secure_filename
 import os
 from db import db
-from db.models import rgz_books
+from db.models import rgz_books, rgz_users
 from flask import jsonify
+
 
 
 # Создаем Blueprint
@@ -122,3 +124,63 @@ def edit_book(book_id):
 
     return render_template('rgz/edit_book.html', book=book)
 
+
+# Регистрация пользователя
+@rgz_books_bp.route('/rgz/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        login = request.form.get('login')
+        password = request.form.get('password')
+
+        # Проверка на пустые поля
+        if not login or not password:
+            flash('Логин и пароль не могут быть пустыми.')
+            return render_template('rgz/register.html')
+
+        # Проверка существующего пользователя
+        user_exists = rgz_users.query.filter_by(login=login).first()
+        if user_exists:
+            flash('Пользователь с таким логином уже существует.')
+            return render_template('rgz/register.html')
+
+        # Создание нового пользователя
+        new_user = rgz_users(
+            login=login,
+            password=generate_password_hash(password),
+            is_admin=False  # По умолчанию пользователь не администратор
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Регистрация прошла успешно! Теперь войдите в свой аккаунт.')
+        return redirect(url_for('rgz_books_bp.login'))
+
+    return render_template('rgz/register.html')
+
+
+# Вход пользователя
+@rgz_books_bp.route('/rgz/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        login = request.form.get('login')
+        password = request.form.get('password')
+
+        # Поиск пользователя
+        user = rgz_users.query.filter_by(login=login).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            flash('Вы успешно вошли в систему.')
+            return redirect(url_for('rgz_books_bp.books_list'))
+
+        flash('Неверный логин или пароль.')
+        return render_template('rgz/login.html')
+
+    return render_template('rgz/login.html')
+
+
+# Выход пользователя
+@rgz_books_bp.route('/rgz/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Вы успешно вышли из системы.')
+    return redirect(url_for('rgz_books_bp.login'))
