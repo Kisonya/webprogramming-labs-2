@@ -21,7 +21,6 @@ def is_valid_login(login):
     return bool(re.match(pattern, login))
 
 
-
 def is_valid_password(password):
     # Проверяем, чтобы пароль содержал только латинские буквы, цифры и знаки препинания и был не меньше 6 символов
     pattern = r'^[a-zA-Z0-9._-]+$'
@@ -106,7 +105,8 @@ def books_list():
 @login_required
 def add_book():
     if not current_user.is_admin:
-        return redirect(url_for('rgz_books.books_list'))  # Только администратор может добавлять книги
+        flash('Ошибка: Только администратор может добавлять книги.', 'error')
+        return redirect(url_for('rgz_books.books_list'))
 
     if request.method == 'POST':
         title = request.form.get('title')
@@ -118,7 +118,8 @@ def add_book():
         # Валидация данных книги
         is_valid, error_message = is_valid_book_data(title, author, pages, publisher)
         if not is_valid:
-            return render_template('rgz/add_book.html', error=error_message)
+            flash(f'Ошибка: {error_message}', 'error')
+            return render_template('rgz/add_book.html')
 
         # Сохранение обложки (если передана)
         cover_image_path = None
@@ -127,7 +128,7 @@ def add_book():
             cover_image_path = os.path.join('static', 'rgz', 'covers', filename)
             cover_image.save(cover_image_path)
 
-        # Добавление книги в базу данных
+        # Добавление книги
         new_book = rgz_books(
             title=title,
             author=author,
@@ -138,7 +139,7 @@ def add_book():
         )
         db.session.add(new_book)
         db.session.commit()
-        flash('Книга успешно добавлена.')
+        flash('Книга успешно добавлена!', 'success')
         return redirect(url_for('rgz_books.books_list'))
 
     return render_template('rgz/add_book.html')
@@ -165,9 +166,10 @@ def delete_book(book_id):
 @login_required
 def edit_book(book_id):
     if not current_user.is_admin:
-        return redirect(url_for('rgz_books.books_list'))  # Только администратор может редактировать книги
+        flash('Ошибка: Только администратор может редактировать книги.', 'error')
+        return redirect(url_for('rgz_books.books_list'))
 
-    book = db.session.query(rgz_books).get_or_404(book_id)
+    book = rgz_books.query.get_or_404(book_id)
 
     if request.method == 'POST':
         title = request.form.get('title')
@@ -179,7 +181,8 @@ def edit_book(book_id):
         # Валидация данных книги
         is_valid, error_message = is_valid_book_data(title, author, pages, publisher)
         if not is_valid:
-            return render_template('rgz/edit_book.html', book=book, error=error_message)
+            flash(f'Ошибка: {error_message}', 'error')
+            return render_template('rgz/edit_book.html', book=book)
 
         # Обновление данных книги
         book.title = title
@@ -195,7 +198,7 @@ def edit_book(book_id):
             book.cover_image = cover_image_path
 
         db.session.commit()
-        flash('Книга успешно обновлена.')
+        flash('Книга успешно обновлена!', 'success')
         return redirect(url_for('rgz_books.books_list'))
 
     return render_template('rgz/edit_book.html', book=book)
@@ -207,34 +210,34 @@ def register():
         login = request.form.get('login')
         password = request.form.get('password')
 
-        # Валидация данных
+        # Валидация логина
         if not is_valid_login(login):
-            flash('Логин должен содержать только латинские буквы, цифры и знаки препинания, и быть не менее 3 символов.')
+            flash('Ошибка: Логин должен содержать только латинские буквы, цифры и знаки препинания, и быть не менее 3 символов.', 'error')
             return render_template('rgz/register.html')
 
+        # Валидация пароля
         if not is_valid_password(password):
-            flash('Пароль должен содержать только латинские буквы, цифры и знаки препинания, и быть не менее 6 символов.')
+            flash('Ошибка: Пароль должен содержать только латинские буквы, цифры и знаки препинания, и быть не менее 6 символов.', 'error')
             return render_template('rgz/register.html')
 
-        # Проверка на существование пользователя
+        # Проверка существующего пользователя
         user_exists = rgz_users.query.filter_by(login=login).first()
         if user_exists:
-            flash('Пользователь с таким логином уже существует.')
+            flash('Ошибка: Пользователь с таким логином уже существует.', 'error')
             return render_template('rgz/register.html')
 
-        # Создание нового пользователя
+        # Добавление нового пользователя
         new_user = rgz_users(
             login=login,
             password=generate_password_hash(password),
-            is_admin=False  # По умолчанию пользователь не администратор
+            is_admin=False
         )
         db.session.add(new_user)
         db.session.commit()
-        flash('Регистрация прошла успешно! Теперь войдите в свой аккаунт.')
+        flash('Регистрация прошла успешно! Теперь войдите в свой аккаунт.', 'success')
         return redirect(url_for('rgz_books.login'))
 
     return render_template('rgz/register.html')
-
 
 
 # Настраиваем логирование
@@ -252,15 +255,23 @@ def login():
         login = request.form.get('login')
         password = request.form.get('password')
 
-        # Поиск пользователя в таблице rgz_users
+        # Поиск пользователя в базе данных
         user = rgz_users.query.filter_by(login=login).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            app.logger.info(f"Пользователь {user.login} (id: {user.id}) авторизовался через таблицу 'rgz_users'.")
-            flash(f"Вы успешно вошли в систему как {user.login}.")
-            return redirect(url_for('rgz_books.books_list'))
 
-        flash('Неверный логин или пароль.')
+        if not user:
+            flash('Ошибка: Пользователь с таким логином не найден.', 'error')
+            return render_template('rgz/login.html')
+
+        if not check_password_hash(user.password, password):
+            flash('Ошибка: Неверный пароль.', 'error')
+            return render_template('rgz/login.html')
+
+        # Авторизация пользователя
+        login_user(user)
+        app.logger.info(f"Пользователь {user.login} (id: {user.id}) авторизовался через таблицу 'rgz_users'.")
+        flash(f"Добро пожаловать, {user.login}!", 'success')
+        return redirect(url_for('rgz_books.books_list'))
+
     return render_template('rgz/login.html')
 
 
