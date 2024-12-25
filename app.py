@@ -60,8 +60,8 @@ login_manager.init_app(app)
 
 # Функция загрузки пользователя по его ID
 @login_manager.user_loader
-def load_user(login_id):
-    return users.query.get(int(login_id))  # Возвращаем пользователя по его ID из базы данных
+def load_user(user_id):
+    return rgz_users.query.get(int(user_id))  # Возвращаем пользователя по его ID из базы данных
 
 # Настройка секретного ключа приложения
 # Используем значение из переменной окружения или задаём дефолтный ключ
