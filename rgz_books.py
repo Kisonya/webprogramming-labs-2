@@ -169,7 +169,7 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             flash('Вы успешно вошли в систему.')
-            return redirect(url_for('rgz_books_bp.books_list'))
+            return redirect(url_for('rgz_books.books_list'))
 
         flash('Неверный логин или пароль.')
         return render_template('rgz/login.html')
