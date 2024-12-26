@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
 import sqlite3
 import psycopg2
@@ -123,25 +123,13 @@ def get_films():
 # REST API — Получение фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
 def get_film(id):
-    print(f"DEBUG: Попытка получить фильм с ID {id}")  # Лог для отладки
-
     conn, cur = db_connect()
-    db_type = os.environ.get('DB_TYPE', 'postgres')
-
-    if db_type == 'postgres':
-        cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
-    else:
-        cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
-
+    cur.execute("SELECT * FROM films WHERE id = ?", (id,))
     film = cur.fetchone()
     conn.close()
-
     if not film:
-        print(f"DEBUG: Фильм с ID {id} не найден")  # Лог для отладки
-        return {"error": "Фильм с указанным ID не найден"}, 404
-
-    print(f"DEBUG: Фильм с ID {id} найден: {film}")  # Лог для отладки
-    return dict(film)
+        return jsonify({"error": "Фильм с указанным ID не найден"}), 404
+    return jsonify(dict(film))
 
 
 # REST API — Добавление фильма
@@ -230,30 +218,13 @@ def put_film(id):
 
 
 # REST API — Удаление фильма по ID
-@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+@lab7.route('/lab7/rest-api/films/<int:id>/', methods=['DELETE'])
 def delete_film(id):
-    print(f"DEBUG: Попытка удалить фильм с ID {id}")  # Лог для отладки
-
     conn, cur = db_connect()
-    db_type = os.environ.get('DB_TYPE', 'postgres')
-
-    if db_type == 'postgres':
-        cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
-        deleted = cur.fetchone()
-    else:
-        cur.execute("DELETE FROM films WHERE id = ?;", (id,))
-        conn.commit()
-        cur.execute("SELECT * FROM films WHERE id = ?", (id,))
-        deleted = cur.fetchone()
-
+    cur.execute("DELETE FROM films WHERE id = ?", (id,))
+    conn.commit()
     conn.close()
-
-    if not deleted:
-        print(f"DEBUG: Фильм с ID {id} не найден")  # Лог для отладки
-        return {"error": "Фильм с указанным ID не найден"}, 404
-
-    print(f"DEBUG: Фильм с ID {id} успешно удалён")  # Лог для отладки
-    return '', 204  # Успешное удаление
+    return jsonify({"message": "Фильм успешно удален"}), 204
 
 
 # Альтернативный маршрут для метода POST (удаление через _method: DELETE)

@@ -49,18 +49,16 @@ function fillFilmList() {
 function deleteFilm(id, title) {
     if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) return;
 
-    fetch(`/lab7/rest-api/films/${id}`, {
-        method: 'DELETE', // Используем правильный HTTP-метод
+    fetch(`/lab7/rest-api/films/${id}/`, {
+        method: 'DELETE',
     })
-        .then((response) => {
-            if (response.ok) {
-                alert(`Фильм "${title}" успешно удалён`);
-                fillFilmList(); // Обновляем список фильмов
-            } else {
-                throw new Error(`Ошибка при удалении фильма: ${response.status}`);
-            }
-        })
-        .catch((err) => alert(`Ошибка при удалении фильма: ${err}`));
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Ошибка при удалении фильма: ${response.status}`);
+        }
+        fillFilmList();
+    })
+    .catch(err => alert(err));
 }
 
 
@@ -96,11 +94,13 @@ function addFilm() {
 
 function editFilm(id) {
     fetch(`/lab7/rest-api/films/${id}/`)
-        .then((response) => {
-            if (!response.ok) throw new Error(`Ошибка при получении фильма: ${response.status}`);
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Ошибка при получении фильма: ${response.status}`);
+            }
             return response.json();
         })
-        .then((film) => {
+        .then(film => {
             document.getElementById('id').value = film.id;
             document.getElementById('title').value = film.title;
             document.getElementById('title-ru').value = film.title_ru;
@@ -108,7 +108,7 @@ function editFilm(id) {
             document.getElementById('description').value = film.description;
             showModal();
         })
-        .catch((err) => alert(`Ошибка при получении фильма: ${err}`));
+        .catch(err => alert(err));
 }
 
 
