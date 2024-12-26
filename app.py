@@ -39,15 +39,14 @@ def load_user(user_id):
         if user:
             print(f"DEBUG: Загрузили пользователя {user.login} из таблицы 'users'")
         return user
-    return None
-
+    return None  # Если маршрут не RGZ и не Lab8
 
 # Обработка неавторизованного доступа
 @login_manager.unauthorized_handler
 def handle_unauthorized():
     # Если пользователь пытается получить доступ к RGZ
     if request.path.startswith('/rgz'):
-        return redirect(url_for('rgz_books_bp.login'))  # Вход для RGZ
+        return redirect(url_for('rgz_books.login'))  # Вход для RGZ
 
     # Если пользователь пытается получить доступ к Lab8
     elif request.path.startswith('/lab8'):
@@ -56,12 +55,8 @@ def handle_unauthorized():
     # Если маршрут не относится к Lab8 или RGZ
     return "Unauthorized access", 401
 
+# Инициализация LoginManager
 login_manager.init_app(app)
-
-# Функция загрузки пользователя по его ID
-@login_manager.user_loader
-def load_user(user_id):
-    return rgz_users.query.get(int(user_id))  # Возвращаем пользователя по его ID из базы данных
 
 # Настройка секретного ключа приложения
 # Используем значение из переменной окружения или задаём дефолтный ключ
