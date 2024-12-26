@@ -67,6 +67,15 @@ def set_session_cookie():
     elif request.path.startswith('/lab8'):
         app.config['SESSION_COOKIE_NAME'] = 'lab8_session'
 
+# Обработка неавторизованного доступа
+@login_manager.unauthorized_handler
+def handle_unauthorized():
+    if request.path.startswith('/rgz'):
+        return redirect(url_for('rgz_books.login'))
+    elif request.path.startswith('/lab8'):
+        return redirect(url_for('lab8.login'))
+    return redirect('/')
+
 # Настройка секретного ключа приложения
 # Используем значение из переменной окружения или задаём дефолтный ключ
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key').encode('utf-8').decode('latin1')
