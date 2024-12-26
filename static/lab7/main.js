@@ -49,20 +49,21 @@ function fillFilmList() {
 function deleteFilm(id, title) {
     if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) return;
 
-    console.log(`Запрос на удаление фильма с ID: ${id}, Название: "${title}"`);
-
-    fetch(`/lab7/rest-api/films/${id}`, {
-        method: 'DELETE', // Используется HTTP-метод DELETE
+    fetch(`/lab7/rest-api/films/${id}/`, {
+        method: 'DELETE', // Указываем метод DELETE
+        headers: { 'Content-Type': 'application/json' }
     })
         .then(response => {
-            if (!response.ok) throw new Error(`Ошибка при удалении фильма: ${response.status}`);
-            console.log(`Фильм с ID ${id} успешно удалён.`);
+            if (!response.ok) {
+                throw new Error(`Ошибка при удалении фильма: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log(result.message); // Логируем сообщение об успешном удалении
             fillFilmList(); // Обновляем список фильмов
         })
-        .catch(err => {
-            console.error(`Ошибка при удалении фильма с ID ${id}:`, err);
-            alert(`Ошибка при удалении фильма: ${err.message}`);
-        });
+        .catch(err => alert(`Ошибка при удалении фильма: ${err}`));
 }
 
 
@@ -97,28 +98,23 @@ function addFilm() {
 }
 
 function editFilm(id) {
-    console.log(`Запрос на получение данных фильма с ID: ${id}`);
-
-    fetch(`/lab7/rest-api/films/${id}`) // Убедитесь, что маршрут без завершающего "/"
+    fetch(`/lab7/rest-api/films/${id}/`) // Используем метод GET
         .then(response => {
-            if (!response.ok) throw new Error(`Ошибка при получении фильма: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Ошибка при получении фильма: ${response.status}`);
+            }
             return response.json();
         })
         .then(film => {
-            console.log(`Данные фильма получены:`, film);
-
-            // Заполняем модальное окно данными фильма
+            // Заполняем данные в модальное окно
             document.getElementById('id').value = film.id;
-            document.getElementById('title').value = film.title;
-            document.getElementById('title-ru').value = film.title_ru;
-            document.getElementById('year').value = film.year;
-            document.getElementById('description').value = film.description;
+            document.getElementById('title').value = film.title || '';
+            document.getElementById('title-ru').value = film.title_ru || '';
+            document.getElementById('year').value = film.year || '';
+            document.getElementById('description').value = film.description || '';
             showModal();
         })
-        .catch(err => {
-            console.error(`Ошибка при запросе фильма с ID ${id}:`, err);
-            alert(`Ошибка при получении фильма: ${err.message}`);
-        });
+        .catch(err => alert(`Ошибка при получении фильма: ${err}`));
 }
 
 
