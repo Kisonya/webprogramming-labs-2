@@ -49,21 +49,18 @@ function fillFilmList() {
 function deleteFilm(id, title) {
     if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) return;
 
-    fetch(`/lab7/rest-api/films/${id}/`, {
-        method: 'DELETE', // Указываем метод DELETE
-        headers: { 'Content-Type': 'application/json' }
+    fetch(`/lab7/rest-api/films/${id}`, {
+        method: 'DELETE', // Используем правильный HTTP-метод
     })
-        .then(response => {
-            if (!response.ok) {
+        .then((response) => {
+            if (response.ok) {
+                alert(`Фильм "${title}" успешно удалён`);
+                fillFilmList(); // Обновляем список фильмов
+            } else {
                 throw new Error(`Ошибка при удалении фильма: ${response.status}`);
             }
-            return response.json();
         })
-        .then(result => {
-            console.log(result.message); // Логируем сообщение об успешном удалении
-            fillFilmList(); // Обновляем список фильмов
-        })
-        .catch(err => alert(`Ошибка при удалении фильма: ${err}`));
+        .catch((err) => alert(`Ошибка при удалении фильма: ${err}`));
 }
 
 
@@ -98,23 +95,20 @@ function addFilm() {
 }
 
 function editFilm(id) {
-    fetch(`/lab7/rest-api/films/${id}/`) // Используем метод GET
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Ошибка при получении фильма: ${response.status}`);
-            }
+    fetch(`/lab7/rest-api/films/${id}/`)
+        .then((response) => {
+            if (!response.ok) throw new Error(`Ошибка при получении фильма: ${response.status}`);
             return response.json();
         })
-        .then(film => {
-            // Заполняем данные в модальное окно
+        .then((film) => {
             document.getElementById('id').value = film.id;
-            document.getElementById('title').value = film.title || '';
-            document.getElementById('title-ru').value = film.title_ru || '';
-            document.getElementById('year').value = film.year || '';
-            document.getElementById('description').value = film.description || '';
+            document.getElementById('title').value = film.title;
+            document.getElementById('title-ru').value = film.title_ru;
+            document.getElementById('year').value = film.year;
+            document.getElementById('description').value = film.description;
             showModal();
         })
-        .catch(err => alert(`Ошибка при получении фильма: ${err}`));
+        .catch((err) => alert(`Ошибка при получении фильма: ${err}`));
 }
 
 

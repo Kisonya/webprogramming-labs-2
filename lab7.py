@@ -123,25 +123,25 @@ def get_films():
 # REST API — Получение фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
 def get_film(id):
-    try:
-        conn, cur = db_connect()
-        db_type = os.environ.get('DB_TYPE', 'postgres')
-        if db_type == 'postgres':
-            cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
-        else:
-            cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
+    print(f"DEBUG: Попытка получить фильм с ID {id}")  # Лог для отладки
 
-        film = cur.fetchone()
-        conn.close()
+    conn, cur = db_connect()
+    db_type = os.environ.get('DB_TYPE', 'postgres')
 
-        if not film:
-            return {"error": "Фильм с указанным ID не найден"}, 404
+    if db_type == 'postgres':
+        cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
+    else:
+        cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
 
-        return dict(film)
-    except Exception as e:
-        print(f"Ошибка при получении фильма: {e}")
-        return {"error": f"Ошибка при получении фильма: {e}"}, 500
+    film = cur.fetchone()
+    conn.close()
 
+    if not film:
+        print(f"DEBUG: Фильм с ID {id} не найден")  # Лог для отладки
+        return {"error": "Фильм с указанным ID не найден"}, 404
+
+    print(f"DEBUG: Фильм с ID {id} найден: {film}")  # Лог для отладки
+    return dict(film)
 
 
 # REST API — Добавление фильма
@@ -230,40 +230,35 @@ def put_film(id):
 
 
 # REST API — Удаление фильма по ID
-@lab7.route('/lab7/rest-api/films/<int:id>/', methods=['DELETE'])
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
 def delete_film(id):
-    try:
-        # Подключаемся к базе данных
-        conn, cur = db_connect()
-        db_type = os.environ.get('DB_TYPE', 'postgres')
+    print(f"DEBUG: Попытка удалить фильм с ID {id}")  # Лог для отладки
 
-        # Удаляем фильм
-        if db_type == 'postgres':
-            cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
-            deleted = cur.fetchone()
-        else:
-            cur.execute("DELETE FROM films WHERE id = ?;", (id,))
-            conn.commit()
-            cur.execute("SELECT * FROM films WHERE id = ?", (id,))
-            deleted = cur.fetchone()
+    conn, cur = db_connect()
+    db_type = os.environ.get('DB_TYPE', 'postgres')
 
-        conn.close()
+    if db_type == 'postgres':
+        cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
+        deleted = cur.fetchone()
+    else:
+        cur.execute("DELETE FROM films WHERE id = ?;", (id,))
+        conn.commit()
+        cur.execute("SELECT * FROM films WHERE id = ?", (id,))
+        deleted = cur.fetchone()
 
-        if not deleted:
-            return {"error": "Фильм с указанным ID не найден"}, 404
+    conn.close()
 
-        return {"message": f"Фильм с ID {id} успешно удален"}, 200
-    except Exception as e:
-        print(f"Ошибка при удалении фильма: {e}")
-        return {"error": f"Ошибка при удалении фильма: {e}"}, 500
+    if not deleted:
+        print(f"DEBUG: Фильм с ID {id} не найден")  # Лог для отладки
+        return {"error": "Фильм с указанным ID не найден"}, 404
 
+    print(f"DEBUG: Фильм с ID {id} успешно удалён")  # Лог для отладки
+    return '', 204  # Успешное удаление
 
 
 # Альтернативный маршрут для метода POST (удаление через _method: DELETE)
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['POST'])
 def delete_film_fallback(id):
     if request.json.get('_method') == 'DELETE':
-        print(f"POST запрос для удаления фильма с ID {id} через _method=DELETE.")
-        return delete_film(id)
-    print(f"Ошибка: Неподдерживаемый метод для фильма с ID {id}.")
-    return {"error": "Метод не поддерживается"}, 405
+        return delete_film(id)  # Вызываем основную функцию
+    return {"error": "Некорректный метод запроса"}, 405
