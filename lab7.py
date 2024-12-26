@@ -99,7 +99,6 @@ def main():
     return render_template('lab7/lab7.html', films=films)
 
  
-
 # REST API — Получение всех фильмов
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
 def get_films():
@@ -200,74 +199,61 @@ def put_film(id):
     # Получаем данные фильма из тела запроса в формате JSON
     film = request.get_json()
 
-    # Валидируем данные фильма с использованием функции validate_film
+    # Валидируем данные фильма
     errors = validate_film(film)
-    if errors:  # Если есть ошибки валидации
-        return errors, 400  # Возвращаем ошибки с кодом состояния 400 (Bad Request)
+    if errors:
+        return errors, 400  # Ошибки валидации
 
-    # Устанавливаем соединение с базой данных и создаем курсор
+    # Подключаемся к базе данных
     conn, cur = db_connect()
-
-    # Определяем тип базы данных из переменной окружения (по умолчанию PostgreSQL)
     db_type = os.environ.get('DB_TYPE', 'postgres')
 
-    # Выполняем SQL-запрос для обновления фильма по его ID
-    if db_type == 'postgres':  # Для PostgreSQL
+    # Обновляем фильм
+    if db_type == 'postgres':
         cur.execute("""
-            UPDATE films SET title = %s, title_ru = %s, year = %s, description = %s
+            UPDATE films
+            SET title = %s, title_ru = %s, year = %s, description = %s
             WHERE id = %s RETURNING *;
         """, (film['title'], film['title_ru'], film['year'], film['description'], id))
-    else:  # Для SQLite
+        updated_film = cur.fetchone()
+    else:
         cur.execute("""
-            UPDATE films SET title = ?, title_ru = ?, year = ?, description = ?
+            UPDATE films
+            SET title = ?, title_ru = ?, year = ?, description = ?
             WHERE id = ?;
         """, (film['title'], film['title_ru'], film['year'], film['description'], id))
+        conn.commit()
+        cur.execute("SELECT * FROM films WHERE id = ?", (id,))
+        updated_film = cur.fetchone()
 
-    # Фиксируем изменения в базе данных
-    conn.commit()
-
-    # Извлекаем данные обновленного фильма
-    updated_film = cur.fetchone()
-
-    # Закрываем соединение с базой данных
     conn.close()
 
-    # Если фильм с указанным ID не найден, возвращаем ошибку с кодом 404
     if not updated_film:
         return {"error": "Фильм с указанным ID не найден"}, 404
 
-    # Преобразуем данные фильма в словарь и возвращаем их в формате JSON
     return dict(updated_film)
 
 
 # REST API — Удаление фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
 def delete_film(id):
-    # Устанавливаем соединение с базой данных и создаем курсор
+    # Подключаемся к базе данных
     conn, cur = db_connect()
-
-    # Определяем тип базы данных из переменной окружения (по умолчанию PostgreSQL)
     db_type = os.environ.get('DB_TYPE', 'postgres')
 
-    # Выполняем SQL-запрос для удаления фильма по его ID
-    if db_type == 'postgres':  # Для PostgreSQL
+    # Удаляем фильм
+    if db_type == 'postgres':
         cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
-    else:  # Для SQLite
+        deleted = cur.fetchone()
+    else:
         cur.execute("DELETE FROM films WHERE id = ?;", (id,))
+        conn.commit()
+        cur.execute("SELECT * FROM films WHERE id = ?", (id,))
+        deleted = cur.fetchone()
 
-    # Фиксируем изменения в базе данных
-    conn.commit()
-
-    # Проверяем, была ли удалена запись
-    deleted = cur.fetchone()
-
-    # Закрываем соединение с базой данных
     conn.close()
 
-    # Если фильм с указанным ID не найден, возвращаем ошибку с кодом 404
     if not deleted:
         return {"error": "Фильм с указанным ID не найден"}, 404
 
-    # Если удаление прошло успешно, возвращаем пустой ответ с кодом 204 (No Content)
-    return '', 204
-
+    return '', 204  # Успешное удаление

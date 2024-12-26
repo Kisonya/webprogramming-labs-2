@@ -56,7 +56,15 @@ function deleteFilm(id, title) {
 
     // Отправляем DELETE-запрос на сервер для удаления фильма по его ID
     fetch(`/lab7/rest-api/films/${id}`, { method: 'DELETE' })
-        .then(() => fillFilmList()); // После успешного удаления обновляем список фильмов
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Ошибка удаления фильма: ${response.status}`);
+            }
+            fillFilmList(); // После успешного удаления обновляем список фильмов
+        })
+        .catch(error => {
+            alert(`Ошибка при удалении фильма: ${error.message}`);
+        });
 }
 
 
@@ -93,7 +101,12 @@ function addFilm() {
 function editFilm(id) {
     // Выполняем запрос к REST API для получения данных фильма по ID
     fetch(`/lab7/rest-api/films/${id}`)
-        .then(response => response.json()) // Преобразуем ответ в JSON
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Ошибка при получении фильма: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(film => {
             // Заполняем поля модального окна данными полученного фильма
             document.getElementById('id').value = film.id; // Устанавливаем ID фильма
@@ -102,6 +115,9 @@ function editFilm(id) {
             document.getElementById('year').value = film.year; // Устанавливаем год выпуска
             document.getElementById('description').value = film.description; // Устанавливаем описание
             showModal(); // Отображаем модальное окно
+        })
+        .catch(error => {
+            alert(`Ошибка при редактировании фильма: ${error.message}`);
         });
 }
 
