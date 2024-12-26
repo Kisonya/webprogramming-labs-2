@@ -1,51 +1,47 @@
 function fillFilmList() {
-    // Отправляем GET-запрос на сервер для получения списка фильмов
+    console.log("Запрос на получение списка фильмов...");
+
     fetch('/lab7/rest-api/films/')
-        .then(response => response.json()) // Преобразуем ответ сервера в JSON
+        .then(response => {
+            if (!response.ok) throw new Error(`Ошибка при получении списка фильмов: ${response.status}`);
+            return response.json();
+        })
         .then(films => {
-            // Получаем элемент таблицы, где будет отображён список фильмов
+            console.log(`Список фильмов успешно получен:`, films);
+
             let tbody = document.getElementById('film-list');
-            tbody.innerHTML = ''; // Очищаем таблицу перед добавлением новых данных
+            tbody.innerHTML = '';
 
-            // Обрабатываем каждый фильм из полученного массива
-            films.forEach((film, i) => {
-                let tr = document.createElement('tr'); // Создаём строку таблицы для каждого фильма
+            films.forEach(film => {
+                let tr = document.createElement('tr');
 
-                // Создаём ячейки для русского названия, названия на английском, года и действий
-                let tdTitleRus = document.createElement('td'); // Ячейка для русского названия
-                let tdTitle = document.createElement('td');    // Ячейка для английского названия
-                let tdYear = document.createElement('td');     // Ячейка для года выпуска
-                let tdActions = document.createElement('td');  // Ячейка для кнопок действий
+                let tdTitleRus = document.createElement('td');
+                let tdTitle = document.createElement('td');
+                let tdYear = document.createElement('td');
+                let tdActions = document.createElement('td');
 
-                // Заполняем ячейку русского названия
                 tdTitleRus.innerText = film.title_ru;
-
-                // Если английское название есть, добавляем его в ячейку с курсивом, иначе оставляем пустым
                 tdTitle.innerHTML = film.title ? `<i>(${film.title})</i>` : '';
-
-                // Заполняем ячейку с годом выпуска фильма
                 tdYear.innerText = film.year;
 
-                // Создаём кнопку для редактирования фильма
                 let editButton = document.createElement('button');
-                editButton.innerText = 'редактировать'; // Текст кнопки
-                editButton.onclick = () => editFilm(film.id); // Привязываем функцию редактирования к кнопке
+                editButton.innerText = 'редактировать';
+                editButton.onclick = () => editFilm(film.id);
 
-                // Создаём кнопку для удаления фильма
                 let delButton = document.createElement('button');
-                delButton.innerText = 'Удалить'; // Текст кнопки
-                delButton.onclick = () => deleteFilm(film.id, film.title_ru); // Привязываем функцию удаления к кнопке
+                delButton.innerText = 'Удалить';
+                delButton.onclick = () => deleteFilm(film.id, film.title_ru);
 
-                // Добавляем кнопки действий в ячейку
                 tdActions.append(editButton);
                 tdActions.append(delButton);
 
-                // Добавляем все ячейки в строку таблицы
                 tr.append(tdTitleRus, tdTitle, tdYear, tdActions);
-
-                // Добавляем строку в таблицу
                 tbody.append(tr);
             });
+        })
+        .catch(err => {
+            console.error("Ошибка при получении списка фильмов:", err);
+            alert(`Ошибка при получении списка фильмов: ${err.message}`);
         });
 }
 
@@ -53,13 +49,20 @@ function fillFilmList() {
 function deleteFilm(id, title) {
     if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) return;
 
+    console.log(`Запрос на удаление фильма с ID: ${id}, Название: "${title}"`);
+
     fetch(`/lab7/rest-api/films/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ _method: 'DELETE' }) // Указываем метод
+        method: 'DELETE', // Используется HTTP-метод DELETE
     })
-    .then(() => fillFilmList())
-    .catch(err => alert(`Ошибка при удалении фильма: ${err}`));
+        .then(response => {
+            if (!response.ok) throw new Error(`Ошибка при удалении фильма: ${response.status}`);
+            console.log(`Фильм с ID ${id} успешно удалён.`);
+            fillFilmList(); // Обновляем список фильмов
+        })
+        .catch(err => {
+            console.error(`Ошибка при удалении фильма с ID ${id}:`, err);
+            alert(`Ошибка при удалении фильма: ${err.message}`);
+        });
 }
 
 
@@ -94,12 +97,17 @@ function addFilm() {
 }
 
 function editFilm(id) {
-    fetch(`/lab7/rest-api/films/${id}/`) // Добавьте слеш в конце, если требуется
+    console.log(`Запрос на получение данных фильма с ID: ${id}`);
+
+    fetch(`/lab7/rest-api/films/${id}`) // Убедитесь, что маршрут без завершающего "/"
         .then(response => {
             if (!response.ok) throw new Error(`Ошибка при получении фильма: ${response.status}`);
             return response.json();
         })
         .then(film => {
+            console.log(`Данные фильма получены:`, film);
+
+            // Заполняем модальное окно данными фильма
             document.getElementById('id').value = film.id;
             document.getElementById('title').value = film.title;
             document.getElementById('title-ru').value = film.title_ru;
@@ -107,7 +115,10 @@ function editFilm(id) {
             document.getElementById('description').value = film.description;
             showModal();
         })
-        .catch(err => alert(err));
+        .catch(err => {
+            console.error(`Ошибка при запросе фильма с ID ${id}:`, err);
+            alert(`Ошибка при получении фильма: ${err.message}`);
+        });
 }
 
 

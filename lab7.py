@@ -229,11 +229,12 @@ def put_film(id):
 # REST API — Удаление фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
 def delete_film(id):
-    # Подключаемся к базе данных
     conn, cur = db_connect()
-    db_type = os.environ.get('DB_TYPE', 'postgres')
 
-    # Удаляем фильм
+    # Логируем входящий запрос
+    print(f"DELETE запрос: удаление фильма с ID {id}")
+
+    db_type = os.environ.get('DB_TYPE', 'postgres')
     if db_type == 'postgres':
         cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
         deleted = cur.fetchone()
@@ -246,14 +247,18 @@ def delete_film(id):
     conn.close()
 
     if not deleted:
+        print(f"Ошибка: Фильм с ID {id} не найден.")
         return {"error": "Фильм с указанным ID не найден"}, 404
 
-    return '', 204  # Успешное удаление
+    print(f"Фильм с ID {id} успешно удалён.")
+    return '', 204
 
 
+# Альтернативный маршрут для метода POST (удаление через _method: DELETE)
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['POST'])
 def delete_film_fallback(id):
     if request.json.get('_method') == 'DELETE':
-        # Код для удаления фильма
-        ...
-    return '', 204
+        print(f"POST запрос для удаления фильма с ID {id} через _method=DELETE.")
+        return delete_film(id)
+    print(f"Ошибка: Неподдерживаемый метод для фильма с ID {id}.")
+    return {"error": "Метод не поддерживается"}, 405
