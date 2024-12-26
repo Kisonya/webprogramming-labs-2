@@ -167,26 +167,28 @@ def add_film():
     # Определяем тип базы данных из переменной окружения (по умолчанию PostgreSQL)
     db_type = os.environ.get('DB_TYPE', 'postgres')
 
-    # Выполняем SQL-запрос для добавления нового фильма в таблицу
     if db_type == 'postgres':  # Для PostgreSQL
         cur.execute("""
             INSERT INTO films (title, title_ru, year, description)
             VALUES (%s, %s, %s, %s) RETURNING *;
         """, (film['title'], film['title_ru'], film['year'], film['description']))
+        new_film = cur.fetchone()  # Извлекаем данные добавленного фильма
     else:  # Для SQLite
         cur.execute("""
             INSERT INTO films (title, title_ru, year, description)
             VALUES (?, ?, ?, ?);
         """, (film['title'], film['title_ru'], film['year'], film['description']))
-
-    # Фиксируем изменения в базе данных
-    conn.commit()
-
-    # Извлекаем данные добавленного фильма
-    new_film = cur.fetchone()
+        conn.commit()  # Подтверждаем изменения в базе данных
+        # Выполняем запрос, чтобы получить данные последней добавленной записи
+        cur.execute("SELECT * FROM films ORDER BY id DESC LIMIT 1;")
+        new_film = cur.fetchone()  # Извлекаем данные добавленного фильма
 
     # Закрываем соединение с базой данных
     conn.close()
+
+    # Проверяем, успешно ли был добавлен фильм
+    if not new_film:
+        return {"error": "Ошибка добавления фильма в базу данных"}, 500
 
     # Возвращаем данные добавленного фильма в формате JSON с кодом состояния 201 (Created)
     return dict(new_film), 201
