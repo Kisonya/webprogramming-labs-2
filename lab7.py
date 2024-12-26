@@ -123,21 +123,24 @@ def get_films():
 # REST API — Получение фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
 def get_film(id):
-    conn, cur = db_connect()
+    try:
+        conn, cur = db_connect()
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
+            cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
+        else:
+            cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
 
-    db_type = os.environ.get('DB_TYPE', 'postgres')
-    if db_type == 'postgres':
-        cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
-    else:
-        cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
+        film = cur.fetchone()
+        conn.close()
 
-    film = cur.fetchone()
-    conn.close()
+        if not film:
+            return {"error": "Фильм с указанным ID не найден"}, 404
 
-    if not film:
-        return {"error": "Фильм с указанным ID не найден"}, 404
-
-    return dict(film)
+        return dict(film)
+    except Exception as e:
+        print(f"Ошибка при получении фильма: {e}")
+        return {"error": f"Ошибка при получении фильма: {e}"}, 500
 
 
 
@@ -227,31 +230,33 @@ def put_film(id):
 
 
 # REST API — Удаление фильма по ID
-@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+@lab7.route('/lab7/rest-api/films/<int:id>/', methods=['DELETE'])
 def delete_film(id):
-    conn, cur = db_connect()
+    try:
+        # Подключаемся к базе данных
+        conn, cur = db_connect()
+        db_type = os.environ.get('DB_TYPE', 'postgres')
 
-    # Логируем входящий запрос
-    print(f"DELETE запрос: удаление фильма с ID {id}")
+        # Удаляем фильм
+        if db_type == 'postgres':
+            cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
+            deleted = cur.fetchone()
+        else:
+            cur.execute("DELETE FROM films WHERE id = ?;", (id,))
+            conn.commit()
+            cur.execute("SELECT * FROM films WHERE id = ?", (id,))
+            deleted = cur.fetchone()
 
-    db_type = os.environ.get('DB_TYPE', 'postgres')
-    if db_type == 'postgres':
-        cur.execute("DELETE FROM films WHERE id = %s RETURNING id;", (id,))
-        deleted = cur.fetchone()
-    else:
-        cur.execute("DELETE FROM films WHERE id = ?;", (id,))
-        conn.commit()
-        cur.execute("SELECT * FROM films WHERE id = ?", (id,))
-        deleted = cur.fetchone()
+        conn.close()
 
-    conn.close()
+        if not deleted:
+            return {"error": "Фильм с указанным ID не найден"}, 404
 
-    if not deleted:
-        print(f"Ошибка: Фильм с ID {id} не найден.")
-        return {"error": "Фильм с указанным ID не найден"}, 404
+        return {"message": f"Фильм с ID {id} успешно удален"}, 200
+    except Exception as e:
+        print(f"Ошибка при удалении фильма: {e}")
+        return {"error": f"Ошибка при удалении фильма: {e}"}, 500
 
-    print(f"Фильм с ID {id} успешно удалён.")
-    return '', 204
 
 
 # Альтернативный маршрут для метода POST (удаление через _method: DELETE)
