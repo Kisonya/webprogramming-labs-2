@@ -123,30 +123,22 @@ def get_films():
 # REST API — Получение фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>/', methods=['GET'])
 def get_film(id):
-    # Устанавливаем соединение с базой данных и создаем курсор
     conn, cur = db_connect()
 
-    # Определяем тип базы данных из переменной окружения (по умолчанию PostgreSQL)
     db_type = os.environ.get('DB_TYPE', 'postgres')
-
-    # Выполняем запрос для получения фильма по его ID в зависимости от типа базы данных
-    if db_type == 'postgres':  # Для PostgreSQL
+    if db_type == 'postgres':
         cur.execute("SELECT * FROM films WHERE id = %s;", (id,))
-    else:  # Для SQLite
+    else:
         cur.execute("SELECT * FROM films WHERE id = ?;", (id,))
 
-    # Извлекаем первую (и единственную) запись из результата запроса
     film = cur.fetchone()
-
-    # Закрываем соединение с базой данных
     conn.close()
 
-    # Если фильм не найден, возвращаем JSON-ответ с ошибкой и статусом 404
     if not film:
         return {"error": "Фильм с указанным ID не найден"}, 404
 
-    # Преобразуем данные фильма в словарь и возвращаем их в формате JSON
     return dict(film)
+
 
 
 # REST API — Добавление фильма
@@ -257,3 +249,11 @@ def delete_film(id):
         return {"error": "Фильм с указанным ID не найден"}, 404
 
     return '', 204  # Успешное удаление
+
+
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['POST'])
+def delete_film_fallback(id):
+    if request.json.get('_method') == 'DELETE':
+        # Код для удаления фильма
+        ...
+    return '', 204

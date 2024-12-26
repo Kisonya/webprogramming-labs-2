@@ -51,20 +51,15 @@ function fillFilmList() {
 
 
 function deleteFilm(id, title) {
-    // Показываем пользователю диалоговое окно для подтверждения удаления
-    if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) return; // Если пользователь отменяет, ничего не делаем
+    if (!confirm(`Вы точно хотите удалить фильм "${title}"?`)) return;
 
-    // Отправляем DELETE-запрос на сервер для удаления фильма по его ID
-    fetch(`/lab7/rest-api/films/${id}`, { method: 'DELETE' })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Ошибка удаления фильма: ${response.status}`);
-            }
-            fillFilmList(); // После успешного удаления обновляем список фильмов
-        })
-        .catch(error => {
-            alert(`Ошибка при удалении фильма: ${error.message}`);
-        });
+    fetch(`/lab7/rest-api/films/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ _method: 'DELETE' }) // Указываем метод
+    })
+    .then(() => fillFilmList())
+    .catch(err => alert(`Ошибка при удалении фильма: ${err}`));
 }
 
 
@@ -99,26 +94,20 @@ function addFilm() {
 }
 
 function editFilm(id) {
-    // Выполняем запрос к REST API для получения данных фильма по ID
-    fetch(`/lab7/rest-api/films/${id}`)
+    fetch(`/lab7/rest-api/films/${id}/`) // Добавьте слеш в конце, если требуется
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`Ошибка при получении фильма: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`Ошибка при получении фильма: ${response.status}`);
             return response.json();
         })
         .then(film => {
-            // Заполняем поля модального окна данными полученного фильма
-            document.getElementById('id').value = film.id; // Устанавливаем ID фильма
-            document.getElementById('title').value = film.title; // Устанавливаем английское название
-            document.getElementById('title-ru').value = film.title_ru; // Устанавливаем русское название
-            document.getElementById('year').value = film.year; // Устанавливаем год выпуска
-            document.getElementById('description').value = film.description; // Устанавливаем описание
-            showModal(); // Отображаем модальное окно
+            document.getElementById('id').value = film.id;
+            document.getElementById('title').value = film.title;
+            document.getElementById('title-ru').value = film.title_ru;
+            document.getElementById('year').value = film.year;
+            document.getElementById('description').value = film.description;
+            showModal();
         })
-        .catch(error => {
-            alert(`Ошибка при редактировании фильма: ${error.message}`);
-        });
+        .catch(err => alert(err));
 }
 
 
