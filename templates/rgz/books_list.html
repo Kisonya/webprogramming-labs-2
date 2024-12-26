@@ -5,77 +5,35 @@
 {% block main %}
 {% include 'rgz/errors.html' %}
 
-<header style="display: flex; justify-content: flex-end; padding: 10px; margin-bottom: 20px;">
-    <nav>
-        <ul style="list-style: none; margin: 0; padding: 0; display: flex; gap: 15px;">
-            {% if current_user.is_authenticated %}
-                <li>
-                    {% if current_user.is_admin %}
-                        <span style="color: red; font-weight: bold;">Админ: {{ current_user.login }}</span>
-                    {% else %}
-                        Привет, {{ current_user.login }}!
-                    {% endif %}
-                </li>
-                <li><a href="{{ url_for('rgz_books.logout') }}" style="text-decoration: none;">Выйти</a></li>
-                {% if current_user.is_admin %}
-                    <li><a href="{{ url_for('rgz_books.add_book') }}" style="text-decoration: none;">Добавить книгу</a></li>
-                {% endif %}
-                <li>
-                    <form action="{{ url_for('rgz_books.delete_account') }}" method="post" style="display: inline;">
-                        <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                            Удалить аккаунт
-                        </button>
-                    </form>
-                </li>
-            {% else %}
-                <li><a href="{{ url_for('rgz_books.login') }}" style="text-decoration: none;">Войти</a></li>
-                <li><a href="{{ url_for('rgz_books.register') }}" style="text-decoration: none;">Регистрация</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+<header style="background-color: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #ccc;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="margin: 0;">Список книг</h1>
+        <form method="get" action="{{ url_for('rgz_books.books_list') }}" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" name="author" value="{{ request.args.get('author', '') }}" placeholder="Автор" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="text" name="publisher" value="{{ request.args.get('publisher', '') }}" placeholder="Издательство" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="number" name="pages_min" value="{{ request.args.get('pages_min', '') }}" placeholder="Страницы (от)" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="number" name="pages_max" value="{{ request.args.get('pages_max', '') }}" placeholder="Страницы (до)" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <select name="sort_by" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="" {% if not request.args.get('sort_by') %}selected{% endif %}>Без сортировки</option>
+                <option value="title" {% if request.args.get('sort_by') == 'title' %}selected{% endif %}>Название</option>
+                <option value="author" {% if request.args.get('sort_by') == 'author' %}selected{% endif %}>Автор</option>
+                <option value="pages" {% if request.args.get('sort_by') == 'pages' %}selected{% endif %}>Количество страниц</option>
+                <option value="publisher" {% if request.args.get('sort_by') == 'publisher' %}selected{% endif %}>Издательство</option>
+            </select>
+            <button type="submit" style="padding: 5px 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
+            <a href="{{ url_for('rgz_books.books_list') }}" style="padding: 5px 10px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; text-decoration: none; cursor: pointer;">Сбросить</a>
+        </form>
+    </div>
 </header>
-
-<h1>Список книг</h1>
-
-<form method="get" action="{{ url_for('rgz_books.books_list') }}" style="margin-bottom: 20px; display: flex; gap: 10px;">
-    <label>
-        Автор:
-        <input type="text" name="author" value="{{ request.args.get('author', '') }}" placeholder="Введите автора">
-    </label>
-    <label>
-        Издательство:
-        <input type="text" name="publisher" value="{{ request.args.get('publisher', '') }}" placeholder="Введите издательство">
-    </label>
-    <label>
-        Страницы (от):
-        <input type="number" name="pages_min" value="{{ request.args.get('pages_min', '') }}" placeholder="Мин">
-    </label>
-    <label>
-        Страницы (до):
-        <input type="number" name="pages_max" value="{{ request.args.get('pages_max', '') }}" placeholder="Макс">
-    </label>
-    <label>
-        Сортировать по:
-        <select name="sort_by" style="padding: 5px;">
-            <option value="" {% if not request.args.get('sort_by') %}selected{% endif %}>Без сортировки</option>
-            <option value="title" {% if request.args.get('sort_by') == 'title' %}selected{% endif %}>Название</option>
-            <option value="author" {% if request.args.get('sort_by') == 'author' %}selected{% endif %}>Автор</option>
-            <option value="pages" {% if request.args.get('sort_by') == 'pages' %}selected{% endif %}>Количество страниц</option>
-            <option value="publisher" {% if request.args.get('sort_by') == 'publisher' %}selected{% endif %}>Издательство</option>
-        </select>
-    </label>
-    <button type="submit" style="padding: 5px 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Применить</button>
-    <a href="{{ url_for('rgz_books.books_list') }}" style="padding: 5px 10px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; text-decoration: none; cursor: pointer;">Сбросить</a>
-</form>
 
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; padding: 20px;">
     {% for book in books.items %}
-    <div style="border: 1px solid #ccc; border-radius: 10px; width: 200px; padding: 15px; text-align: center; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; justify-content: space-between; height: 360px; background-color: white;">
+    <div style="border: 1px solid #ccc; border-radius: 10px; width: 200px; padding: 15px; text-align: center; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; justify-content: space-between; height: 400px; background-color: white;">
         <div>
             {% if book.cover_image %}
-            <img src="{{ book.cover_image }}" alt="Обложка книги" style="width: 100%; height: 150px; border-radius: 10px; object-fit: cover;">
+            <img src="{{ book.cover_image }}" alt="Обложка книги" style="width: 150px; height: 250px; margin: 0 auto; display: block; border-radius: 5px; object-fit: cover;">
             {% else %}
-            <div style="width: 100%; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 12px; color: #888;">
+            <div style="width: 150px; height: 250px; margin: 0 auto; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 5px; font-size: 12px; color: #888;">
                 Нет обложки
             </div>
             {% endif %}
