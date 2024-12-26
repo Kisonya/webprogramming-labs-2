@@ -24,6 +24,8 @@ app = Flask(__name__)
 # RGZ LoginManager
 rgz_login_manager = LoginManager()
 rgz_login_manager.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 rgz_login_manager.login_view = 'rgz_books_bp.login'
 
 @rgz_login_manager.user_loader
@@ -31,6 +33,20 @@ def load_rgz_user(user_id):
     from db.models import rgz_users
     return rgz_users.query.get(int(user_id))
 
+@login_manager.user_loader
+def load_user(user_id):
+    """Выбор модели пользователя в зависимости от текущего маршрута."""
+    if request.path.startswith('/rgz'):
+        user = rgz_users.query.get(int(user_id))
+        if user:
+            print(f"DEBUG: Загрузили пользователя {user.login} из таблицы 'rgz_users'")
+        return user
+    elif request.path.startswith('/lab8'):
+        user = users.query.get(int(user_id))
+        if user:
+            print(f"DEBUG: Загрузили пользователя {user.login} из таблицы 'users'")
+        return user
+    return None
 
 # Lab8 LoginManager
 lab8_login_manager = LoginManager()
